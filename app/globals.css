@@ -17,6 +17,9 @@
   --positive: #0f8a5f;
   --tax: #d9822b;
   --danger: #c8372d;
+  --logo-a: #1a3fd1;
+  --logo-b: #3d6bff;
+  --logo-steps: #ffffff;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   color-scheme: light;
@@ -36,6 +39,9 @@
     --positive: #3fcf94;
     --tax: #f0a55a;
     --danger: #ff6b60;
+    --logo-a: #3d6bff;
+    --logo-b: #7fa0ff;
+    --logo-steps: #0b1533;
     color-scheme: dark;
   }
 }
@@ -73,7 +79,6 @@ body {
   font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.5;
-  font-variant-numeric: tabular-nums;
 }
 
 :focus-visible {

@@ -8,6 +8,7 @@ Logo canvas (source designs): https://claude.ai/artifact/U9s7JZgsXz1PS3brW2ba6n
 | File | Use |
 |---|---|
 | `stepkite-mark.svg` | the kite mark alone (header on small screens, social avatars) |
+| `stepkite-logo-dark.svg` | the logo for dark backgrounds (lighter facets, light wordmark). On the site use `components/ui/Logo.tsx`, which switches by itself |
 | `stepkite-logo.svg` | mark + wordmark (site header, emails). The wordmark is live text in Plus Jakarta Sans 800: convert to outlines before print or use outside the site |
 | `stepkite-app-icon.svg` | PWA and app icons (export 192, 512, 180 PNG) |
 | `favicon.svg` | browser tab; steps removed so it reads at 16 and 32px |

@@ -1,26 +1,26 @@
 # DESIGN.md — UI system
 
 Feel: calm, trustworthy, fast. A precise tool, not a marketing site. Numbers are the hero.
-Colours and type come from the Stepkite logo (docs/BRAND.md). Polish rules come from the `emil-design-eng`, `mobile-native` and `review-animations` skills.
+Colours and type come from the Stepkite brand (docs/BRAND.md): white pages, near-black text, blue only for actions, links and focus. Standard and professional, not decorative. Polish rules come from the `emil-design-eng`, `mobile-native` and `review-animations` skills.
 
 ## Tokens (CSS variables in `app/globals.css`, mapped in `tailwind.config.ts`)
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| `--bg` | #F7F8FB (Paper) | #0B1533 (Ink) | page |
-| `--surface` | #FFFFFF | #111C3D | cards |
-| `--surface-2` | #EEF1F7 | #18244A | inputs, wells |
-| `--border` | #E3E7F0 | #24315C | dividers |
-| `--text` | #0B1533 (Ink) | #E8ECF5 | body |
-| `--text-muted` | #4A5470 | #A3ADC6 | hints |
+| `--bg` | #FFFFFF | #0E1116 | page |
+| `--surface` | #FFFFFF | #151A21 | cards (separated by border, not tint) |
+| `--surface-2` | #F4F5F7 | #1D232C | inputs, wells |
+| `--border` | #E3E5E9 | #2A313C | dividers |
+| `--text` | #111827 (Ink) | #E8EAED | body |
+| `--text-muted` | #4B5563 | #A1A9B5 | hints |
 | `--primary` | #1A3FD1 (Deep Blue) | #7FA0FF | actions, links, focus ring |
-| `--primary-fg` | #FFFFFF | #0B1533 | text on primary |
+| `--primary-fg` | #FFFFFF | #0E1116 | text on primary |
 | `--brand` | #3D6BFF (Kite Blue) | #3D6BFF | logo, charts, large accents only (not small text: 4.4:1 on white) |
-| `--accent-soft` | #E8EEFF (Sky) | #18244A | selected rows, highlights |
+| `--accent-soft` | #EEF1F6 (Slate) | #1D232C | selected rows, highlights |
 | `--highlight` | #FFB020 (Sunrise) | #FFB020 | rare emphasis badges, with Ink text |
 | `--positive` | #0F8A5F | #3FCF94 | net pay |
 | `--tax` | #D9822B | #F0A55A | tax segments |
 | `--danger` | #C8372D | #FF6B60 | errors |
-Contrast: every text pair ≥ 4.5:1 (checked: Ink on Paper, Deep Blue on white, #7FA0FF on Ink, muted on both surfaces). Check new colours before use.
+Contrast: every text pair ≥ 4.5:1 (checked: Ink on white, Deep Blue on white, #7FA0FF on #0E1116, muted on both surfaces). Check new colours before use.
 
 Type: Plus Jakarta Sans ExtraBold (800) for the logo, page titles and result figures' labels; Inter (400, 600) for UI and body; `tabular-nums` for every figure. Load both with `next/font` (self-hosted, no layout shift). Scale 12/14/16/18/22/28/36/48. Body 16px, line-height 1.5. Result figure 36–48px, bold, `tabular-nums`. Inputs never below 16px (stops iOS zoom).
 Spacing: 4px base (4, 8, 12, 16, 24, 32, 48, 64). Radius: 8 (inputs), 12 (cards), 999 (pills). Shadow: one soft level for cards; none in dark mode (use border).

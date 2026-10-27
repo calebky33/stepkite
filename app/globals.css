@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+/* Tokens from docs/DESIGN.md. Light is default; dark follows the system. */
+:root {
+  --bg: #f7f8fb;
+  --surface: #ffffff;
+  --surface-2: #eef1f7;
+  --border: #e3e7f0;
+  --text: #0b1533;
+  --text-muted: #4a5470;
+  --primary: #1a3fd1;
+  --primary-fg: #ffffff;
+  --brand: #3d6bff;
+  --accent-soft: #e8eeff;
+  --highlight: #ffb020;
+  --ink: #0b1533;
+  --positive: #0f8a5f;
+  --tax: #d9822b;
+  --danger: #c8372d;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1533;
+    --surface: #111c3d;
+    --surface-2: #18244a;
+    --border: #24315c;
+    --text: #e8ecf5;
+    --text-muted: #a3adc6;
+    --primary: #7fa0ff;
+    --primary-fg: #0b1533;
+    --accent-soft: #18244a;
+    --positive: #3fcf94;
+    --tax: #f0a55a;
+    --danger: #ff6b60;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--text-muted);
+  --color-primary: var(--primary);
+  --color-primary-fg: var(--primary-fg);
+  --color-brand: var(--brand);
+  --color-accent-soft: var(--accent-soft);
+  --color-highlight: var(--highlight);
+  --color-ink: var(--ink);
+  --color-positive: var(--positive);
+  --color-tax: var(--tax);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
+  --radius-input: 8px;
+  --radius-card: 12px;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+button,
+a,
+input,
+select {
+  touch-action: manipulation;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

@@ -3,7 +3,7 @@
 Tick items as they ship. One Claude Code session per line where possible.
 
 ## Weeks 1–2: foundation
-- [ ] Scaffold Next.js + TS strict + Tailwind + Vitest + Playwright + ESLint/Prettier
+- [x] Scaffold Next.js + TS strict + Tailwind + Vitest + Playwright + ESLint/Prettier
 - [ ] Deploy hello-world to Cloudflare Workers via OpenNext (test SSG, route handler, OG image)
 - [ ] Design tokens + `components/ui` primitives + dev gallery
 - [ ] Country routing, layout, header/footer, consent banner (UK/EU)

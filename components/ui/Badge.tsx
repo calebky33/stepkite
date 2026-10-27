@@ -10,15 +10,19 @@ const tones: Record<Tone, string> = {
 
 type BadgeProps = HTMLAttributes<HTMLSpanElement> & { tone?: Tone };
 
-export function Badge({ tone = "neutral", className, ...props }: BadgeProps) {
+/** One line, never wraps. Long text is cut with an ellipsis and the full text stays in the title. */
+export function Badge({ tone = "neutral", className, children, title, ...props }: BadgeProps) {
   return (
     <span
+      title={title ?? (typeof children === "string" ? children : undefined)}
       className={cn(
-        "inline-flex items-center rounded-full px-3 py-0.5 text-sm font-semibold",
+        "inline-block max-w-full truncate whitespace-nowrap rounded-full px-3 py-0.5 align-middle text-sm font-semibold",
         tones[tone],
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </span>
   );
 }

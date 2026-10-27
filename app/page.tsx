@@ -6,8 +6,7 @@ export default function Home() {
       <Logo className="h-10 w-auto self-start" />
       <h1 className="font-display text-4xl font-extrabold">Stepkite is being built.</h1>
       <p className="max-w-prose text-muted">
-        Take-home pay calculators and CV tools for the UK, US and India. The first calculator comes
-        next.
+        The UK take-home pay calculator is first. A CV builder for the UK, US and India follows.
       </p>
     </main>
   );

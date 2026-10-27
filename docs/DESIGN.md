@@ -10,6 +10,7 @@ Colours and type come from the Stepkite brand (docs/BRAND.md): white pages, near
 | `--surface` | #FFFFFF | #151A21 | cards (separated by border, not tint) |
 | `--surface-2` | #F4F5F7 | #1D232C | inputs, wells |
 | `--border` | #E3E5E9 | #2A313C | dividers |
+| `--border-strong` | #6B7280 | #7D8798 | input and control boundaries (3:1 or better) |
 | `--text` | #111827 (Ink) | #E8EAED | body |
 | `--text-muted` | #4B5563 | #A1A9B5 | hints |
 | `--primary` | #1A3FD1 (Deep Blue) | #7FA0FF | actions, links, focus ring |

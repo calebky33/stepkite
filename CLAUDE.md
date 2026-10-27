@@ -1,7 +1,7 @@
 # CLAUDE.md — Stepkite
 
 Stepkite: country-aware career tools. Free take-home-pay calculators (traffic) + CV builder (conversion) + job tracker (retention).
-Launch markets: UK, US, India. Business plan summary: docs/PRODUCT.md. Brand and logo: docs/BRAND.md. Product and build rules: docs/RULES.md (read before any new feature). CV builder design: docs/CV-BLUEPRINT.md. Calculator behaviour: docs/CALCULATOR-UX.md. Read other docs only when the task needs them.
+Launch markets: UK, US, India. Business plan summary: docs/PRODUCT.md. Brand and logo: docs/BRAND.md. Product and build rules: docs/RULES.md (read before any new feature). CV builder design: docs/CV-BLUEPRINT.md. Calculator behaviour: docs/CALCULATOR-UX.md. Job tracker: docs/TRACKER-SPEC.md. Read other docs only when the task needs them.
 
 ## Stack (do not change without asking)
 - Next.js (App Router) + TypeScript strict + Tailwind CSS

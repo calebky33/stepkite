@@ -1,12 +1,13 @@
 import { LegalPage } from "@/components/shell/LegalPage";
 
-import { SITE_URL } from "@/lib/seo";
+import { SITE_URL, stubMetadata } from "@/lib/seo";
 
-export const metadata = {
+// Draft text: noindex until it is final.
+export const metadata = stubMetadata({
   alternates: { canonical: `${SITE_URL}/privacy` },
   title: "Privacy",
   description: "What Stepkite keeps, where it stays, and how to delete it.",
-};
+});
 
 export default function Privacy() {
   return (

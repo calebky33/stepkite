@@ -11,15 +11,13 @@ import { getRates } from "@/lib/tax";
 import { MAX_GROSS, MIN_GROSS, type PayEngine } from "@/lib/tax/types";
 import { InFields } from "./InFields";
 import { buildOptions, DEFAULT_VALUES, type FieldValues } from "./options";
+import { convertGross, PERIODS_PER_YEAR, type Period } from "./period";
 import { NetBar, ResultCard, type ResultState } from "./ResultCard";
 import { UkFields } from "./UkFields";
 import { useEngine } from "./useEngine";
 import { UsFields } from "./UsFields";
 
-type Period = "year" | "month" | "week";
-
 const PERIOD_WORD: Record<Period, string> = { year: "a year", month: "a month", week: "a week" };
-const PERIODS_PER_YEAR: Record<Period, number> = { year: 1, month: 12, week: 52 };
 
 /** Slider reach per country, in yearly terms. Input limits for the slider only, not tax figures. */
 const SLIDER_YEARLY: Record<CountryCode, { max: number; step: number }> = {
@@ -112,6 +110,10 @@ export function PayCalculator({ country, initialGross }: PayCalculatorProps) {
     setEdited(true);
     setGross(next);
   };
+  const changePeriod = (next: Period) => {
+    setGross((current) => convertGross(current, period, next));
+    setPeriod(next);
+  };
   const Fields = FIELDS[country];
   const onField = (key: string, value: string) =>
     setValues((current) => ({ ...current, [key]: value }));
@@ -152,7 +154,7 @@ export function PayCalculator({ country, initialGross }: PayCalculatorProps) {
             <SegmentedControl<Period>
               label="How often you're paid"
               value={period}
-              onValueChange={setPeriod}
+              onValueChange={changePeriod}
               options={[
                 { value: "year", label: "Year" },
                 { value: "month", label: "Month" },

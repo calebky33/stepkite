@@ -1,12 +1,13 @@
 import { LegalPage } from "@/components/shell/LegalPage";
 
-import { SITE_URL } from "@/lib/seo";
+import { SITE_URL, stubMetadata } from "@/lib/seo";
 
-export const metadata = {
+// Draft text: noindex until it is final.
+export const metadata = stubMetadata({
   alternates: { canonical: `${SITE_URL}/terms` },
   title: "Terms of use",
   description: "The plain rules for using Stepkite, including what the estimates are and are not.",
-};
+});
 
 export default function Terms() {
   return (

@@ -25,5 +25,9 @@ describe("seo", () => {
     }
     expect(urls).toHaveLength(INDEXABLE_PATHS.length);
     expect(INDEXABLE_PATHS).not.toContain("/");
+    // Draft legal pages stay out until they are final.
+    for (const draft of ["/privacy", "/terms", "/cookies"]) {
+      expect(INDEXABLE_PATHS).not.toContain(draft);
+    }
   });
 });

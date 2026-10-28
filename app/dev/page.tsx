@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { Controls } from "./Controls";
+import { ThemeToggle } from "./ThemeToggle";
 import { demo, worst } from "./fixtures";
 
 export default async function DevGallery({ searchParams }: PageProps<"/dev">) {
@@ -16,6 +18,9 @@ export default async function DevGallery({ searchParams }: PageProps<"/dev">) {
   return (
     <main className="mx-auto flex max-w-[1120px] flex-col gap-8 px-4 pb-24 pt-12">
       <h1 className="font-display text-3xl font-extrabold">Component gallery</h1>
+      <Card>
+        <ThemeToggle />
+      </Card>
       <Card className="flex flex-wrap items-center gap-3">
         <Button>{d.button[0]}</Button>
         <Button variant="secondary">{d.button[1]}</Button>
@@ -44,6 +49,7 @@ export default async function DevGallery({ searchParams }: PageProps<"/dev">) {
         <Skeleton className="h-6 w-1/2" />
         <Skeleton className="h-6 w-full" />
       </Card>
+      <Controls data={d} />
       <nav
         aria-label="Gallery data"
         className="fixed inset-x-0 bottom-4 flex justify-center pb-[env(safe-area-inset-bottom,0px)]"

@@ -23,11 +23,13 @@
   --logo-steps: #ffffff;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --overlay: rgb(0 0 0 / 0.4);
+  --elev: 0 1px 2px rgb(17 24 39 / 0.06), 0 4px 12px rgb(17 24 39 / 0.08);
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #0e1116;
     --surface: #151a21;
     --surface-2: #1d232c;
@@ -44,8 +46,36 @@
     --logo-a: #e5e7eb;
     --logo-b: #7fa0ff;
     --logo-steps: #0e1116;
+    --overlay: rgb(0 0 0 / 0.6);
+    --elev: none;
     color-scheme: dark;
   }
+}
+
+html[data-theme="dark"] {
+  --bg: #0e1116;
+  --surface: #151a21;
+  --surface-2: #1d232c;
+  --border: #2a313c;
+  --border-strong: #7d8798;
+  --text: #e8eaed;
+  --text-muted: #a1a9b5;
+  --primary: #7fa0ff;
+  --primary-fg: #0e1116;
+  --accent-soft: #1d232c;
+  --positive: #3fcf94;
+  --tax: #f0a55a;
+  --danger: #ff6b60;
+  --logo-a: #e5e7eb;
+  --logo-b: #7fa0ff;
+  --logo-steps: #0e1116;
+  --overlay: rgb(0 0 0 / 0.6);
+  --elev: none;
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
 }
 
 @theme inline {
@@ -65,11 +95,14 @@
   --color-positive: var(--positive);
   --color-tax: var(--tax);
   --color-danger: var(--danger);
+  --color-overlay: var(--overlay);
+  --shadow-pop: var(--elev);
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-display: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
   --radius-input: 8px;
   --radius-card: 12px;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 html {
@@ -100,6 +133,69 @@ select {
 button {
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+}
+
+/* Enter and exit for Radix layers. Each surface sets --sk-from. Transform and opacity only. */
+@keyframes sk-in {
+  from {
+    opacity: 0;
+    transform: var(--sk-from, none);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sk-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: var(--sk-from, none);
+  }
+}
+
+.sk-anim[data-state="open"],
+.sk-anim[data-state="delayed-open"] {
+  animation: sk-in var(--sk-dur, 200ms) var(--ease-out) both;
+}
+
+.sk-anim[data-state="closed"] {
+  animation: sk-out var(--sk-dur-out, 150ms) var(--ease-out) both;
+}
+
+.sk-pop {
+  --sk-from: scale(0.95);
+  --sk-dur: 150ms;
+  --sk-dur-out: 120ms;
+}
+
+.sk-sheet {
+  --sk-from: translateY(100%);
+  --sk-dur: 260ms;
+  --sk-dur-out: 200ms;
+}
+
+.sk-toast {
+  --sk-from: translateY(8px);
+  --sk-dur: 200ms;
+  --sk-dur-out: 150ms;
+}
+
+.sk-fade {
+  --sk-dur: 150ms;
+  --sk-dur-out: 120ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sk-pop,
+  .sk-sheet,
+  .sk-toast {
+    --sk-from: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

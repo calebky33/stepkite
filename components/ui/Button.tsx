@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes } from "react";
+import type { ComponentProps } from "react";
 import { cn } from "./cn";
 
 type Variant = "primary" | "secondary" | "ghost";
@@ -9,7 +9,7 @@ const styles: Record<Variant, string> = {
   ghost: "text-primary hover:bg-surface-2",
 };
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+type ButtonProps = ComponentProps<"button"> & {
   variant?: Variant;
   loading?: boolean;
 };

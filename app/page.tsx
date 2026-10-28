@@ -1,13 +1,24 @@
-import { Logo } from "@/components/ui/Logo";
+import { AdSlot } from "@/components/shell/AdSlot";
+import { PageShell } from "@/components/shell/PageShell";
+import { HomeCalculator } from "@/components/tools/PayCalculator/HomeCalculator";
+import { stubMetadata } from "@/lib/seo";
+
+export const metadata = stubMetadata({
+  title: "Take-home pay calculator",
+  description:
+    "Type your salary and see what lands in your bank. Pay calculators for the UK, the US and India.",
+});
 
 export default function Home() {
   return (
-    <main className="mx-auto flex min-h-dvh max-w-[1120px] flex-col gap-6 px-4 py-16">
-      <Logo className="h-10 w-auto self-start" />
-      <h1 className="font-display text-4xl font-extrabold">Stepkite is being built.</h1>
-      <p className="max-w-prose text-muted">
-        The UK take-home pay calculator is first. A CV builder for the UK, US and India follows.
-      </p>
-    </main>
+    <PageShell
+      title="Work out your take-home pay"
+      lead="Type your salary. The result updates as you type, and nothing you enter leaves your device."
+    >
+      <div className="flex flex-col gap-8">
+        <HomeCalculator />
+        <AdSlot placement="calculator" />
+      </div>
+    </PageShell>
   );
 }

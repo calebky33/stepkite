@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { COUNTRIES, COUNTRY_INFO } from "@/lib/countries";
 import { readEnv } from "@/lib/env";
+import { SITE_URL } from "@/lib/seo";
 import { createStripe } from "@/lib/stripe";
 import { createSupabaseServer } from "@/lib/supabase/server";
 
@@ -38,7 +39,11 @@ export async function POST(request: Request): Promise<Response> {
   const price = readEnv(PRICE_ENV[plan][COUNTRY_INFO[country].currency]);
   if (!price.ok) return Response.json({ error: "not_available" }, { status: 503 });
 
-  const origin = new URL(request.url).origin;
+  // The annual plan has no webhook handler yet, so it must not take payment.
+  if (plan === "annual") return Response.json({ error: "not_available" }, { status: 503 });
+
+  // A fixed origin, not the request Host header, so a spoofed Host cannot redirect the buyer.
+  const origin = SITE_URL;
   try {
     const session = await stripe.checkout.sessions.create({
       mode: plan === "pass" ? "payment" : "subscription",

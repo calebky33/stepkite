@@ -20,6 +20,10 @@ describe("seo", () => {
     ]) {
       expect(urls.some((url) => url.includes(stub))).toBe(false);
     }
+    for (const country of ["uk", "us", "in"]) {
+      expect(urls.some((url) => url.includes(`/${country}`))).toBe(false);
+    }
     expect(urls).toHaveLength(INDEXABLE_PATHS.length);
+    expect(INDEXABLE_PATHS).not.toContain("/");
   });
 });

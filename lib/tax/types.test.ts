@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getEngine, getRates } from "./index";
+import { getRates, loadEngine } from "./index";
 import { MAX_GROSS, MIN_GROSS, payInputSchema, type PayInput } from "./types";
 import { COUNTRIES } from "@/lib/countries";
 
@@ -38,8 +38,8 @@ describe("payInputSchema", () => {
 });
 
 describe("stub engines", () => {
-  it.each(COUNTRIES)("%s reports missing rates and invents no figures", (country) => {
-    const outcome = getEngine(country)({ ...base, country });
+  it.each(COUNTRIES)("%s reports missing rates and invents no figures", async (country) => {
+    const outcome = (await loadEngine(country))({ ...base, country });
     expect(outcome.status).toBe("rates-missing");
   });
 

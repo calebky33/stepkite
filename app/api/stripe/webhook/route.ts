@@ -32,7 +32,13 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ error: "bad_signature" }, { status: 400 });
   }
 
-  if (event.type !== "checkout.session.completed") return Response.json({ received: true });
+  // Delayed methods (bank debits, UPI) confirm later with the async event, so grant on both.
+  if (
+    event.type !== "checkout.session.completed" &&
+    event.type !== "checkout.session.async_payment_succeeded"
+  ) {
+    return Response.json({ received: true });
+  }
 
   const session = event.data.object;
   const userId = session.client_reference_id;

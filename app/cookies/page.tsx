@@ -1,6 +1,9 @@
 import { LegalPage } from "@/components/shell/LegalPage";
 
+import { SITE_URL } from "@/lib/seo";
+
 export const metadata = {
+  alternates: { canonical: `${SITE_URL}/cookies` },
   title: "Cookies",
   description: "Which cookies and browser storage Stepkite uses, and how to change your choice.",
 };

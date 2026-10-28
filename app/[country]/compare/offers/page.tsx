@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { OfferCompare } from "@/components/tools/compare/OfferCompare";
+import { COUNTRY_INFO } from "@/lib/countries";
 import { countryParams, requireCountry, type CountryParams } from "@/lib/routes";
-import { stubMetadata } from "@/lib/seo";
+import { SITE_URL, stubMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<CountryParams> };
 
@@ -12,10 +13,12 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  await requireCountry(params);
+  const country = await requireCountry(params);
+  const name = COUNTRY_INFO[country].name;
   return stubMetadata({
-    title: "Compare two job offers",
-    description: "Put two salaries side by side after tax.",
+    title: `Compare two job offers in ${name}`,
+    description: `Put two ${name} salaries side by side after tax.`,
+    alternates: { canonical: `${SITE_URL}/${country}/compare/offers` },
   });
 }
 

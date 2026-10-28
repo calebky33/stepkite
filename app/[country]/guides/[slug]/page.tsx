@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/Badge";
 import { GUIDES, findGuide } from "@/content/guides";
 import { isCountry } from "@/lib/countries";
-import { stubMetadata } from "@/lib/seo";
+import { SITE_URL, stubMetadata } from "@/lib/seo";
 
 type Params = { country: string; slug: string };
 type Props = { params: Promise<Params> };
@@ -24,8 +24,12 @@ async function resolve(params: Promise<Params>) {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { guide } = await resolve(params);
-  return stubMetadata({ title: guide.title, description: guide.summary });
+  const { country, guide } = await resolve(params);
+  return stubMetadata({
+    title: guide.title,
+    description: guide.summary,
+    alternates: { canonical: `${SITE_URL}/${country}/guides/${guide.slug}` },
+  });
 }
 
 export default async function GuidePage({ params }: Props) {

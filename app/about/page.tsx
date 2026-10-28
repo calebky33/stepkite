@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { PageShell } from "@/components/shell/PageShell";
 
+import { SITE_URL } from "@/lib/seo";
+
 export const metadata = {
+  alternates: { canonical: `${SITE_URL}/about` },
   title: "About Stepkite",
   description:
     "Stepkite builds pay calculators and CV tools that follow the rules of the UK, the US and India.",

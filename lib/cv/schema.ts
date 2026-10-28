@@ -48,7 +48,7 @@ export const skillGroupSchema = z.object({
   items: z.array(short).max(40),
 });
 
-export const SECTION_KEYS = ["summary", "experience", "education", "skills"] as const;
+export const SECTION_KEYS = ["summary", "experience", "impact", "education", "skills"] as const;
 export type SectionKey = (typeof SECTION_KEYS)[number];
 
 export const cvSchema = z.object({
@@ -70,6 +70,8 @@ export const cvSchema = z.object({
   experience: z.array(experienceSchema).max(20),
   education: z.array(educationSchema).max(10),
   skills: z.array(skillGroupSchema).max(10),
+  /** Quantified impact lines. Absent in older saves, so it defaults to none. */
+  impact: z.array(bullet).max(12).default([]),
   sectionOrder: z.array(z.enum(SECTION_KEYS)).max(SECTION_KEYS.length),
   updatedAt: z.iso.datetime(),
 });
@@ -89,6 +91,7 @@ export function emptyCv(id: string, country: Cv["country"], nowIso: string): Cv 
     experience: [],
     education: [],
     skills: [],
+    impact: [],
     sectionOrder: [...SECTION_KEYS],
     updatedAt: nowIso,
   };

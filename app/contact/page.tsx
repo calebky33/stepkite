@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { PageShell } from "@/components/shell/PageShell";
 
+import { SITE_URL } from "@/lib/seo";
+
 export const metadata = {
+  alternates: { canonical: `${SITE_URL}/contact` },
   title: "Contact",
   description: "How to reach Stepkite. Support is still being set up.",
 };

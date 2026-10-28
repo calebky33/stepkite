@@ -57,7 +57,7 @@ export function NewsletterSignup() {
       <p role="status" className="min-h-6 text-base">
         {status === "success" ? "Done. We'll email you when a new tool opens." : null}
         {status === "unavailable"
-          ? "Sign-up isn't open yet, so we haven't saved your email. Please check back later."
+          ? "Sign-up isn't open yet, so we haven't saved your email. Check back later."
           : null}
         {status === "error" ? "That didn't go through. Try again in a minute." : null}
       </p>

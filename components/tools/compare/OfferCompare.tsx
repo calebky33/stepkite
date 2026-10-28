@@ -4,14 +4,19 @@ import { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { CurrencyInput } from "@/components/ui/CurrencyInput";
 import { COUNTRY_INFO, formatMoney, type CountryCode } from "@/lib/countries";
-import { getEngine, getRates } from "@/lib/tax";
-import { MAX_GROSS, MIN_GROSS, type EngineOutcome } from "@/lib/tax/types";
+import { useEngine } from "@/components/tools/PayCalculator/useEngine";
+import { getRates } from "@/lib/tax";
+import { MAX_GROSS, MIN_GROSS, type EngineOutcome, type PayEngine } from "@/lib/tax/types";
 
 type Offer = { name: "Offer A" | "Offer B"; gross: number | null };
 
-function outcomeFor(country: CountryCode, gross: number | null): EngineOutcome | null {
-  if (gross === null || gross < MIN_GROSS || gross > MAX_GROSS) return null;
-  return getEngine(country)({
+function outcomeFor(
+  engine: PayEngine | null,
+  country: CountryCode,
+  gross: number | null,
+): EngineOutcome | null {
+  if (!engine || gross === null || gross < MIN_GROSS || gross > MAX_GROSS) return null;
+  return engine({
     country,
     taxYear: getRates(country).taxYear,
     gross,
@@ -31,7 +36,9 @@ export function OfferCompare({ country }: { country: CountryCode }) {
     { name: "Offer A", gross: null },
     { name: "Offer B", gross: null },
   ]);
-  const outcomes = offers.map((o) => outcomeFor(country, o.gross));
+  const state = useEngine(country);
+  const engine = state.status === "ready" ? state.engine : null;
+  const outcomes = offers.map((o) => outcomeFor(engine, country, o.gross));
   const [a, b] = outcomes;
 
   let difference: string;

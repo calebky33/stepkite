@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { PayCalculator } from "@/components/tools/PayCalculator/PayCalculator";
 import { ToolLinks } from "@/components/tools/ToolLinks";
 import { COUNTRIES, COUNTRY_INFO, formatMoney, isCountry } from "@/lib/countries";
-import { stubMetadata } from "@/lib/seo";
+import { SITE_URL, stubMetadata } from "@/lib/seo";
 
 type Params = { country: string; amount: string };
 type Props = { params: Promise<Params> };
@@ -28,8 +28,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { country, gross } = await resolve(params);
   const money = formatMoney(gross, country);
   return stubMetadata({
-    title: `${money} salary: ${COUNTRY_INFO[country].takeHomeTerm}`,
-    description: `Check what a ${money} salary leaves you after tax.`,
+    title: `${money} salary in ${COUNTRY_INFO[country].name}: ${COUNTRY_INFO[country].takeHomeTerm}`,
+    description: `Check what a ${money} salary leaves you after tax in ${COUNTRY_INFO[country].name}.`,
+    alternates: { canonical: `${SITE_URL}/${country}/salary/${gross}` },
   });
 }
 

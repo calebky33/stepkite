@@ -111,3 +111,12 @@ describe("AdSlot", () => {
     expect(box.getAttribute("data-ads")).toBe("allowed");
   });
 });
+
+describe("Footer", () => {
+  it("holds the newsletter form and the country links", async () => {
+    const { Footer } = await import("./Footer");
+    render(<Footer />);
+    expect(screen.getByLabelText("Email address")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "India" }).getAttribute("href")).toBe("/in");
+  });
+});

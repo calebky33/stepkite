@@ -26,6 +26,23 @@ function guessRegion(pathname: string | null): string | null {
   return "OUTSIDE";
 }
 
+/**
+ * Shares the banner height as --consent-h so other fixed or sticky bars (pay bar, undo bar, footer)
+ * sit above it and nothing is covered. The cleanup removes the variable when the banner goes.
+ */
+function publishHeight(el: HTMLElement | null): (() => void) | undefined {
+  if (!el) return undefined;
+  const root = document.documentElement;
+  const set = () => root.style.setProperty("--consent-h", `${el.offsetHeight}px`);
+  set();
+  const observer = new ResizeObserver(set);
+  observer.observe(el);
+  return () => {
+    observer.disconnect();
+    root.style.removeProperty("--consent-h");
+  };
+}
+
 export function ConsentBanner() {
   const pathname = usePathname();
   const stored = useConsent();
@@ -46,6 +63,7 @@ export function ConsentBanner() {
 
   return (
     <section
+      ref={publishHeight}
       aria-label="Cookie choice"
       className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:px-6"
     >

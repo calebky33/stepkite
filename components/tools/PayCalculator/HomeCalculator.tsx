@@ -34,12 +34,6 @@ export function HomeCalculator() {
         >
           More about pay in {info.name}
         </Link>
-        <Link
-          href={`/${country}/cv`}
-          className="inline-flex min-h-11 items-center text-base text-primary underline underline-offset-2"
-        >
-          Build a {SHORT_NAME[country]} {info.cvName}
-        </Link>
       </div>
     </div>
   );

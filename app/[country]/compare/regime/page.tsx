@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { RegimeCompare } from "@/components/tools/compare/RegimeCompare";
 import { countryParams, requireCountry, type CountryParams } from "@/lib/routes";
-import { stubMetadata } from "@/lib/seo";
+import { SITE_URL, stubMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<CountryParams> };
 
@@ -21,8 +21,9 @@ async function requireIndia(params: Promise<CountryParams>) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   await requireIndia(params);
   return stubMetadata({
-    title: "Old regime or new regime",
+    title: "Old regime or new regime in India",
     description: "Compare your in-hand salary under the old and new income tax regimes.",
+    alternates: { canonical: `${SITE_URL}/in/compare/regime` },
   });
 }
 

@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { PagedPreview } from "@/components/tools/cv/PagedPreview";
 import { Controls } from "./Controls";
+import { galleryCv } from "./cvFixture";
 import { ThemeToggle } from "./ThemeToggle";
 import { demo, worst } from "./fixtures";
 
@@ -48,6 +50,9 @@ export default async function DevGallery({ searchParams }: PageProps<"/dev">) {
       <Card className="flex flex-col gap-3">
         <Skeleton className="h-6 w-1/2" />
         <Skeleton className="h-6 w-full" />
+      </Card>
+      <Card className="min-w-0">
+        <PagedPreview cv={galleryCv(isWorst)} country="uk" />
       </Card>
       <Controls data={d} />
       <nav

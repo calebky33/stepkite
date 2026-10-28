@@ -4,7 +4,7 @@ import { PayCalculator } from "@/components/tools/PayCalculator/PayCalculator";
 import { ToolLinks } from "@/components/tools/ToolLinks";
 import { COUNTRY_INFO } from "@/lib/countries";
 import { countryParams, requireCountry, type CountryParams } from "@/lib/routes";
-import { stubMetadata } from "@/lib/seo";
+import { SITE_URL, stubMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<CountryParams> };
 
@@ -18,8 +18,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const country = await requireCountry(params);
   const term = COUNTRY_INFO[country].takeHomeTerm;
   return stubMetadata({
-    title: `Salary calculator: ${term}`,
-    description: `Work out your ${term}.`,
+    title: `${COUNTRY_INFO[country].name} salary calculator`,
+    description: `Work out your ${term} in ${COUNTRY_INFO[country].name}.`,
+    alternates: { canonical: `${SITE_URL}/${country}/salary-calculator` },
   });
 }
 

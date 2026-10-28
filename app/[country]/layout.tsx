@@ -19,7 +19,7 @@ export default async function CountryLayout({
   const country = await requireCountry(params);
   const info = COUNTRY_INFO[country];
   return (
-    <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-6 px-4 pb-16 pt-4">
+    <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-6 px-4 pb-16 pt-4 md:px-6">
       <nav aria-label="Breadcrumb">
         <ol className="flex flex-wrap items-center gap-x-2 text-sm text-muted">
           <li>

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
 import { CountrySwitcher } from "./CountrySwitcher";
-import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
   return (
@@ -12,16 +11,11 @@ export function Header() {
       >
         Skip to content
       </a>
-      <div className="mx-auto flex max-w-[1120px] flex-wrap items-end justify-between gap-x-6 gap-y-3 px-4 py-3 md:px-6">
+      <div className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 md:px-6">
         <Link href="/" className="inline-flex min-h-11 items-center">
           <Logo className="h-8 w-auto" />
         </Link>
-        <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
-          <CountrySwitcher />
-          <div className="w-60">
-            <ThemeToggle />
-          </div>
-        </div>
+        <CountrySwitcher />
       </div>
     </header>
   );

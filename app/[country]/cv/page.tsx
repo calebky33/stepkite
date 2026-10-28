@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { CvBuilderShell } from "@/components/tools/cv/CvBuilderShell";
 import { COUNTRY_INFO } from "@/lib/countries";
 import { countryParams, requireCountry, type CountryParams } from "@/lib/routes";
-import { stubMetadata } from "@/lib/seo";
+import { SITE_URL, stubMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<CountryParams> };
 
@@ -15,8 +15,9 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const country = await requireCountry(params);
   return stubMetadata({
-    title: `${COUNTRY_INFO[country].cvName} builder`,
-    description: `Write your ${COUNTRY_INFO[country].cvName} on your own device.`,
+    title: `${COUNTRY_INFO[country].cvName} builder for ${COUNTRY_INFO[country].name}`,
+    description: `Write your ${COUNTRY_INFO[country].cvName} to ${COUNTRY_INFO[country].name} standards, on your own device.`,
+    alternates: { canonical: `${SITE_URL}/${country}/cv` },
   });
 }
 
@@ -29,7 +30,7 @@ export default async function CvPage({ params }: Props) {
       <p className="max-w-prose text-muted">
         Your {doc} is saved on this device. Nothing is sent to us.
       </p>
-      <CvBuilderShell country={country} />
+      <CvBuilderShell key={country} country={country} />
     </>
   );
 }

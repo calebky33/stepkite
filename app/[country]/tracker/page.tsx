@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { TrackerShell } from "@/components/tools/tracker/TrackerShell";
+import { COUNTRY_INFO } from "@/lib/countries";
 import { countryParams, requireCountry, type CountryParams } from "@/lib/routes";
-import { stubMetadata } from "@/lib/seo";
+import { SITE_URL, stubMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<CountryParams> };
 
@@ -12,10 +13,12 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  await requireCountry(params);
+  const country = await requireCountry(params);
+  const name = COUNTRY_INFO[country].name;
   return stubMetadata({
-    title: "Job tracker",
-    description: "Keep track of every job you apply for, on your own device.",
+    title: `Job tracker for ${name}`,
+    description: `Keep track of every job you apply for in ${name}, on your own device.`,
+    alternates: { canonical: `${SITE_URL}/${country}/tracker` },
   });
 }
 

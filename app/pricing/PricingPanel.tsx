@@ -1,20 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import type { CountryCode } from "@/lib/countries";
 
-type Plan = "pass" | "annual";
-type Status =
-  | { kind: "idle" }
-  | { kind: "loading"; plan: Plan }
-  | { kind: "message"; text: string; signIn?: boolean };
-
+/** Planned prices from docs/PRODUCT.md. Nothing can be bought yet. */
 const PASS_PRICE: Record<CountryCode, string> = { uk: "£6", us: "$7", in: "₹299" };
-/** Only the US annual price is set so far. */
+/** Only the US annual price is planned so far. */
 const ANNUAL_PRICE: Partial<Record<CountryCode, string>> = { us: "$39" };
 
 const INCLUDED = [
@@ -28,53 +23,7 @@ const INCLUDED = [
 
 export function PricingPanel() {
   const [country, setCountry] = useState<CountryCode>("uk");
-  const [status, setStatus] = useState<Status>({ kind: "idle" });
   const annual = ANNUAL_PRICE[country];
-
-  const checkout = async (plan: Plan) => {
-    setStatus({ kind: "loading", plan });
-    try {
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ country, plan }),
-      });
-      if (response.ok) {
-        const body: unknown = await response.json().catch(() => null);
-        const url =
-          body && typeof body === "object" && "url" in body && typeof body.url === "string"
-            ? body.url
-            : null;
-        if (url?.startsWith("https://checkout.stripe.com/")) {
-          window.location.assign(url);
-          return;
-        }
-        setStatus({
-          kind: "message",
-          text: "We couldn't open checkout. Nothing was charged. Try again.",
-        });
-        return;
-      }
-      if (response.status === 401) {
-        setStatus({ kind: "message", text: "Sign in first, then come back to pay.", signIn: true });
-      } else if (response.status === 503) {
-        setStatus({
-          kind: "message",
-          text: "Checkout isn't open yet. Nothing was charged. Please check back later.",
-        });
-      } else {
-        setStatus({
-          kind: "message",
-          text: "We couldn't open checkout. Nothing was charged. Try again.",
-        });
-      }
-    } catch {
-      setStatus({
-        kind: "message",
-        text: "We couldn't reach checkout. Check your connection and try again. Nothing was charged.",
-      });
-    }
-  };
 
   return (
     <div className="grid gap-6 lg:grid-cols-[3fr_2fr] lg:items-start">
@@ -92,54 +41,35 @@ export function PricingPanel() {
         />
         <div className="flex flex-col gap-1">
           <h2 className="text-base font-semibold">Pro Pass</h2>
-          <p className="font-display text-5xl font-extrabold tabular-nums">{PASS_PRICE[country]}</p>
+          <p className="flex flex-wrap items-center gap-3">
+            <span className="font-display text-5xl font-extrabold tabular-nums">
+              {PASS_PRICE[country]}
+            </span>
+            <Badge tone="highlight">Planned price</Badge>
+          </p>
           <p className="text-base text-muted">
             One payment for 30 days. It never renews by itself.
           </p>
         </div>
-        <Button
-          loading={status.kind === "loading" && status.plan === "pass"}
-          onClick={() => checkout("pass")}
-          className="self-start"
-        >
-          Pay {PASS_PRICE[country]} for 30 days
-        </Button>
+        <div className="flex flex-col gap-2">
+          <Button disabled className="self-start">
+            Pro Pass opens soon
+          </Button>
+          <p className="text-sm text-muted">Nothing can be bought yet, and nothing is charged.</p>
+        </div>
 
         <div className="flex flex-col gap-2 border-t border-border pt-6">
           <h2 className="text-base font-semibold">Annual plan, if you prefer it</h2>
           {annual ? (
-            <>
-              <p className="text-base text-muted">
-                {annual} a year. It renews every year until you cancel, and you can cancel from your
-                account at any time.
-              </p>
-              <Button
-                variant="secondary"
-                loading={status.kind === "loading" && status.plan === "annual"}
-                onClick={() => checkout("annual")}
-                className="self-start"
-              >
-                Pay {annual} a year
-              </Button>
-            </>
+            <p className="text-base text-muted">
+              Planned at about {annual} a year, and only if you choose it. It would renew every
+              year until you cancel.
+            </p>
           ) : (
             <p className="text-base text-muted">
               The annual price for this country isn&apos;t set yet.
             </p>
           )}
-        </div>
-
-        <div role="status" className="min-h-6 text-base">
-          {status.kind === "message" ? (
-            <p>
-              {status.text}{" "}
-              {status.signIn ? (
-                <Link href="/sign-in" className="text-primary underline underline-offset-2">
-                  Go to sign in
-                </Link>
-              ) : null}
-            </p>
-          ) : null}
         </div>
       </Card>
 
@@ -151,7 +81,7 @@ export function PricingPanel() {
           ))}
         </ul>
         <p className="text-sm text-muted">
-          These tools are still being built, and checkout opens when they are ready.
+          These tools are still being built, and the Pass opens when they are ready.
         </p>
       </Card>
     </div>

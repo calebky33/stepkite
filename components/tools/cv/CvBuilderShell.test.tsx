@@ -24,7 +24,7 @@ describe("CvBuilderShell", () => {
     const download = screen.getByRole("button", { name: "Download CV" }) as HTMLButtonElement;
     expect(download.disabled).toBe(true);
     const reason = document.getElementById(download.getAttribute("aria-describedby") ?? "");
-    expect(reason?.textContent).toBe("PDF download is not ready yet.");
+    expect(reason?.textContent).toBe("PDF download is not connected yet.");
     expect(screen.getByRole("radio", { name: "Preview" })).toBeTruthy();
   });
 
@@ -74,5 +74,21 @@ describe("CvBuilderShell", () => {
     fireEvent.click(screen.getByRole("button", { name: "Add a job" }));
     type("Start", "");
     expect(screen.getByRole("alert").textContent).toContain("Choose a start month.");
+  });
+
+  it("marks each template as a placeholder and saves the chosen one", async () => {
+    render(<CvBuilderShell country="uk" />);
+    await screen.findByLabelText("Full name");
+    expect(screen.getAllByText("Placeholder template")).toHaveLength(3);
+    fireEvent.click(screen.getByRole("radio", { name: /Compact/ }));
+    await waitFor(() => expect(db.write).toHaveBeenCalled(), { timeout: 2000 });
+    expect(db.write.mock.calls[0]?.[3].templateId).toBe("compact");
+  });
+
+  it("keeps the PDF message plain and offers no ad slot", async () => {
+    render(<CvBuilderShell country="uk" />);
+    await screen.findByLabelText("Full name");
+    expect(screen.getByText("PDF download is not connected yet.")).toBeTruthy();
+    expect(screen.queryByText("Advertisement")).toBeNull();
   });
 });

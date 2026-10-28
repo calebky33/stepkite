@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { guidesFor } from "@/content/guides";
+import { COUNTRY_INFO } from "@/lib/countries";
 import { countryParams, requireCountry, type CountryParams } from "@/lib/routes";
-import { stubMetadata } from "@/lib/seo";
+import { SITE_URL, stubMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<CountryParams> };
 
@@ -14,10 +15,12 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  await requireCountry(params);
+  const country = await requireCountry(params);
+  const name = COUNTRY_INFO[country].name;
   return stubMetadata({
-    title: "Guides",
-    description: "Plain guides on pay and job applications.",
+    title: `Pay and job guides for ${name}`,
+    description: `Plain guides on pay and job applications in ${name}.`,
+    alternates: { canonical: `${SITE_URL}/${country}/guides` },
   });
 }
 

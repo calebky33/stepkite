@@ -17,7 +17,7 @@ export const GUIDES: readonly Guide[] = [
     slug: "cv-photo",
     country: "uk",
     title: "Should your UK CV have a photo?",
-    summary: "You are about to add a headshot to your CV and wonder if it will help or hurt.",
+    summary: "You are about to add a headshot to your CV. Will it help or hurt?",
     paragraphs: [
       "Most UK employers do not expect a photo on a CV, and some recruiters prefer none so they judge your experience first.",
       "A person will check this guide against current careers service advice and add sources before it is published.",
@@ -29,7 +29,7 @@ export const GUIDES: readonly Guide[] = [
     slug: "resume-length",
     country: "us",
     title: "How long should your résumé be?",
-    summary: "Your résumé runs onto a second page and you are not sure what to cut.",
+    summary: "Your résumé runs onto a second page and you can't tell what to cut.",
     paragraphs: [
       "A résumé that gives old roles as much room as recent ones hides the work you most want read.",
       "A person will check this guide against current careers service advice and add sources before it is published.",

@@ -10,7 +10,10 @@ class ResizeObserverStub {
   disconnect(): void {}
 }
 globalThis.ResizeObserver ??= ResizeObserverStub;
-Element.prototype.hasPointerCapture ??= () => false;
-Element.prototype.setPointerCapture ??= () => {};
-Element.prototype.releasePointerCapture ??= () => {};
-Element.prototype.scrollIntoView ??= () => {};
+// Node-environment tests (such as the check:copy script test) have no DOM.
+if (typeof Element !== "undefined") {
+  Element.prototype.hasPointerCapture ??= () => false;
+  Element.prototype.setPointerCapture ??= () => {};
+  Element.prototype.releasePointerCapture ??= () => {};
+  Element.prototype.scrollIntoView ??= () => {};
+}

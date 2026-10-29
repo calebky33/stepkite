@@ -5,26 +5,27 @@ Colours and type come from the Stepkite brand (docs/BRAND.md): near-white pages 
 
 ## Tokens (CSS variables in `app/globals.css`, mapped in `tailwind.config.ts`)
 
-| Token                                                                                                                                                    | Light               | Dark    | Use                                                               |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ------- | ----------------------------------------------------------------- |
-| `--bg`                                                                                                                                                   | #F7F8FA             | #0B0E13 | page                                                              |
-| `--surface`                                                                                                                                              | #FFFFFF             | #151A21 | cards (raised by border and soft shadow)                          |
-| `--surface-2`                                                                                                                                            | #F1F3F6             | #1D232C | inputs, wells                                                     |
-| `--border`                                                                                                                                               | #E3E5E9             | #2A313C | dividers                                                          |
-| `--border-strong`                                                                                                                                        | #6B7280             | #7D8798 | input and control boundaries (3:1 or better)                      |
-| `--text`                                                                                                                                                 | #111827 (Ink)       | #E8EAED | body                                                              |
-| `--text-muted`                                                                                                                                           | #4B5563             | #A1A9B5 | hints                                                             |
-| `--primary`                                                                                                                                              | #1A3FD1 (Deep Blue) | #7FA0FF | actions, links, focus ring                                        |
-| `--primary-fg`                                                                                                                                           | #FFFFFF             | #0E1116 | text on primary                                                   |
-| `--brand`                                                                                                                                                | #3D6BFF (Kite Blue) | #3D6BFF | logo, charts, large accents only (not small text: 4.4:1 on white) |
-| `--accent-soft`                                                                                                                                          | #EEF1F6 (Slate)     | #1D232C | selected rows, highlights                                         |
-| `--highlight`                                                                                                                                            | #FFB020 (Sunrise)   | #FFB020 | rare emphasis badges, with Ink text                               |
-| `--positive`                                                                                                                                             | #0F8A5F             | #3FCF94 | net pay                                                           |
-| `--tax`                                                                                                                                                  | #D9822B             | #F0A55A | tax segments                                                      |
-| `--danger`                                                                                                                                               | #C8372D             | #FF6B60 | errors                                                            |
-| Contrast: every text pair ≥ 4.5:1 (checked: Ink on white, Deep Blue on white, #7FA0FF on #0E1116, muted on both surfaces). Check new colours before use. |
+| Token             | Light               | Dark    | Use                                                               |
+| ----------------- | ------------------- | ------- | ----------------------------------------------------------------- |
+| `--bg`            | #F7F8FA             | #0B0E13 | page                                                              |
+| `--surface`       | #FFFFFF             | #151A21 | cards (raised by border and soft shadow)                          |
+| `--surface-2`     | #F1F3F6             | #1D232C | inputs, wells                                                     |
+| `--border`        | #E3E5E9             | #2A313C | dividers                                                          |
+| `--border-strong` | #6B7280             | #7D8798 | input and control boundaries (3:1 or better)                      |
+| `--text`          | #111827 (Ink)       | #E8EAED | body                                                              |
+| `--text-muted`    | #4B5563             | #A1A9B5 | hints                                                             |
+| `--primary`       | #1A3FD1 (Deep Blue) | #7FA0FF | actions, links, focus ring                                        |
+| `--primary-fg`    | #FFFFFF             | #0E1116 | text on primary                                                   |
+| `--brand`         | #3D6BFF (Kite Blue) | #3D6BFF | logo, charts, large accents only (not small text: 4.4:1 on white) |
+| `--accent-soft`   | #EEF1F6 (Slate)     | #1D232C | selected rows, highlights                                         |
+| `--highlight`     | #FFB020 (Sunrise)   | #FFB020 | rare emphasis badges, with Ink text                               |
+| `--positive`      | #0F8A5F             | #3FCF94 | net pay                                                           |
+| `--tax`           | #D9822B             | #F0A55A | tax segments                                                      |
+| `--danger`        | #C8372D             | #FF6B60 | errors                                                            |
 
-Type: Calistoga (400 only, never faux bold) for page titles and section headings; Inter (400, 500, 600) for UI, body and every figure, with `tabular-nums` (Calistoga has no tabular numerals); Plus Jakarta Sans 800 only for the logo wordmark (`--font-logo`). Load all three with `next/font` (self-hosted, no layout shift). Scale 12/14/16/18/22/28/36/48. Body 16px, line-height 1.5. Result figure 36–48px, bold, `tabular-nums`. Inputs never below 16px (stops iOS zoom).
+Contrast: every text pair ≥ 4.5:1 (checked: Ink on white, Deep Blue on white, #7FA0FF on #0E1116, muted on #F7F8FA about 7:1 and on #F1F3F6 about 6.8:1, border-strong on #F1F3F6 about 4.3:1 which passes the 3:1 control minimum). Check new colours before use.
+
+Type: Calistoga (400 only, never faux bold) for page titles and section headings; Inter (400, 500, 600) for UI, body and every figure, with `tabular-nums` (Calistoga has no tabular numerals); Plus Jakarta Sans 800 only for the logo wordmark (`--font-logo`). Load all three with `next/font` (self-hosted, no layout shift). Scale 12/14/16/18/22/28/36/48. Body 16px, line-height 1.5. Result figure 36–48px, semibold, `tabular-nums`. Inputs never below 16px (stops iOS zoom).
 Spacing: 4px base (4, 8, 12, 16, 24, 32, 48, 64). Radius: 8 (inputs), 12 (cards), 999 (pills). Shadow: three layered soft levels (`--elev-sm` cards, `--elev-md` popovers, `--elev-lg` dialogs and sheets) plus a 1px inner top highlight on cards; in dark mode the same levels use black at higher opacity and the border does most of the work.
 Breakpoints: 375 / 768 / 1024 / 1280. Max content width 1120px.
 

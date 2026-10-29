@@ -48,19 +48,20 @@ Launch markets: UK, US, India. Business plan summary: docs/PRODUCT.md. Brand and
 
 ## Required agents and skills (always call them; never skip, even for small changes)
 
-| Change                                                                                                                                                                                                                                                   | Must run, in order                                                                   |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Any user-facing text (UI copy, guides, errors, emails, metadata)                                                                                                                                                                                         | `copy-editor` agent, which applies the `humanizer` skill                             |
-| Any UI component, layout, or styling                                                                                                                                                                                                                     | `ui-builder` agent, then `emil-design-eng` skill review, then `react-reviewer` agent |
-| Any animation or transition                                                                                                                                                                                                                              | `review-animations` skill                                                            |
-| Any screen showing user data (CV, tracker, results)                                                                                                                                                                                                      | `break-ui` skill (worst-case data)                                                   |
-| Mobile layouts, sheets, sticky bars, inputs                                                                                                                                                                                                              | `mobile-native` skill                                                                |
-| Any TypeScript or JavaScript                                                                                                                                                                                                                             | `typescript-reviewer` agent                                                          |
-| Auth, payments, webhooks, CV data, AI route, secrets                                                                                                                                                                                                     | `security-reviewer` agent                                                            |
-| Database, Supabase, RLS, migrations                                                                                                                                                                                                                      | `database-reviewer` agent                                                            |
-| Build fails                                                                                                                                                                                                                                              | `build-error-resolver` agent                                                         |
-| Before every merge or deploy                                                                                                                                                                                                                             | `reviewer` agent, then `/ship-check`                                                 |
-| Project agents live in `.claude/agents/`; `react-reviewer`, `typescript-reviewer`, `security-reviewer`, `database-reviewer`, `build-error-resolver` are installed globally. Fix every BLOCKING finding; list anything left unfixed in the final message. |
+| Change                                                           | Must run, in order                                                                   |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Any user-facing text (UI copy, guides, errors, emails, metadata) | `copy-editor` agent, which applies the `humanizer` skill                             |
+| Any UI component, layout, or styling                             | `ui-builder` agent, then `emil-design-eng` skill review, then `react-reviewer` agent |
+| Any animation or transition                                      | `review-animations` skill                                                            |
+| Any screen showing user data (CV, tracker, results)              | `break-ui` skill (worst-case data)                                                   |
+| Mobile layouts, sheets, sticky bars, inputs                      | `mobile-native` skill                                                                |
+| Any TypeScript or JavaScript                                     | `typescript-reviewer` agent                                                          |
+| Auth, payments, webhooks, CV data, AI route, secrets             | `security-reviewer` agent                                                            |
+| Database, Supabase, RLS, migrations                              | `database-reviewer` agent                                                            |
+| Build fails                                                      | `build-error-resolver` agent                                                         |
+| Before every merge or deploy                                     | `reviewer` agent, then `/ship-check`                                                 |
+
+Project agents live in `.claude/agents/`; `react-reviewer`, `typescript-reviewer`, `security-reviewer`, `database-reviewer`, `build-error-resolver` are installed globally. Fix every BLOCKING finding; list anything left unfixed in the final message. |
 
 ## Token & time discipline (always)
 

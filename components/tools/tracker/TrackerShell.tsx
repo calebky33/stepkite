@@ -329,7 +329,7 @@ export function TrackerShell() {
         >
           <div className="flex w-full max-w-md items-center justify-between gap-3 rounded-card border border-border bg-surface p-3 shadow-pop">
             <p className="min-w-0 text-base [overflow-wrap:anywhere]">Deleted {undo.title}.</p>
-            <Button variant="secondary" onClick={restore}>
+            <Button variant="secondary" className="shrink-0" onClick={restore}>
               Undo
             </Button>
           </div>

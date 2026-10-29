@@ -39,7 +39,7 @@ export function Dialog({
         <RadixDialog.Content
           {...(description ? {} : { "aria-describedby": undefined })}
           className={cn(
-            "sk-anim sk-pop fixed inset-0 z-50 m-auto h-fit max-h-[85dvh] w-[calc(100%-2rem)] max-w-md overflow-y-auto",
+            "sk-anim sk-pop fixed inset-0 z-50 m-auto h-fit max-h-[85dvh] w-[calc(100%-2rem)] max-w-md overflow-y-auto overscroll-contain",
             "rounded-card border border-border bg-surface p-6 text-text shadow-dialog md:p-8",
             className,
           )}

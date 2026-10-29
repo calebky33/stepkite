@@ -34,7 +34,7 @@ Rules for building every part of Stepkite so it is simply better than what is on
 
 23. **Learn mechanics, never copy.** Ideas from other products are fine. Their names, text, images, template designs, prices and statistics are not. Do not name other products in the repo, the UI, the docs or commit messages.
 24. **Our voice.** All user-facing text follows `docs/VOICE.md` and passes `copy-editor`: plain, specific, local spelling, no dashes in prose, no filler words, no emoji.
-25. **Our look.** Follow `docs/DESIGN.md`. No gradients, glass blur, glow, sparkles, stock heroes or rows of identical cards. Depth comes from layered soft shadows, type and spacing.
+25. **Our look.** Follow `docs/DESIGN.md`. No gradients, glass blur, glow, sparkles, stock heroes or rows of identical cards. Depth comes from layered soft shadows, type and spacing. Why: the owner asked for a premium look and relaxed the earlier flat rule on shadows and display type.
 
 ## Make it stay good: process
 

@@ -80,7 +80,7 @@ export function OfferCompare({ country }: { country: CountryCode }) {
       </div>
       <Card role="region" aria-label="Difference" className="min-h-28 bg-accent-soft md:p-8">
         <h2 className="text-sm font-medium text-muted">The difference</h2>
-        <p aria-live="polite" className="mt-2 text-lg text-text">
+        <p aria-live="polite" className="mt-2 text-lg tabular-nums text-text">
           {difference}
         </p>
       </Card>

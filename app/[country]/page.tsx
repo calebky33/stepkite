@@ -70,11 +70,11 @@ export default async function CountryHubPage({ params }: Props) {
       </p>
       <Link
         href={`/${country}/salary-calculator`}
-        className="inline-flex min-h-11 items-center self-start rounded-input bg-primary px-4 py-2 text-base font-semibold text-primary-fg transition-[transform,opacity] duration-150 ease-[var(--ease-out)] hover:opacity-90 active:scale-[0.97]"
+        className="inline-flex min-h-11 items-center self-start rounded-input bg-primary px-4 py-2 text-base font-semibold text-primary-fg transition-[transform,scale,translate,opacity] duration-150 ease-[var(--ease-out)] hover:opacity-90 active:scale-[0.97]"
       >
         Open the salary calculator
       </Link>
-      <div className="grid gap-6 lg:grid-cols-[3fr_2fr] lg:gap-8">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-8">
         {groupsFor(country).map((group) => {
           const lead = group.heading === "Common salaries";
           return (

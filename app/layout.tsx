@@ -19,6 +19,7 @@ const calistoga = Calistoga({
 });
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
+  preload: false,
   subsets: ["latin"],
   weight: ["800"],
 });

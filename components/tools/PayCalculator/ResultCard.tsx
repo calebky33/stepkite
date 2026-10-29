@@ -165,7 +165,7 @@ export function ResultCard({ country, state, annualGross, entered, example }: Re
       ) : null}
       <Link
         href={`/${country}/cv`}
-        className="inline-flex min-h-11 w-full items-center justify-center rounded-input bg-primary px-4 py-2 text-base font-semibold text-primary-fg transition-[transform,opacity] duration-150 ease-[var(--ease-out)] active:scale-[0.97] hover:opacity-90 sm:w-fit"
+        className="inline-flex min-h-11 w-full items-center justify-center rounded-input bg-primary px-4 py-2 text-base font-semibold text-primary-fg transition-[transform,scale,translate,opacity] duration-150 ease-[var(--ease-out)] active:scale-[0.97] hover:opacity-90 sm:w-fit"
       >
         Build a {info.cvName}
       </Link>
@@ -303,7 +303,7 @@ function ReadyHeadline({
       </p>
       <p
         aria-hidden="true"
-        className="min-h-12 font-sans text-4xl leading-none font-semibold tracking-tight text-positive tabular-nums md:text-5xl"
+        className="min-h-12 font-sans text-4xl leading-none font-semibold tracking-tight text-positive tabular-nums [overflow-wrap:anywhere] md:text-5xl"
       >
         {formatMoney(shown, country)}{" "}
         <span className="text-base font-normal tracking-normal text-muted">{VIEW_WORD[view]}</span>

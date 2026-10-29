@@ -35,7 +35,7 @@ export function IconButton({
       aria-busy={loading || undefined}
       className={cn(
         "inline-flex size-11 shrink-0 select-none items-center justify-center rounded-input",
-        "transition-[transform,background-color,opacity] duration-150 ease-[var(--ease-out)] active:scale-[0.97]",
+        "transition-[transform,scale,translate,background-color,opacity] duration-150 ease-[var(--ease-out)] active:scale-[0.97]",
         "disabled:opacity-50 disabled:active:scale-100",
         loading && "animate-pulse",
         styles[variant],

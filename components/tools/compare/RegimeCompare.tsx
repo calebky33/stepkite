@@ -58,7 +58,7 @@ export function RegimeCompare() {
           return (
             <Card key={regime.key} className="flex min-h-40 flex-col gap-2 md:p-8">
               <h2 className="text-sm font-medium text-muted">{regime.title}</h2>
-              <p aria-live="polite" className="text-lg text-text">
+              <p aria-live="polite" className="text-lg tabular-nums text-text">
                 {!outcome
                   ? "Enter a yearly salary to see this regime."
                   : outcome.status === "ready"

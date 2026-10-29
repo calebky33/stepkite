@@ -83,7 +83,7 @@ export function SegmentedControl<T extends string>({
                 onKeyDown={(e) => onKeyDown(e, index)}
                 className={cn(
                   "min-h-11 min-w-11 flex-1 select-none rounded-[6px] px-3 text-base [overflow-wrap:anywhere]",
-                  "transition-[background-color,color,transform] duration-150 ease-[var(--ease-out)] active:scale-[0.97]",
+                  "transition-[background-color,color,transform,scale] duration-150 ease-[var(--ease-out)] active:scale-[0.97]",
                   "disabled:opacity-50 disabled:active:scale-100",
                   checked
                     ? "border border-border bg-surface font-semibold text-text shadow-card"

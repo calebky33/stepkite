@@ -38,7 +38,7 @@ export function Sheet({
         <RadixDialog.Content
           {...(description ? {} : { "aria-describedby": undefined })}
           className={cn(
-            "sk-anim sk-sheet fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[85dvh] w-full max-w-lg overflow-y-auto",
+            "sk-anim sk-sheet fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[85dvh] w-full max-w-lg overflow-y-auto overscroll-contain",
             "rounded-t-card border border-b-0 border-border bg-surface px-6 pt-6 text-text shadow-dialog",
             "pb-[max(1.5rem,env(safe-area-inset-bottom))]",
             className,

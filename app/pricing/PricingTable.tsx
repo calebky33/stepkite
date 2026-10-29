@@ -23,6 +23,7 @@ const ROWS: Row[] = [
   { feature: "ATS check", free: "Yes", pro: "Yes", building: true },
   { feature: "Job tracker on your device", free: "Yes", pro: "Yes" },
   { feature: "Job ad matching", free: "1 a month", pro: "Unlimited", building: true },
+  { feature: "Offer comparison", free: "Yes", pro: "Yes", building: true },
   { feature: "Tailored CV versions", free: "No", pro: "Yes", building: true },
   { feature: "Cover letters", free: "No", pro: "Yes", building: true },
   { feature: "Sync between your devices", free: "No", pro: "Yes", building: true },

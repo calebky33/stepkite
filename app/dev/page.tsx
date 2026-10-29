@@ -18,7 +18,7 @@ export default async function DevGallery({ searchParams }: PageProps<"/dev">) {
   const d = isWorst ? worst : demo;
 
   return (
-    <main className="mx-auto flex max-w-[1120px] flex-col gap-8 px-4 pb-24 pt-12">
+    <div className="mx-auto flex max-w-[1120px] flex-col gap-8 px-4 pb-24 pt-12">
       <h1 className="font-display text-3xl">Component gallery</h1>
       <Card>
         <ThemeToggle />
@@ -76,6 +76,6 @@ export default async function DevGallery({ searchParams }: PageProps<"/dev">) {
           </Link>
         </div>
       </nav>
-    </main>
+    </div>
   );
 }

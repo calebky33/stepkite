@@ -166,7 +166,7 @@ export function PayCalculator({ country, initialGross }: PayCalculatorProps) {
             <Fields values={values} errors={built.errors} onChange={onField} />
           </Card>
         </div>
-        <div className="min-w-0 lg:sticky lg:top-6">
+        <div className="min-w-0 lg:sticky lg:top-[calc(var(--header-h)+1.5rem)] lg:max-h-[calc(100dvh-var(--header-h)-3rem)] lg:overflow-y-auto lg:pr-1">
           <ResultCard
             country={country}
             state={state}

@@ -35,7 +35,7 @@ Patterns:
 
 ## Design: avoid the AI-generated look
 - No purple-to-blue gradients, no glassmorphism, no glowing blobs, no floating 3D shapes.
-- No generic hero with "headline + subhead + two buttons + mockup". The calculator IS the hero: the user types a salary on the first screen.
+- No generic hero with "headline + subhead + two buttons + mockup" on a tool page. The homepage may introduce the toolkit once, with a real product view, working links and an honest status for each tool. Tool pages still open with the tool: the calculator page starts with the salary input.
 - No stock illustrations of smiling people with laptops. Use real UI, real numbers, simple diagrams.
 - No sparkle ✨ icons for AI features. Call the feature what it does: "Match to job ad".
 - No identical three-card "features" rows. Show the product working.

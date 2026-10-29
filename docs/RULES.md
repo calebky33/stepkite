@@ -43,6 +43,8 @@ Rules for building every part of Stepkite so it is simply better than what is on
 28. **Ship small, ship often.** Each merge passes typecheck, lint, `check:copy`, tests and `pnpm build`. Check 375 px and 1280 px, light and dark.
 29. **Validate with people.** Nothing is "done" for a market until real strangers have finished the task. The week 8 gate in ROADMAP.md is a hard gate.
 30. **Write down decisions.** If a rule changes, edit this file in the same change and say why in one line.
+    Decision (2026-10-29): the homepage may open with one toolkit introduction because the owner asked for a platform landing page; tool pages still open with the tool, and `docs/VOICE.md` and `docs/DESIGN.md` carry the detail.
+
 ## Make it safe
 
 31. **Never trust the visitor's clock or the client for money.** Deadlines, prices and access are decided by the server and Stripe. The browser only displays them.

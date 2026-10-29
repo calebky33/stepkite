@@ -35,9 +35,7 @@ export default async function CountryLayout({
           </li>
         </ol>
       </nav>
-      <main id="main" className="flex min-w-0 flex-col gap-8">
-        {children}
-      </main>
+      <div className="flex min-w-0 flex-col gap-8">{children}</div>
     </div>
   );
 }

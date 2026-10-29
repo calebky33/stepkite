@@ -13,4 +13,4 @@ export function stubMetadata(meta: Metadata): Metadata {
 export const SITE_URL = "https://stepkite.com";
 
 /** Only pages with finished content. Add a route here in the same change that makes it real and removes its noindex. */
-export const INDEXABLE_PATHS: readonly string[] = ["/about", "/contact", "/pricing"];
+export const INDEXABLE_PATHS: readonly string[] = ["/", "/about", "/contact", "/pricing"];

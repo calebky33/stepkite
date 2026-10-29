@@ -1,7 +1,10 @@
 import type { ComponentProps } from "react";
 import { cn } from "./cn";
 
-type Variant = "primary" | "secondary" | "ghost";
+export type Variant = "primary" | "secondary" | "ghost";
+
+const BASE =
+  "inline-flex min-h-11 max-w-full select-none items-center justify-center rounded-input px-4 py-2 text-center text-base font-semibold transition-[transform,scale,translate,background-color,opacity] duration-150 ease-[var(--ease-out)] active:scale-[0.97] disabled:opacity-50 disabled:active:scale-100";
 
 const styles: Record<Variant, string> = {
   primary:
@@ -10,6 +13,18 @@ const styles: Record<Variant, string> = {
   secondary: "border border-border-strong bg-surface text-text shadow-card hover:bg-surface-2",
   ghost: "text-primary hover:bg-surface-2",
 };
+
+/**
+ * Class string for a link styled as a button. `extra` must not repeat a utility
+ * from BASE or the variant: `cn` joins classes without resolving conflicts, so
+ * the last one in the stylesheet wins, not the last one passed.
+ */
+export function buttonStyles(
+  variant: Variant = "primary",
+  ...extra: Array<string | false | null | undefined>
+): string {
+  return cn(BASE, styles[variant], ...extra);
+}
 
 type ButtonProps = ComponentProps<"button"> & {
   variant?: Variant;
@@ -31,13 +46,7 @@ export function Button({
       type={type}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
-      className={cn(
-        "inline-flex min-h-11 max-w-full select-none items-center justify-center rounded-input px-4 py-2 text-center text-base font-semibold",
-        "transition-[transform,scale,translate,background-color,opacity] duration-150 ease-[var(--ease-out)] active:scale-[0.97]",
-        "disabled:opacity-50 disabled:active:scale-100",
-        styles[variant],
-        className,
-      )}
+      className={cn(BASE, styles[variant], className)}
       {...props}
     >
       {children}

@@ -11,7 +11,13 @@ const SHORT_NAME: Record<CountryCode, string> = { uk: "UK", us: "US", in: "India
  * Plain links to the same page in another country. The pathname is known at build time
  * for static routes, so the links are in the HTML and work without JavaScript.
  */
-export function CountrySwitcher({ className }: { className?: string }) {
+export function CountrySwitcher({
+  className,
+  onNavigate,
+}: {
+  className?: string;
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname() ?? "/";
   const [, first = "", ...rest] = pathname.split("/");
   const active = isCountry(first) ? first : null;
@@ -25,6 +31,7 @@ export function CountrySwitcher({ className }: { className?: string }) {
             <Link
               href={`/${code}${tail}`}
               aria-current={code === active ? "page" : undefined}
+              onClick={onNavigate}
               className={cn(
                 "inline-flex min-h-11 min-w-11 items-center justify-center rounded-input px-3 text-base",
                 "transition-colors duration-150 ease-[var(--ease-out)] hover:bg-surface-2",

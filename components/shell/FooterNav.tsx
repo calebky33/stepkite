@@ -1,0 +1,65 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { COUNTRY_INFO, isCountry, type CountryCode } from "@/lib/countries";
+
+const LINK_CLASS =
+  "inline-flex min-h-11 items-center text-base text-muted underline-offset-2 hover:text-text hover:underline";
+
+type FooterLink = { href: string; label: string };
+
+function countryFrom(pathname: string): CountryCode {
+  const first = pathname.split("/")[1] ?? "";
+  return isCountry(first) ? first : "uk";
+}
+
+function Column({ title, links, label }: { title: string; links: FooterLink[]; label?: string }) {
+  return (
+    <nav aria-label={label ?? title}>
+      <h2 className="text-sm font-semibold">{title}</h2>
+      <ul>
+        {links.map((item) => (
+          <li key={item.href}>
+            <Link href={item.href} className={LINK_CLASS}>
+              {item.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+/** The three country-aware footer columns. Kept small and separate from the static footer. */
+export function FooterNav() {
+  const pathname = usePathname() ?? "/";
+  const country = countryFrom(pathname);
+  const info = COUNTRY_INFO[country];
+
+  const tools: FooterLink[] = [
+    { href: `/${country}/salary-calculator`, label: "Take-home calculator" },
+    { href: `/${country}/cv`, label: info.cvName === "résumé" ? "Résumé builder" : "CV builder" },
+    { href: `/${country}/compare/offers`, label: "Offer comparison" },
+    { href: `/${country}`, label: "All tools" },
+  ];
+  const explore: FooterLink[] = [
+    { href: `/${country}/guides`, label: "Career guides" },
+    { href: "/pricing", label: "Pricing" },
+    { href: "#product-updates", label: "Product updates" },
+  ];
+  const company: FooterLink[] = [
+    { href: "/about", label: "About" },
+    { href: "/contact", label: "Contact" },
+    { href: "/privacy", label: "Privacy policy" },
+    { href: "/terms", label: "Terms of use" },
+  ];
+
+  return (
+    <div className="grid gap-8 py-8 md:grid-cols-3">
+      <Column title="Tools" links={tools} />
+      <Column title="Explore" links={explore} />
+      <Column title="Stepkite" label="Company" links={company} />
+    </div>
+  );
+}

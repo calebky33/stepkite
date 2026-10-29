@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import sitemap from "@/app/sitemap";
-import { INDEXABLE_PATHS, STUB_ROBOTS, stubMetadata } from "./seo";
+import { INDEXABLE_PATHS, SITE_URL, STUB_ROBOTS, stubMetadata } from "./seo";
 
 describe("seo", () => {
   it("marks stub pages noindex", () => {
@@ -24,7 +24,9 @@ describe("seo", () => {
       expect(urls.some((url) => url.includes(`/${country}`))).toBe(false);
     }
     expect(urls).toHaveLength(INDEXABLE_PATHS.length);
-    expect(INDEXABLE_PATHS).not.toContain("/");
+    // The homepage carries the finished platform introduction, so it is indexable.
+    expect(INDEXABLE_PATHS).toContain("/");
+    expect(urls).toContain(SITE_URL);
     // Draft legal pages stay out until they are final.
     for (const draft of ["/privacy", "/terms", "/cookies"]) {
       expect(INDEXABLE_PATHS).not.toContain(draft);

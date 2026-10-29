@@ -193,7 +193,7 @@ export function CvBuilderShell({ country }: { country: CountryCode }) {
           Start a new {doc}
         </Button>
       ) : null}
-      <div className="sticky top-0 z-10 -mx-1 border-b border-border bg-bg px-1 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] md:hidden">
+      <div className="sticky top-[var(--header-h)] z-20 -mx-1 border-b border-border bg-bg px-1 py-2 md:hidden">
         <SegmentedControl
           label="View"
           options={[
@@ -211,8 +211,8 @@ export function CvBuilderShell({ country }: { country: CountryCode }) {
         <div
           className={
             view === "preview"
-              ? "block min-w-0 md:sticky md:top-4 md:max-h-[calc(100dvh-2rem)] md:overflow-y-auto"
-              : "hidden min-w-0 md:sticky md:top-4 md:max-h-[calc(100dvh-2rem)] md:overflow-y-auto md:block"
+              ? "block min-w-0 md:sticky md:top-[calc(var(--header-h)+1rem)] md:max-h-[calc(100dvh-var(--header-h)-2rem)] md:overflow-y-auto"
+              : "hidden min-w-0 md:sticky md:top-[calc(var(--header-h)+1rem)] md:max-h-[calc(100dvh-var(--header-h)-2rem)] md:overflow-y-auto md:block"
           }
         >
           <PagedPreview cv={cv} country={country} />

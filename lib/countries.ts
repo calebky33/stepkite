@@ -51,6 +51,12 @@ export const COUNTRY_INFO: Record<CountryCode, CountryInfo> = {
   },
 };
 
+export const COUNTRY_SHORT_NAME: Record<CountryCode, string> = {
+  uk: "UK",
+  us: "US",
+  in: "India",
+};
+
 export function isCountry(value: string): value is CountryCode {
   return (COUNTRIES as readonly string[]).includes(value);
 }

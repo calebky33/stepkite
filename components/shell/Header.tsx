@@ -9,6 +9,7 @@ import { IconButton } from "@/components/ui/IconButton";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/components/ui/cn";
 import { COUNTRY_INFO, isCountry, type CountryCode } from "@/lib/countries";
+import { useSavedCountry } from "@/lib/countryPreference";
 import { CountrySwitcher } from "./CountrySwitcher";
 import { ToolsMenu } from "./ToolsMenu";
 
@@ -17,9 +18,9 @@ type ItemKey = "pay" | "cv" | "tools" | "pricing";
 const LINK_CLASS =
   "inline-flex min-h-11 items-center rounded-input px-3 text-base font-medium transition-colors duration-150 ease-[var(--ease-out)]";
 
-function countryFrom(pathname: string): CountryCode {
+function countryFrom(pathname: string, saved: CountryCode): CountryCode {
   const first = pathname.split("/")[1] ?? "";
-  return isCountry(first) ? first : "uk";
+  return isCountry(first) ? first : saved;
 }
 
 /**
@@ -77,7 +78,7 @@ function currentFor(pathname: string, href: string, active: boolean): "page" | "
 
 export function Header() {
   const pathname = usePathname() ?? "/";
-  const country = countryFrom(pathname);
+  const country = countryFrom(pathname, useSavedCountry());
   const info = COUNTRY_INFO[country];
   // The menu belongs to the path it was opened on, so a route change closes it.
   const [openedPath, setOpenedPath] = useState<string | null>(null);
@@ -178,12 +179,12 @@ export function Header() {
         <div className="flex items-center gap-2">
           <div className="hidden items-center gap-2 lg:flex">
             <CountrySwitcher />
-            <Link href={`/${country}/cv`} className={buttonStyles("dark")}>
+            <Link href={`/${country}/cv`} className={buttonStyles("primary")}>
               Build a {info.cvName}
             </Link>
           </div>
           <span className="hidden sm:block lg:hidden">
-            <Link href={`/${country}/cv`} className={buttonStyles("dark")}>
+            <Link href={`/${country}/cv`} className={buttonStyles("primary")}>
               Build {info.cvName}
             </Link>
           </span>
@@ -242,12 +243,12 @@ export function Header() {
             );
           })}
           <div className="mt-2 border-t border-border pt-3">
-            <CountrySwitcher onNavigate={() => setOpenedPath(null)} />
+            <CountrySwitcher layout="inline" onNavigate={() => setOpenedPath(null)} />
           </div>
           <Link
             href={`/${country}/cv`}
             onClick={() => setOpenedPath(null)}
-            className={buttonStyles("dark", "mt-2 w-full")}
+            className={buttonStyles("primary", "mt-2 w-full")}
           >
             Build a {info.cvName}
           </Link>

@@ -82,7 +82,7 @@ export function SegmentedControl<T extends string>({
                 onClick={() => choose(option.value)}
                 onKeyDown={(e) => onKeyDown(e, index)}
                 className={cn(
-                  "min-h-11 min-w-11 flex-1 select-none rounded-[6px] px-3 text-base [overflow-wrap:anywhere]",
+                  "min-h-11 min-w-11 flex-1 select-none whitespace-nowrap rounded-[6px] px-3 text-base",
                   "transition-[background-color,color,transform,scale] duration-150 ease-[var(--ease-out)] active:scale-[0.97]",
                   "disabled:opacity-50 disabled:active:scale-100",
                   checked

@@ -19,7 +19,7 @@ describe("Header", () => {
     render(<Header />);
     expect(screen.getByRole("img", { name: "Stepkite" })).toBeTruthy();
     expect(screen.getByRole("navigation", { name: "Main" })).toBeTruthy();
-    expect(screen.getByRole("navigation", { name: "Country" })).toBeTruthy();
+    expect(screen.getAllByRole("button", { name: /^Country, / }).length).toBeGreaterThan(0);
     expect(screen.getByRole("link", { name: "Pay calculator" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "CV builder" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Build a CV" })).toBeTruthy();

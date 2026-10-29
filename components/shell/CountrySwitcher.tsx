@@ -1,48 +1,58 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { COUNTRIES, isCountry, type CountryCode } from "@/lib/countries";
-import { cn } from "@/components/ui/cn";
+import { COUNTRIES, COUNTRY_SHORT_NAME, isCountry } from "@/lib/countries";
+import { pathForCountry, saveCountry, useSavedCountry } from "@/lib/countryPreference";
+import { Flag } from "./Flag";
+import { ToolsMenu } from "./ToolsMenu";
 
-const SHORT_NAME: Record<CountryCode, string> = { uk: "UK", us: "US", in: "India" };
+const BUTTON_CLASS =
+  "inline-flex min-h-11 items-center rounded-input px-3 text-base font-medium transition-colors duration-150 ease-[var(--ease-out)]";
 
 /**
- * Plain links to the same page in another country. The pathname is known at build time
- * for static routes, so the links are in the HTML and work without JavaScript.
+ * One dropdown for the country. Choosing one remembers it on this device and opens the same
+ * page in that country when it exists, else the country hub. The links are real links.
  */
 export function CountrySwitcher({
-  className,
+  layout = "popover",
   onNavigate,
 }: {
-  className?: string;
+  layout?: "popover" | "inline";
   onNavigate?: () => void;
 }) {
   const pathname = usePathname() ?? "/";
-  const [, first = "", ...rest] = pathname.split("/");
-  const active = isCountry(first) ? first : null;
-  const tail = active && rest.length > 0 ? `/${rest.join("/")}` : "";
+  const saved = useSavedCountry();
+  const first = pathname.split("/")[1] ?? "";
+  const active = isCountry(first) ? first : saved;
+
+  const links = COUNTRIES.map((code) => ({
+    href: pathForCountry(pathname, code),
+    onSelect: () => saveCountry(code),
+    label: (
+      <span className="inline-flex items-center gap-2">
+        <Flag code={code} />
+        {COUNTRY_SHORT_NAME[code]}
+      </span>
+    ),
+  }));
+  const current = pathForCountry(pathname, active);
 
   return (
-    <nav aria-label="Country" className={className}>
-      <ul className="flex gap-1">
-        {COUNTRIES.map((code) => (
-          <li key={code}>
-            <Link
-              href={`/${code}${tail}`}
-              aria-current={code === active ? "page" : undefined}
-              onClick={onNavigate}
-              className={cn(
-                "inline-flex min-h-11 min-w-11 items-center justify-center rounded-input px-3 text-base",
-                "transition-colors duration-150 ease-[var(--ease-out)] hover:bg-surface-2",
-                code === active ? "bg-accent-soft font-semibold text-text" : "text-muted",
-              )}
-            >
-              {SHORT_NAME[code]}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
+    <ToolsMenu
+      layout={layout}
+      links={links}
+      current={current}
+      pathname={pathname}
+      active={false}
+      onNavigate={onNavigate}
+      buttonLabel={`Country, ${COUNTRY_SHORT_NAME[active]}`}
+      trigger={
+        <span className="inline-flex items-center gap-2">
+          <Flag code={active} />
+          {COUNTRY_SHORT_NAME[active]}
+        </span>
+      }
+      className={BUTTON_CLASS}
+    />
   );
 }

@@ -1,3 +1,4 @@
+import { CountryLink, SavedCountryName, SavedExampleSalary } from "@/components/shell/CountryLink";
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { buttonStyles } from "@/components/ui/Button";
@@ -18,9 +19,9 @@ export function Hero() {
             the US and India.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link href="/uk/cv" className={buttonStyles("dark")}>
+            <CountryLink path="/cv" className={buttonStyles("primary")}>
               Build a CV
-            </Link>
+            </CountryLink>
             <Link href="#calculator" className={buttonStyles("secondary")}>
               Try the take-home calculator
             </Link>
@@ -35,18 +36,18 @@ export function Hero() {
           </ul>
         </div>
 
-        <div className="relative min-w-0 rounded-card on-ink bg-ink p-4 pb-0 text-ink-fg shadow-pop md:p-6 md:pb-0">
+        <div className="relative min-w-0 rounded-card on-ink bg-ink p-4 text-ink-fg shadow-pop md:p-6 lg:pb-0">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-semibold">CV builder</p>
             <Badge>Preview</Badge>
           </div>
-          <div className="mt-4 flex justify-start overflow-hidden pb-40 md:pb-28">
+          <div className="mt-4 flex justify-start overflow-hidden lg:pb-56">
             <CvPreview showCaption={false} compact label="Example CV page from the CV builder" />
           </div>
           <div
             role="group"
             aria-label="Example calculator"
-            className="on-light absolute inset-x-4 bottom-[-32px] ml-auto flex max-w-xs flex-col gap-3 rounded-card border border-border bg-surface p-4 text-text shadow-dialog sm:right-6 sm:left-auto md:bottom-[-40px]"
+            className="on-light mt-6 flex w-full max-w-xs flex-col gap-3 rounded-card border border-border bg-surface p-4 text-text shadow-dialog sm:ml-auto lg:absolute lg:right-6 lg:bottom-[-40px] lg:mt-0"
           >
             <div className="flex items-center justify-between gap-2">
               <p className="text-sm font-semibold">Take-home calculator</p>
@@ -54,9 +55,13 @@ export function Hero() {
             </div>
             <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
               <dt className="text-muted">Country</dt>
-              <dd className="text-right font-medium">United Kingdom</dd>
+              <dd className="text-right font-medium">
+                <SavedCountryName />
+              </dd>
               <dt className="text-muted">Salary</dt>
-              <dd className="text-right font-medium tabular-nums">£45,000 a year</dd>
+              <dd className="text-right font-medium tabular-nums">
+                <SavedExampleSalary /> a year
+              </dd>
             </dl>
             <Link href="#calculator" className={buttonStyles("primary", "w-full")}>
               Calculate
@@ -67,7 +72,7 @@ export function Hero() {
           </div>
         </div>
       </div>
-      <div aria-hidden="true" className="h-8 md:h-10" />
+      <div aria-hidden="true" className="h-0 lg:h-10" />
     </section>
   );
 }

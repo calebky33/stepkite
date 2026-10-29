@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { CountryLink } from "@/components/shell/CountryLink";
 import { Calculator, FileText, LayoutGrid, Scale, Target, type LucideIcon } from "lucide-react";
 import { StatusPill, type Status } from "@/components/shell/StatusPill";
 
@@ -11,43 +11,49 @@ type Tile = {
   description: string;
   status: Status;
   Icon: LucideIcon;
+  action: string;
 };
 
 const TILES: Tile[] = [
   {
-    href: "/uk/salary-calculator",
+    href: "/salary-calculator",
     title: "Take-home pay",
     description: "See what reaches your bank after tax and pension.",
     status: "coming-soon",
     Icon: Calculator,
+    action: "Calculate my pay",
   },
   {
-    href: "/uk/cv",
+    href: "/cv",
     title: "CV builder",
     description: "Write each section and watch the page update.",
     status: "preview",
     Icon: FileText,
+    action: "Build my CV",
   },
   {
-    href: "/uk/compare/offers",
+    href: "/compare/offers",
     title: "Salary comparison",
     description: "Put two offers side by side after tax.",
     status: "coming-soon",
     Icon: Scale,
+    action: "Compare salaries",
   },
   {
-    href: "/uk/match",
+    href: "/match",
     title: "Job matching",
     description: "Check a job ad against what your CV says.",
     status: "coming-soon",
     Icon: Target,
+    action: "Explore job matching",
   },
   {
-    href: "/uk",
+    href: "",
     title: "More tools",
     description: "A job tracker and short career guides.",
     status: "beta",
     Icon: LayoutGrid,
+    action: "See more tools",
   },
 ];
 
@@ -73,13 +79,11 @@ export function Suite() {
             Each tool says what works today and what is still being built.
           </p>
         </div>
-        <Link href="/uk" className={LINK}>
-          Explore all tools
-        </Link>
+        <CountryLink className={LINK}>Explore all tools</CountryLink>
       </div>
 
       <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        {TILES.map(({ href, title, description, status, Icon }) => (
+        {TILES.map(({ href, title, description, status, Icon, action }) => (
           <li key={title} className="min-w-0">
             <article className="flex h-full flex-col gap-3 rounded-card border border-border bg-surface p-4 shadow-card">
               <span className="flex size-10 items-center justify-center rounded-input bg-accent-soft">
@@ -88,9 +92,10 @@ export function Suite() {
               <h3 className="text-base font-semibold [overflow-wrap:anywhere]">{title}</h3>
               <StatusPill status={status} className="self-start" />
               <p className="text-sm text-muted">{description}</p>
-              <Link href={href} className={`${LINK} mt-auto text-sm`}>
-                Open {title}
-              </Link>
+              <CountryLink path={href} className={`${LINK} mt-auto text-sm`}>
+                {action}
+                <span className="sr-only">: {title}</span>
+              </CountryLink>
             </article>
           </li>
         ))}

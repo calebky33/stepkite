@@ -1,23 +1,30 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { Tabs } from "@/components/ui/Tabs";
-import { COUNTRY_INFO, type CountryCode } from "@/lib/countries";
+import { COUNTRY_SHORT_NAME, isCountry, type CountryCode } from "@/lib/countries";
+import { useSavedCountry } from "@/lib/countryPreference";
 import { PayCalculator } from "./PayCalculator";
 
-const SHORT_NAME: Record<CountryCode, string> = { uk: "UK", us: "US", in: "India" };
 const CODES: CountryCode[] = ["uk", "us", "in"];
 
-/** The home page calculator with a country tab for each market. Starts on the UK. */
+/** The home page calculator with a country tab for each market. Opens on the saved country. */
 export function HomeCalculator() {
+  const saved = useSavedCountry();
+  // A tab the visitor picks wins over the saved country until they leave the page.
+  const [picked, setPicked] = useState<CountryCode | null>(null);
   return (
     <Tabs
       label="Country"
-      defaultValue="uk"
+      value={picked ?? saved}
+      onValueChange={(value) => {
+        if (isCountry(value)) setPicked(value);
+      }}
       className="gap-8"
       tabs={CODES.map((code) => ({
         value: code,
-        label: SHORT_NAME[code],
+        label: COUNTRY_SHORT_NAME[code],
         content: (
           <div className="flex flex-col gap-8">
             <PayCalculator country={code} />
@@ -25,7 +32,7 @@ export function HomeCalculator() {
               href={`/${code}`}
               className="inline-flex min-h-11 items-center self-start text-base text-primary underline-offset-4 hover:underline"
             >
-              More about pay in {COUNTRY_INFO[code].name}
+              More pay tools
             </Link>
           </div>
         ),

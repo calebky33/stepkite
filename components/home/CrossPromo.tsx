@@ -1,3 +1,4 @@
+import { CountryLink } from "@/components/shell/CountryLink";
 import Link from "next/link";
 
 const LINK =
@@ -35,9 +36,9 @@ export function CrossPromo() {
           <p className="mt-2 text-base text-muted">
             See the page change as you type. Your work saves on this device.
           </p>
-          <Link href="/uk/cv" className={`${LINK} mt-auto pt-5`}>
+          <CountryLink path="/cv" className={`${LINK} mt-auto pt-5`}>
             Build a CV
-          </Link>
+          </CountryLink>
         </article>
       </div>
     </section>

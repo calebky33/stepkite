@@ -75,20 +75,57 @@ describe("ConsentBanner", () => {
 });
 
 describe("CountrySwitcher", () => {
-  it("links to the same page in the other countries and marks the current one", () => {
+  beforeEach(() => window.localStorage.clear());
+
+  it("is one button that opens a list of countries and marks the current one", () => {
     pathname = "/uk/cv";
     render(<CountrySwitcher />);
-    expect(screen.getByRole("navigation", { name: "Country" })).toBeTruthy();
+    const button = screen.getByRole("button", { name: "Country, UK" });
+    expect(button.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(button);
+    expect(button.getAttribute("aria-expanded")).toBe("true");
     expect(screen.getByRole("link", { name: "US" }).getAttribute("href")).toBe("/us/cv");
     expect(screen.getByRole("link", { name: "India" }).getAttribute("href")).toBe("/in/cv");
     expect(screen.getByRole("link", { name: "UK" }).getAttribute("aria-current")).toBe("page");
   });
 
-  it("links to the country pages from pages outside a country", () => {
+  it("falls back to the country hub when the page has no twin", () => {
+    pathname = "/uk/compare/regime";
+    render(<CountrySwitcher />);
+    fireEvent.click(screen.getByRole("button", { name: "Country, UK" }));
+    expect(screen.getByRole("link", { name: "India" }).getAttribute("href")).toBe(
+      "/in/compare/regime",
+    );
+    expect(screen.getByRole("link", { name: "US" }).getAttribute("href")).toBe("/us");
+  });
+
+  it("closes on Escape and returns focus to the button", () => {
+    pathname = "/uk";
+    render(<CountrySwitcher />);
+    const button = screen.getByRole("button", { name: "Country, UK" });
+    fireEvent.click(button);
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(button.getAttribute("aria-expanded")).toBe("false");
+    expect(document.activeElement).toBe(button);
+  });
+
+  it("remembers the choice and uses it outside a country", () => {
+    pathname = "/uk";
+    const { unmount } = render(<CountrySwitcher />);
+    fireEvent.click(screen.getByRole("button", { name: "Country, UK" }));
+    fireEvent.click(screen.getByRole("link", { name: "India" }));
+    expect(window.localStorage.getItem("sk_country")).toBe("in");
+    unmount();
     pathname = "/about";
     render(<CountrySwitcher />);
-    expect(screen.getByRole("link", { name: "UK" }).getAttribute("href")).toBe("/uk");
-    expect(screen.queryByRole("link", { current: "page" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Country, India" })).toBeTruthy();
+  });
+
+  it("ignores a saved value that is not a country", () => {
+    window.localStorage.setItem("sk_country", "zz");
+    pathname = "/about";
+    render(<CountrySwitcher />);
+    expect(screen.getByRole("button", { name: "Country, UK" })).toBeTruthy();
   });
 });
 

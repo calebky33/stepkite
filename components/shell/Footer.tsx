@@ -44,11 +44,11 @@ export function Footer() {
           </nav>
         </FooterNav>
 
-        <div className="on-light grid gap-6 rounded-card bg-surface p-4 text-text md:grid-cols-[1fr_auto] md:p-6">
+        <div className="on-light grid gap-6 rounded-card bg-surface p-4 text-text md:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] md:items-start md:gap-12 md:p-6">
           <section
             id="product-updates"
             aria-labelledby="footer-news"
-            className="scroll-mt-[calc(var(--header-h)+1rem)] flex flex-col gap-3"
+            className="scroll-mt-[calc(var(--header-h)+1rem)] flex max-w-md flex-col gap-3"
           >
             <h2 id="footer-news" className="text-sm font-semibold">
               Product updates
@@ -58,7 +58,7 @@ export function Footer() {
             </p>
             <NewsletterSignup />
           </section>
-          <div className="flex w-full max-w-60 shrink-0 flex-col gap-3">
+          <div className="flex w-full min-w-0 flex-col gap-4 border-t border-border pt-6 md:border-t-0 md:border-l md:pt-0 md:pl-12">
             <ThemeToggle />
             <p className="text-sm text-muted">
               Stepkite gives estimates, not tax advice. Your actual pay may differ.

@@ -2,13 +2,19 @@
 
 import Link from "next/link";
 import { Check, ChevronDown } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/components/ui/cn";
 
-export type ToolLink = { href: string; label: string };
+export type ToolLink = { href: string; label: ReactNode; onSelect?: () => void };
 
 type Props = {
   links: ToolLink[];
+  /** Button content. Defaults to "Tools". */
+  trigger?: ReactNode;
+  /** Href of the link to mark as current. Defaults to the one equal to pathname. */
+  current?: string;
+  /** Names the button when its content is not enough, for example a flag and a short name. */
+  buttonLabel?: string;
   pathname: string;
   active: boolean;
   /** "popover" floats under the button. "inline" opens in the flow, for the mobile menu. */
@@ -18,7 +24,17 @@ type Props = {
 };
 
 /** A disclosure button with a list of links. Escape closes it and returns focus to the button. */
-export function ToolsMenu({ links, pathname, active, layout, onNavigate, className }: Props) {
+export function ToolsMenu({
+  links,
+  trigger = "Tools",
+  current,
+  buttonLabel,
+  pathname,
+  active,
+  layout,
+  onNavigate,
+  className,
+}: Props) {
   const [openedPath, setOpenedPath] = useState<string | null>(null);
   const open = openedPath === pathname;
   const id = useId();
@@ -59,6 +75,7 @@ export function ToolsMenu({ links, pathname, active, layout, onNavigate, classNa
         type="button"
         aria-expanded={open}
         aria-controls={id}
+        aria-label={buttonLabel}
         onClick={() => setOpenedPath(open ? null : pathname)}
         className={cn(
           className,
@@ -69,7 +86,7 @@ export function ToolsMenu({ links, pathname, active, layout, onNavigate, classNa
             : "text-muted hover:bg-surface-2 hover:text-text",
         )}
       >
-        Tools
+        {trigger}
         <ChevronDown
           aria-hidden="true"
           size={16}
@@ -88,28 +105,32 @@ export function ToolsMenu({ links, pathname, active, layout, onNavigate, classNa
             : "mt-1 flex flex-col gap-1 pl-3",
         )}
       >
-        {links.map((link) => (
-          <li key={link.href}>
-            <Link
-              href={link.href}
-              aria-current={pathname === link.href ? "page" : undefined}
-              onClick={() => {
-                setOpenedPath(null);
-                onNavigate?.();
-              }}
-              className={cn(
-                "flex min-h-11 w-full items-center justify-between gap-2 rounded-input px-3 text-base text-text",
-                "transition-colors duration-150 ease-[var(--ease-out)] hover:bg-surface-2 active:bg-accent-soft",
-                pathname === link.href && "bg-accent-soft font-semibold",
-              )}
-            >
-              {link.label}
-              {pathname === link.href ? (
-                <Check aria-hidden="true" size={18} className="shrink-0 text-primary" />
-              ) : null}
-            </Link>
-          </li>
-        ))}
+        {links.map((link) => {
+          const here = (current ?? pathname) === link.href;
+          return (
+            <li key={link.href}>
+              <Link
+                href={link.href}
+                aria-current={here ? "page" : undefined}
+                onClick={() => {
+                  link.onSelect?.();
+                  setOpenedPath(null);
+                  onNavigate?.();
+                }}
+                className={cn(
+                  "flex min-h-11 w-full items-center justify-between gap-2 rounded-input px-3 text-base text-text",
+                  "transition-colors duration-150 ease-[var(--ease-out)] hover:bg-surface-2 active:bg-accent-soft",
+                  here && "bg-accent-soft font-semibold",
+                )}
+              >
+                {link.label}
+                {here ? (
+                  <Check aria-hidden="true" size={18} className="shrink-0 text-primary" />
+                ) : null}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

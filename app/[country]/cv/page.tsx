@@ -26,7 +26,7 @@ export default async function CvPage({ params }: Props) {
   const doc = COUNTRY_INFO[country].cvName;
   return (
     <>
-      <h1 className="font-display text-4xl font-extrabold">Build your {doc}</h1>
+      <h1 className="font-display text-4xl">Build your {doc}</h1>
       <p className="max-w-prose text-muted">
         Your {doc} is saved on this device. Nothing is sent to us.
       </p>

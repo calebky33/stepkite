@@ -162,13 +162,13 @@ export function CvBuilderShell({ country }: { country: CountryCode }) {
   );
 
   return (
-    <div className="flex min-w-0 flex-col gap-4">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+    <div className="flex min-w-0 flex-col gap-6">
+      <div className="flex flex-col gap-3 rounded-card border border-border bg-surface p-4 shadow-card sm:flex-row sm:items-start sm:justify-between">
         {/* Reserved height so the message never pushes the page down. */}
         <p
           role="status"
           aria-live="polite"
-          className={isError ? "min-h-12 text-danger" : "min-h-12 text-muted"}
+          className={isError ? "min-h-12 text-sm text-danger" : "min-h-12 text-sm text-muted"}
         >
           {message[saveState]}
         </p>
@@ -193,7 +193,7 @@ export function CvBuilderShell({ country }: { country: CountryCode }) {
           Start a new {doc}
         </Button>
       ) : null}
-      <div className="sticky top-0 z-10 -mx-1 bg-bg px-1 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] md:hidden">
+      <div className="sticky top-0 z-10 -mx-1 border-b border-border bg-bg px-1 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] md:hidden">
         <SegmentedControl
           label="View"
           options={[

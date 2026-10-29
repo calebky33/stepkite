@@ -15,7 +15,7 @@ export default function Home() {
       title="Work out your take-home pay"
       lead="Type your salary. The result updates as you type, and nothing you enter leaves your device."
     >
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-12">
         <HomeCalculator />
         <AdSlot placement="calculator" />
       </div>

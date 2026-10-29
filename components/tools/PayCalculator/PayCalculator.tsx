@@ -126,9 +126,9 @@ export function PayCalculator({ country, initialGross }: PayCalculatorProps) {
 
   return (
     <div className="flex min-w-0 flex-col gap-6">
-      <div className="grid gap-6 lg:grid-cols-[2fr_3fr] lg:items-start">
+      <div className="grid gap-6 lg:grid-cols-[2fr_3fr] lg:items-start lg:gap-8">
         <div className="flex min-w-0 flex-col gap-6">
-          <Card className="flex flex-col gap-4">
+          <Card className="flex flex-col gap-6 md:p-8">
             <div className="flex min-h-6 items-center gap-2">
               {edited ? null : <Badge>Example</Badge>}
               {edited ? null : <p className="text-sm text-muted">Change it to your own salary.</p>}
@@ -162,7 +162,7 @@ export function PayCalculator({ country, initialGross }: PayCalculatorProps) {
               ]}
             />
           </Card>
-          <Card>
+          <Card className="bg-surface md:p-8">
             <Fields values={values} errors={built.errors} onChange={onField} />
           </Card>
         </div>

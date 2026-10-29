@@ -40,12 +40,12 @@ export function Dialog({
           {...(description ? {} : { "aria-describedby": undefined })}
           className={cn(
             "sk-anim sk-pop fixed inset-0 z-50 m-auto h-fit max-h-[85dvh] w-[calc(100%-2rem)] max-w-md overflow-y-auto",
-            "rounded-card border border-border bg-surface p-6 text-text shadow-pop",
+            "rounded-card border border-border bg-surface p-6 text-text shadow-dialog md:p-8",
             className,
           )}
         >
           <div className="flex items-start justify-between gap-3">
-            <RadixDialog.Title className="font-display text-xl font-extrabold [overflow-wrap:anywhere]">
+            <RadixDialog.Title className="font-display text-xl tracking-tight [overflow-wrap:anywhere]">
               {title}
             </RadixDialog.Title>
             <RadixDialog.Close asChild>

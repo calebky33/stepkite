@@ -31,8 +31,8 @@ const ROWS: Row[] = [
 
 export function PricingTable() {
   return (
-    <section aria-labelledby="compare-plans" className="mt-12 flex flex-col gap-4">
-      <h2 id="compare-plans" className="text-lg font-semibold">
+    <section aria-labelledby="compare-plans" className="mt-12 flex flex-col gap-6">
+      <h2 id="compare-plans" className="font-display text-[22px] leading-tight md:text-[28px]">
         Free and Pro side by side
       </h2>
       <Table label="Free and Pro features">

@@ -20,6 +20,7 @@ export function Input({ label, hint, error, className, ...props }: InputProps) {
           className={cn(
             "min-h-11 w-full min-w-0 rounded-input border bg-surface-2 px-3 text-base text-text",
             "transition-colors duration-150 ease-[var(--ease-out)] disabled:opacity-50",
+            "focus-visible:border-primary focus-visible:bg-surface",
             error ? "border-danger" : "border-border-strong",
             className,
           )}

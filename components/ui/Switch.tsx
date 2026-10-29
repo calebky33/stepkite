@@ -64,7 +64,7 @@ export function Switch({
         >
           <RadixSwitch.Thumb
             className={cn(
-              "block size-5 translate-x-0.5 rounded-full bg-text",
+              "block size-5 translate-x-0.5 rounded-full bg-text shadow-card",
               "transition-transform duration-150 ease-[var(--ease-in-out)]",
               "data-[state=checked]:translate-x-6 data-[state=checked]:bg-primary-fg",
             )}

@@ -61,7 +61,7 @@ export default async function CountryHubPage({ params }: Props) {
   const info = COUNTRY_INFO[country];
   return (
     <>
-      <h1 className="font-display text-[28px] font-extrabold leading-tight md:text-4xl [overflow-wrap:anywhere]">
+      <h1 className="font-display text-[28px] leading-tight md:text-4xl [overflow-wrap:anywhere]">
         Tools for {info.name}
       </h1>
       <p className="max-w-prose text-lg text-muted">
@@ -74,31 +74,52 @@ export default async function CountryHubPage({ params }: Props) {
       >
         Open the salary calculator
       </Link>
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {groupsFor(country).map((group) => (
-          <section key={group.heading} aria-labelledby={`hub-${group.heading}`.replace(/\s/g, "-")}>
-            <h2 id={`hub-${group.heading}`.replace(/\s/g, "-")} className="text-lg font-semibold">
-              {group.heading}
-            </h2>
-            <ul>
-              {group.links.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="inline-flex min-h-11 flex-wrap items-center gap-x-2 text-base font-semibold text-primary underline underline-offset-4"
+      <div className="grid gap-6 lg:grid-cols-[3fr_2fr] lg:gap-8">
+        {groupsFor(country).map((group) => {
+          const lead = group.heading === "Common salaries";
+          return (
+            <section
+              key={group.heading}
+              aria-labelledby={`hub-${group.heading}`.replace(/\s/g, "-")}
+              className={
+                lead
+                  ? "rounded-card border border-border bg-surface p-6 shadow-card md:p-8 lg:col-start-1 lg:row-span-2 lg:row-start-1"
+                  : "rounded-card border border-border bg-surface-2 p-6 lg:col-start-2"
+              }
+            >
+              <h2
+                id={`hub-${group.heading}`.replace(/\s/g, "-")}
+                className={
+                  lead
+                    ? "mb-4 font-display text-[28px] leading-tight"
+                    : "mb-2 text-lg font-semibold"
+                }
+              >
+                {group.heading}
+              </h2>
+              <ul>
+                {group.links.map((link) => (
+                  <li
+                    key={link.href}
+                    className={lead ? "border-t border-border first:border-t-0" : undefined}
                   >
-                    {link.label}
-                    {link.note ? (
-                      <span className="text-sm font-normal text-muted no-underline">
-                        {link.note}
-                      </span>
-                    ) : null}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
+                    <Link
+                      href={link.href}
+                      className="inline-flex min-h-11 flex-wrap items-center gap-x-2 text-base font-semibold text-primary underline underline-offset-4"
+                    >
+                      {link.label}
+                      {link.note ? (
+                        <span className="text-sm font-normal text-muted no-underline">
+                          {link.note}
+                        </span>
+                      ) : null}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        })}
       </div>
     </>
   );

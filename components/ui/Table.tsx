@@ -13,7 +13,7 @@ export function Table({ label, className, children, ...props }: TableProps) {
       role="region"
       aria-label={label}
       tabIndex={0}
-      className="w-full overflow-x-auto rounded-card border border-border"
+      className="w-full overflow-x-auto rounded-card border border-border bg-surface shadow-card"
     >
       <table className={cn("w-full border-collapse text-left text-base", className)} {...props}>
         <caption className="sr-only">{label}</caption>

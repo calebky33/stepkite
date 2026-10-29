@@ -29,7 +29,7 @@ export default async function SalaryCalculatorPage({ params }: Props) {
   const info = COUNTRY_INFO[country];
   return (
     <>
-      <h1 className="font-display text-4xl font-extrabold">Salary calculator for {info.name}</h1>
+      <h1 className="font-display text-4xl">Salary calculator for {info.name}</h1>
       <PayCalculator country={country} />
       <AdSlot placement="calculator" />
       <ToolLinks country={country} />

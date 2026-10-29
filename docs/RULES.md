@@ -34,7 +34,7 @@ Rules for building every part of Stepkite so it is simply better than what is on
 
 23. **Learn mechanics, never copy.** Ideas from other products are fine. Their names, text, images, template designs, prices and statistics are not. Do not name other products in the repo, the UI, the docs or commit messages.
 24. **Our voice.** All user-facing text follows `docs/VOICE.md` and passes `copy-editor`: plain, specific, local spelling, no dashes in prose, no filler words, no emoji.
-25. **Our look.** Follow `docs/DESIGN.md`. No gradients, glass effects, sparkles, stock heroes or rows of identical cards.
+25. **Our look.** Follow `docs/DESIGN.md`. No gradients, glass blur, glow, sparkles, stock heroes or rows of identical cards. Depth comes from layered soft shadows, type and spacing.
 
 ## Make it stay good: process
 
@@ -43,6 +43,7 @@ Rules for building every part of Stepkite so it is simply better than what is on
 28. **Ship small, ship often.** Each merge passes typecheck, lint, `check:copy`, tests and `pnpm build`. Check 375 px and 1280 px, light and dark.
 29. **Validate with people.** Nothing is "done" for a market until real strangers have finished the task. The week 8 gate in ROADMAP.md is a hard gate.
 30. **Write down decisions.** If a rule changes, edit this file in the same change and say why in one line.
+
 ## Make it safe
 
 31. **Never trust the visitor's clock or the client for money.** Deadlines, prices and access are decided by the server and Stripe. The browser only displays them.

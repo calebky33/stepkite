@@ -46,19 +46,16 @@ export function MatchShell({ country }: { country: CountryCode }) {
   }, []);
 
   return (
-    <div className="flex min-w-0 flex-col gap-6">
+    <div className="flex min-w-0 flex-col gap-8">
       <p
         role="status"
         className="rounded-card border border-border bg-accent-soft p-4 text-base font-semibold"
       >
         Job ad matching is not available yet.
       </p>
-      <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
-        <Card className="flex min-w-0 flex-col gap-6">
-          <Field
-            label="Job ad"
-            hint="Paste the full text of the ad. It stays on this page."
-          >
+      <div className="grid gap-6 lg:grid-cols-2 lg:items-start lg:gap-8">
+        <Card className="flex min-w-0 flex-col gap-6 md:p-8">
+          <Field label="Job ad" hint="Paste the full text of the ad. It stays on this page.">
             {(control) => (
               <>
                 <textarea
@@ -119,9 +116,13 @@ export function MatchShell({ country }: { country: CountryCode }) {
           </div>
         </Card>
 
-        <Card role="region" className="flex min-w-0 flex-col gap-6" aria-labelledby="match-result">
+        <Card
+          role="region"
+          className="flex min-w-0 flex-col gap-8 md:p-8"
+          aria-labelledby="match-result"
+        >
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 id="match-result" className="text-lg font-semibold">
+            <h2 id="match-result" className="font-display text-[22px] leading-tight">
               Result
             </h2>
             <Badge tone="highlight">Placeholder</Badge>
@@ -136,10 +137,14 @@ export function MatchShell({ country }: { country: CountryCode }) {
               </h3>
               <ul className="flex flex-col gap-3">
                 {ROWS.map((n) => (
-                  <li key={n} className="rounded-input border border-dashed border-border-strong p-3">
+                  <li
+                    key={n}
+                    className="rounded-input border border-dashed border-border-strong p-3"
+                  >
                     <p className="text-sm font-semibold">Requirement {n}</p>
                     <p className="text-sm text-muted">
-                      Evidence: the line in your {cvName} that shows it, or a note that none was found.
+                      Evidence: the line in your {cvName} that shows it, or a note that none was
+                      found.
                     </p>
                   </li>
                 ))}

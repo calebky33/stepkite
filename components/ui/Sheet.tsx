@@ -39,13 +39,13 @@ export function Sheet({
           {...(description ? {} : { "aria-describedby": undefined })}
           className={cn(
             "sk-anim sk-sheet fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[85dvh] w-full max-w-lg overflow-y-auto",
-            "rounded-t-card border border-b-0 border-border bg-surface px-6 pt-6 text-text shadow-pop",
+            "rounded-t-card border border-b-0 border-border bg-surface px-6 pt-6 text-text shadow-dialog",
             "pb-[max(1.5rem,env(safe-area-inset-bottom))]",
             className,
           )}
         >
           <div className="flex items-start justify-between gap-3">
-            <RadixDialog.Title className="font-display text-xl font-extrabold [overflow-wrap:anywhere]">
+            <RadixDialog.Title className="font-display text-xl tracking-tight [overflow-wrap:anywhere]">
               {title}
             </RadixDialog.Title>
             <RadixDialog.Close asChild>

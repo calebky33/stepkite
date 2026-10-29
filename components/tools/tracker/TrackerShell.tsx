@@ -159,10 +159,10 @@ export function TrackerShell() {
 
   return (
     <div className="flex min-w-0 flex-col gap-8">
-      <Card>
-        <form onSubmit={addJob} noValidate className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold">Add a job</h2>
-          <div className="grid gap-4 md:grid-cols-3">
+      <Card className="md:p-8">
+        <form onSubmit={addJob} noValidate className="flex flex-col gap-6">
+          <h2 className="font-display text-[22px] leading-tight">Add a job</h2>
+          <div className="grid gap-4 md:grid-cols-3 md:gap-6">
             <Input
               label="Job title"
               value={title}
@@ -244,9 +244,9 @@ export function TrackerShell() {
               <section
                 key={stage}
                 aria-labelledby={`stage-${stage}`}
-                className="flex min-w-0 flex-col gap-3 md:w-64 md:shrink-0 lg:w-auto"
+                className="flex min-w-0 flex-col gap-3 rounded-card bg-surface-2 p-3 md:w-64 md:shrink-0 lg:w-auto"
               >
-                <h2 id={`stage-${stage}`} className="text-base font-semibold">
+                <h2 id={`stage-${stage}`} className="px-1 text-sm font-semibold">
                   {STAGE_LABELS[stage]}{" "}
                   <span className="font-normal text-muted tabular-nums">{inStage.length}</span>
                 </h2>

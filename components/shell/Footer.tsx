@@ -21,7 +21,7 @@ const COMPANY = [
 export function Footer() {
   return (
     <footer className="mt-16 mb-[var(--consent-h,0px)] border-t border-border pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-      <div className="mx-auto grid max-w-[1120px] gap-8 px-4 py-8 md:grid-cols-3 md:px-6">
+      <div className="mx-auto grid max-w-[1120px] gap-8 px-4 py-10 md:grid-cols-3 md:px-6">
         <nav aria-label="Countries">
           <h2 className="text-sm font-semibold">Countries</h2>
           <ul>

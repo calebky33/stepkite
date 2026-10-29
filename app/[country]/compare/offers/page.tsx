@@ -26,7 +26,7 @@ export default async function OfferComparePage({ params }: Props) {
   const country = await requireCountry(params);
   return (
     <>
-      <h1 className="font-display text-4xl font-extrabold">Compare two job offers</h1>
+      <h1 className="font-display text-4xl">Compare two job offers</h1>
       <p className="max-w-prose text-muted">
         Enter both salaries to see which one leaves you more after tax.
       </p>

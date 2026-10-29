@@ -55,10 +55,10 @@ export function OfferCompare({ country }: { country: CountryCode }) {
   }
 
   return (
-    <div className="flex min-w-0 flex-col gap-6">
-      <div className="grid gap-6 md:grid-cols-2">
+    <div className="flex min-w-0 flex-col gap-8">
+      <div className="grid gap-6 md:grid-cols-2 md:gap-8">
         {offers.map((offer, index) => (
-          <Card key={offer.name} className="flex flex-col gap-4">
+          <Card key={offer.name} className="flex flex-col gap-4 md:p-8">
             <h2 className="text-lg font-semibold">{offer.name}</h2>
             <CurrencyInput
               label="Yearly salary before tax"
@@ -78,9 +78,9 @@ export function OfferCompare({ country }: { country: CountryCode }) {
           </Card>
         ))}
       </div>
-      <Card role="region" aria-label="Difference" className="min-h-24">
-        <h2 className="text-lg font-semibold">The difference</h2>
-        <p aria-live="polite" className="mt-2 text-muted">
+      <Card role="region" aria-label="Difference" className="min-h-28 bg-accent-soft md:p-8">
+        <h2 className="text-sm font-medium text-muted">The difference</h2>
+        <p aria-live="polite" className="mt-2 text-lg text-text">
           {difference}
         </p>
       </Card>

@@ -89,7 +89,10 @@ export function ResultCard({ country, state, annualGross, entered, example }: Re
   const ready = state.kind === "ready";
 
   return (
-    <Card className="flex min-h-112 flex-col gap-6 scroll-mt-4 lg:min-h-160" id={BREAKDOWN_ID}>
+    <Card
+      className="flex min-h-112 scroll-mt-4 flex-col gap-8 p-6 shadow-card md:p-8 lg:min-h-160"
+      id={BREAKDOWN_ID}
+    >
       <SegmentedControl<ResultView>
         label="Show amounts per"
         value={view}
@@ -133,7 +136,7 @@ export function ResultCard({ country, state, annualGross, entered, example }: Re
               />
             ) : null}
           </div>
-          <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
+          <div className="flex flex-col items-center gap-6 border-t border-border pt-8 sm:flex-row sm:items-start sm:gap-8">
             <Donut
               slices={state.kind === "ready" ? slicesFor(state.result) : null}
               activeKey={active}
@@ -192,7 +195,7 @@ function MissingNotice({
           </span>
         </p>
       ) : null}
-      <h2 className="font-display text-[22px] font-extrabold">Estimate. Rates not loaded yet.</h2>
+      <h2 className="font-display text-[22px]">Estimate. Rates not loaded yet.</h2>
       <p className="text-base">
         We show figures only once they are checked against the official source
         {host && url ? (
@@ -292,7 +295,7 @@ function ReadyHeadline({
 
   return (
     <>
-      <p className="text-base">
+      <p className="text-sm font-medium text-muted">
         <span className="sr-only">
           You take home {formatMoney(net, country)} {VIEW_WORD[view]}.
         </span>
@@ -300,10 +303,10 @@ function ReadyHeadline({
       </p>
       <p
         aria-hidden="true"
-        className="min-h-12 font-display text-4xl font-extrabold tabular-nums text-positive md:text-5xl"
+        className="min-h-12 font-sans text-4xl leading-none font-semibold tracking-tight text-positive tabular-nums md:text-5xl"
       >
         {formatMoney(shown, country)}{" "}
-        <span className="text-base font-normal text-muted">{VIEW_WORD[view]}</span>
+        <span className="text-base font-normal tracking-normal text-muted">{VIEW_WORD[view]}</span>
       </p>
     </>
   );
@@ -364,7 +367,7 @@ function ReadyTable({
 function ReadyNotes({ state }: { state: Extract<ResultState, { kind: "ready" }> }) {
   const sources = Array.from(new Set(state.result.lines.map((line) => line.source)));
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 rounded-input bg-surface-2 p-4">
       {state.result.assumptions.length > 0 ? (
         <ul className="list-disc pl-5 text-sm text-muted">
           {state.result.assumptions.map((text) => (
@@ -423,13 +426,13 @@ export function NetBar({ country, state }: NetBarProps) {
   const month =
     state.kind === "ready" ? formatMoney(state.result.perPeriod.month, country) : PENDING;
   return (
-    <div className="sticky bottom-[var(--consent-h,0px)] z-10 rounded-card border border-border bg-surface px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:hidden">
+    <div className="sticky bottom-[var(--consent-h,0px)] z-10 rounded-card border border-border bg-surface px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-pop lg:hidden">
       <a
         href={`#${BREAKDOWN_ID}`}
         className="flex min-h-11 items-center justify-between gap-4 text-base"
       >
         <span className="min-w-0 text-muted">{capitalise(info.takeHomeTerm)} a month</span>
-        <span className="font-display text-[22px] font-extrabold tabular-nums">{month}</span>
+        <span className="font-sans text-[22px] font-semibold tabular-nums">{month}</span>
       </a>
     </div>
   );

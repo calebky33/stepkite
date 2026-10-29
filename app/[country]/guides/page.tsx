@@ -29,13 +29,16 @@ export default async function GuidesPage({ params }: Props) {
   const guides = guidesFor(country);
   return (
     <>
-      <h1 className="font-display text-4xl font-extrabold">Guides</h1>
+      <h1 className="font-display text-4xl">Guides</h1>
       {guides.length === 0 ? (
         <p className="text-muted">No guides here yet.</p>
       ) : (
         <ul className="flex max-w-prose flex-col gap-6">
           {guides.map((guide) => (
-            <li key={guide.slug} className="flex flex-col gap-2">
+            <li
+              key={guide.slug}
+              className="flex flex-col gap-2 rounded-card border border-border bg-surface p-6 shadow-card"
+            >
               <Badge>Draft for human rewrite</Badge>
               <Link
                 href={`/${country}/guides/${guide.slug}`}

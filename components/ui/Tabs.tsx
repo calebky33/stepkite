@@ -26,7 +26,7 @@ export function Tabs({ label, tabs, value, defaultValue, onValueChange, classNam
     >
       <RadixTabs.List
         aria-label={label}
-        className="flex gap-1 overflow-x-auto border-b border-border"
+        className="flex gap-2 overflow-x-auto border-b border-border"
       >
         {tabs.map((tab) => (
           <RadixTabs.Trigger

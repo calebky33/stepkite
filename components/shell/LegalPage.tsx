@@ -22,7 +22,7 @@ export function LegalPage({ title, lead, sections }: LegalPageProps) {
       <div className="flex flex-col gap-8">
         {sections.map((section) => (
           <section key={section.heading} className="flex flex-col gap-3">
-            <h2 className="font-display text-[22px] font-extrabold">{section.heading}</h2>
+            <h2 className="font-display text-[22px] tracking-tight">{section.heading}</h2>
             {section.paragraphs.map((text) => (
               <p key={text} className="text-base">
                 {text}

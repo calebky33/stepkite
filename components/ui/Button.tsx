@@ -4,8 +4,9 @@ import { cn } from "./cn";
 type Variant = "primary" | "secondary" | "ghost";
 
 const styles: Record<Variant, string> = {
-  primary: "bg-primary text-primary-fg hover:opacity-90",
-  secondary: "border border-border bg-surface text-text hover:bg-surface-2",
+  primary:
+    "bg-primary text-primary-fg shadow-[inset_0_0_0_1px_rgb(0_0_0/0.22),0_1px_2px_rgb(17_24_39/0.12)] hover:-translate-y-px hover:shadow-[inset_0_0_0_1px_rgb(0_0_0/0.22),0_4px_10px_rgb(17_24_39/0.16)]",
+  secondary: "border border-border-strong bg-surface text-text shadow-card hover:bg-surface-2",
   ghost: "text-primary hover:bg-surface-2",
 };
 

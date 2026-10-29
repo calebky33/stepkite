@@ -85,7 +85,7 @@ export function PagedPreview({ cv: userCv, country }: { cv: Cv; country: Country
   const total = pages.length;
 
   return (
-    <div className="relative flex min-w-0 flex-col gap-3 rounded-card bg-surface-2 p-3 sm:p-4">
+    <div className="relative flex min-w-0 flex-col gap-3 rounded-card border border-border bg-surface-2 p-4 sm:p-6">
       <p className="min-h-6 text-sm text-muted">
         {isEmpty
           ? `Example. Your own words replace this as you type.`
@@ -111,7 +111,7 @@ export function PagedPreview({ cv: userCv, country }: { cv: Cv; country: Country
           zoom === "full" && "overflow-x-auto overscroll-x-contain pb-2",
         )}
       >
-        <div className="flex flex-col gap-4" style={zoom === "full" ? { width: pageW } : undefined}>
+        <div className="flex flex-col gap-6" style={zoom === "full" ? { width: pageW } : undefined}>
           {pages.map((page, index) => {
             const naturalH = Math.max(pageH, page.usedPx + 2 * margin);
             return (

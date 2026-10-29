@@ -27,7 +27,7 @@ export function Logo({ className, ...props }: SVGProps<SVGSVGElement>) {
         fontWeight="800"
         letterSpacing="-1.4"
         fill="currentColor"
-        style={{ fontFamily: "var(--font-display)" }}
+        style={{ fontFamily: "var(--font-logo)" }}
       >
         stepkite
       </text>

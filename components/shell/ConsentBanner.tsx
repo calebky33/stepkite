@@ -65,7 +65,7 @@ export function ConsentBanner() {
     <section
       ref={publishHeight}
       aria-label="Cookie choice"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:px-6"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface px-4 pt-4 shadow-pop pb-[max(1rem,env(safe-area-inset-bottom))] md:px-6"
     >
       <div className="mx-auto flex max-w-[1120px] flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <p className="max-w-prose text-base">

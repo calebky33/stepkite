@@ -40,7 +40,7 @@ export default async function SalaryAmountPage({ params }: Props) {
   const money = formatMoney(gross, country);
   return (
     <>
-      <h1 className="font-display text-4xl font-extrabold">
+      <h1 className="font-display text-4xl">
         What a {money} salary leaves you in {info.name}
       </h1>
       <p className="max-w-prose text-muted">

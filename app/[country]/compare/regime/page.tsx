@@ -31,7 +31,7 @@ export default async function RegimeComparePage({ params }: Props) {
   await requireIndia(params);
   return (
     <>
-      <h1 className="font-display text-4xl font-extrabold">Old regime or new regime</h1>
+      <h1 className="font-display text-4xl">Old regime or new regime</h1>
       <p className="max-w-prose text-muted">
         Enter your salary to see your in-hand pay under each regime.
       </p>

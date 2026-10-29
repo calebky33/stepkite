@@ -27,7 +27,7 @@ export default async function MatchPage({ params }: Props) {
   const cv = COUNTRY_INFO[country].cvName;
   return (
     <>
-      <h1 className="font-display text-4xl font-extrabold">Match your {cv} to a job ad</h1>
+      <h1 className="font-display text-4xl">Match your {cv} to a job ad</h1>
       <p className="max-w-prose text-muted">
         Paste a job ad to see what it asks for and which lines of your {cv} already show it. You
         approve every change.

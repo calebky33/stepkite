@@ -2,9 +2,9 @@
 
 /* Tokens from docs/DESIGN.md. Light is default; dark follows the system. */
 :root {
-  --bg: #ffffff;
+  --bg: #f7f8fa;
   --surface: #ffffff;
-  --surface-2: #f4f5f7;
+  --surface-2: #f1f3f6;
   --border: #e3e5e9;
   --border-strong: #6b7280;
   --text: #111827;
@@ -20,17 +20,21 @@
   --danger: #c8372d;
   --logo-a: #111827;
   --logo-b: #1a3fd1;
-  --logo-steps: #ffffff;
+  --logo-steps: #f7f8fa;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --overlay: rgb(0 0 0 / 0.4);
-  --elev: 0 1px 2px rgb(17 24 39 / 0.06), 0 4px 12px rgb(17 24 39 / 0.08);
+  --elev-sm:
+    0 1px 0 rgb(255 255 255 / 0.9) inset, 0 1px 2px rgb(17 24 39 / 0.05),
+    0 2px 6px rgb(17 24 39 / 0.04);
+  --elev-md: 0 2px 4px rgb(17 24 39 / 0.05), 0 8px 24px rgb(17 24 39 / 0.1);
+  --elev-lg: 0 4px 8px rgb(17 24 39 / 0.06), 0 24px 56px rgb(17 24 39 / 0.18);
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0e1116;
+    --bg: #0b0e13;
     --surface: #151a21;
     --surface-2: #1d232c;
     --border: #2a313c;
@@ -45,15 +49,17 @@
     --danger: #ff6b60;
     --logo-a: #e5e7eb;
     --logo-b: #7fa0ff;
-    --logo-steps: #0e1116;
+    --logo-steps: #0b0e13;
     --overlay: rgb(0 0 0 / 0.6);
-    --elev: none;
+    --elev-sm: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 1px 2px rgb(0 0 0 / 0.4);
+    --elev-md: 0 2px 4px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.5);
+    --elev-lg: 0 4px 8px rgb(0 0 0 / 0.5), 0 24px 56px rgb(0 0 0 / 0.6);
     color-scheme: dark;
   }
 }
 
 html[data-theme="dark"] {
-  --bg: #0e1116;
+  --bg: #0b0e13;
   --surface: #151a21;
   --surface-2: #1d232c;
   --border: #2a313c;
@@ -68,9 +74,11 @@ html[data-theme="dark"] {
   --danger: #ff6b60;
   --logo-a: #e5e7eb;
   --logo-b: #7fa0ff;
-  --logo-steps: #0e1116;
+  --logo-steps: #0b0e13;
   --overlay: rgb(0 0 0 / 0.6);
-  --elev: none;
+  --elev-sm: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 1px 2px rgb(0 0 0 / 0.4);
+  --elev-md: 0 2px 4px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.5);
+  --elev-lg: 0 4px 8px rgb(0 0 0 / 0.5), 0 24px 56px rgb(0 0 0 / 0.6);
   color-scheme: dark;
 }
 
@@ -96,9 +104,12 @@ html[data-theme="light"] {
   --color-tax: var(--tax);
   --color-danger: var(--danger);
   --color-overlay: var(--overlay);
-  --shadow-pop: var(--elev);
+  --shadow-card: var(--elev-sm);
+  --shadow-pop: var(--elev-md);
+  --shadow-dialog: var(--elev-lg);
   --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-display: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-calistoga), Georgia, "Times New Roman", serif;
+  --font-logo: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
   --radius-input: 8px;
   --radius-card: 12px;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -106,6 +117,7 @@ html[data-theme="light"] {
 }
 
 html {
+  font-synthesis: none;
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
 }

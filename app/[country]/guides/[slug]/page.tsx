@@ -35,10 +35,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function GuidePage({ params }: Props) {
   const { country, guide } = await resolve(params);
   return (
-    <article className="flex max-w-prose flex-col gap-4">
+    <article className="flex max-w-prose flex-col gap-4 leading-relaxed">
       <Badge className="self-start">Draft for human rewrite</Badge>
-      <h1 className="font-display text-4xl font-extrabold">{guide.title}</h1>
-      <p className="text-lg">{guide.summary}</p>
+      <h1 className="font-display text-[28px] leading-tight md:text-4xl [overflow-wrap:anywhere]">
+        {guide.title}
+      </h1>
+      <p className="border-b border-border pb-6 text-lg text-muted">{guide.summary}</p>
       {guide.paragraphs.map((text) => (
         <p key={text}>{text}</p>
       ))}

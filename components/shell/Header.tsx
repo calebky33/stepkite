@@ -11,7 +11,7 @@ export function Header() {
       >
         Skip to content
       </a>
-      <div className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 md:px-6">
+      <div className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-4 md:px-6">
         <Link href="/" className="inline-flex min-h-11 items-center">
           <Logo className="h-8 w-auto" />
         </Link>

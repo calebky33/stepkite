@@ -52,7 +52,7 @@ function ToastButtons({ data }: { data: GalleryData["controls"] }) {
 function Pair({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <Card className="flex flex-col gap-4">
-      <h2 className="font-display text-lg font-extrabold">{title}</h2>
+      <h2 className="font-display text-lg">{title}</h2>
       {children}
     </Card>
   );
@@ -163,7 +163,7 @@ export function Controls({ data }: { data: GalleryData }) {
       </Pair>
 
       <Pair title="Slider with count tween">
-        <p aria-live="polite" className="font-display text-4xl font-extrabold tabular-nums">
+        <p aria-live="polite" className="font-sans text-4xl font-semibold tabular-nums">
           {Math.round(tween).toLocaleString("en-GB")}
         </p>
         <Slider

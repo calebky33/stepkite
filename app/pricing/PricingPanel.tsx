@@ -26,8 +26,8 @@ export function PricingPanel() {
   const annual = ANNUAL_PRICE[country];
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[3fr_2fr] lg:items-start">
-      <Card className="flex flex-col gap-6">
+    <div className="grid gap-6 lg:grid-cols-[3fr_2fr] lg:items-start lg:gap-8">
+      <Card className="flex flex-col gap-8 md:p-8">
         <SegmentedControl<CountryCode>
           label="Country"
           value={country}
@@ -40,9 +40,9 @@ export function PricingPanel() {
           ]}
         />
         <div className="flex flex-col gap-1">
-          <h2 className="text-base font-semibold">Pro Pass</h2>
-          <p className="flex flex-wrap items-center gap-3">
-            <span className="font-display text-5xl font-extrabold tabular-nums">
+          <h2 className="text-sm font-medium text-muted">Pro Pass</h2>
+          <p className="mt-2 flex flex-wrap items-center gap-3">
+            <span className="font-sans text-5xl leading-none font-semibold tracking-tight tabular-nums">
               {PASS_PRICE[country]}
             </span>
             <Badge tone="highlight">Planned price</Badge>
@@ -62,8 +62,8 @@ export function PricingPanel() {
           <h2 className="text-base font-semibold">Annual plan, if you prefer it</h2>
           {annual ? (
             <p className="text-base text-muted">
-              Planned at about {annual} a year, and only if you choose it. It would renew every
-              year until you cancel.
+              Planned at about {annual} a year, and only if you choose it. It would renew every year
+              until you cancel.
             </p>
           ) : (
             <p className="text-base text-muted">
@@ -73,9 +73,9 @@ export function PricingPanel() {
         </div>
       </Card>
 
-      <Card className="flex flex-col gap-3">
-        <h2 className="text-base font-semibold">What the Pass is for</h2>
-        <ul className="list-disc pl-5 text-base">
+      <Card className="flex flex-col gap-4 bg-surface-2 shadow-none md:p-8">
+        <h2 className="font-display text-[22px] leading-tight">What the Pass is for</h2>
+        <ul className="list-disc space-y-2 pl-5 text-base marker:text-muted">
           {INCLUDED.map((item) => (
             <li key={item}>{item}</li>
           ))}

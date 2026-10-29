@@ -55,7 +55,7 @@ export function Select({
             className={cn(
               "flex min-h-11 w-full min-w-0 items-center justify-between gap-2 rounded-input border bg-surface-2 px-3 text-left text-base text-text",
               "transition-colors duration-150 ease-[var(--ease-out)] disabled:opacity-50",
-              "data-[placeholder]:text-muted",
+              "focus-visible:border-primary data-[state=open]:border-primary data-[placeholder]:text-muted",
               error ? "border-danger" : "border-border-strong",
               className,
             )}

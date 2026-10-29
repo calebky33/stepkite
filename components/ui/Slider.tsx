@@ -71,7 +71,7 @@ export function Slider({
             aria-invalid={control["aria-invalid"]}
             aria-valuetext={valueText}
             className={cn(
-              "relative block size-6 rounded-full border-2 border-primary bg-surface",
+              "relative block size-6 rounded-full border-2 border-primary bg-surface shadow-pop",
               "after:absolute after:-inset-2.5",
               "transition-transform duration-150 ease-[var(--ease-out)] active:scale-[0.97]",
             )}

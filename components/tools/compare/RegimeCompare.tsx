@@ -40,8 +40,8 @@ export function RegimeCompare() {
       : undefined;
 
   return (
-    <div className="flex min-w-0 flex-col gap-6">
-      <Card className="max-w-md">
+    <div className="flex min-w-0 flex-col gap-8">
+      <Card className="max-w-md md:p-8">
         <CurrencyInput
           label="Yearly salary before tax"
           hint="Use your CTC if that is the figure you have."
@@ -52,13 +52,13 @@ export function RegimeCompare() {
           onValueChange={setGross}
         />
       </Card>
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2 md:gap-8">
         {REGIMES.map((regime) => {
           const outcome = outcomeFor(engine, gross, regime.key);
           return (
-            <Card key={regime.key} className="flex min-h-40 flex-col gap-2">
-              <h2 className="text-lg font-semibold">{regime.title}</h2>
-              <p aria-live="polite" className="text-muted">
+            <Card key={regime.key} className="flex min-h-40 flex-col gap-2 md:p-8">
+              <h2 className="text-sm font-medium text-muted">{regime.title}</h2>
+              <p aria-live="polite" className="text-lg text-text">
                 {!outcome
                   ? "Enter a yearly salary to see this regime."
                   : outcome.status === "ready"

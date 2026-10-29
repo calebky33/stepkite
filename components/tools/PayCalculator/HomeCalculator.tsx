@@ -14,7 +14,7 @@ export function HomeCalculator() {
   const info = COUNTRY_INFO[country];
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <SegmentedControl<CountryCode>
         label="Country"
         value={country}

@@ -86,7 +86,7 @@ export function SegmentedControl<T extends string>({
                   "transition-[background-color,color,transform] duration-150 ease-[var(--ease-out)] active:scale-[0.97]",
                   "disabled:opacity-50 disabled:active:scale-100",
                   checked
-                    ? "border border-border bg-surface font-semibold text-text"
+                    ? "border border-border bg-surface font-semibold text-text shadow-card"
                     : "border border-transparent text-muted hover:text-text",
                 )}
               >

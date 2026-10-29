@@ -87,7 +87,10 @@ export function CurrencyInput({
   ...props
 }: CurrencyInputProps) {
   const { decimal, symbol } = useMemo(() => localeParts(locale, currency), [locale, currency]);
-  const groupFmt = useMemo(() => new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }), [locale]);
+  const groupFmt = useMemo(
+    () => new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }),
+    [locale],
+  );
 
   const format = (whole: string, frac: string, seenDecimal: boolean) => {
     const grouped = whole === "" ? (seenDecimal ? "0" : "") : groupFmt.format(Number(whole));
@@ -145,7 +148,7 @@ export function CurrencyInput({
           className={cn(
             "flex min-h-11 w-full min-w-0 items-center rounded-input border bg-surface-2",
             "transition-colors duration-150 ease-[var(--ease-out)]",
-            "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-primary",
+            "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:border-primary has-[:focus-visible]:bg-surface has-[:focus-visible]:outline-primary",
             error ? "border-danger" : "border-border-strong",
             props.disabled && "opacity-50",
             className,

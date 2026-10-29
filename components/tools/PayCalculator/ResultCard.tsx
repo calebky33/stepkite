@@ -426,7 +426,7 @@ export function NetBar({ country, state }: NetBarProps) {
   const month =
     state.kind === "ready" ? formatMoney(state.result.perPeriod.month, country) : PENDING;
   return (
-    <div className="sticky bottom-[var(--consent-h,0px)] z-10 rounded-card border border-border bg-surface px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-pop lg:hidden">
+    <div className="sticky bottom-[var(--consent-h,0px)] z-10 rounded-card border border-border bg-surface px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-bar lg:hidden">
       <a
         href={`#${BREAKDOWN_ID}`}
         className="flex min-h-11 items-center justify-between gap-4 text-base"

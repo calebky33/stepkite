@@ -29,6 +29,7 @@
     0 2px 6px rgb(17 24 39 / 0.04);
   --elev-md: 0 2px 4px rgb(17 24 39 / 0.05), 0 8px 24px rgb(17 24 39 / 0.1);
   --elev-lg: 0 4px 8px rgb(17 24 39 / 0.06), 0 24px 56px rgb(17 24 39 / 0.18);
+  --elev-up: 0 -2px 4px rgb(17 24 39 / 0.04), 0 -8px 24px rgb(17 24 39 / 0.1);
   color-scheme: light;
 }
 
@@ -54,6 +55,7 @@
     --elev-sm: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 1px 2px rgb(0 0 0 / 0.4);
     --elev-md: 0 2px 4px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.5);
     --elev-lg: 0 4px 8px rgb(0 0 0 / 0.5), 0 24px 56px rgb(0 0 0 / 0.6);
+    --elev-up: 0 -2px 4px rgb(0 0 0 / 0.4), 0 -8px 24px rgb(0 0 0 / 0.5);
     color-scheme: dark;
   }
 }
@@ -79,6 +81,7 @@ html[data-theme="dark"] {
   --elev-sm: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 1px 2px rgb(0 0 0 / 0.4);
   --elev-md: 0 2px 4px rgb(0 0 0 / 0.4), 0 8px 24px rgb(0 0 0 / 0.5);
   --elev-lg: 0 4px 8px rgb(0 0 0 / 0.5), 0 24px 56px rgb(0 0 0 / 0.6);
+  --elev-up: 0 -2px 4px rgb(0 0 0 / 0.4), 0 -8px 24px rgb(0 0 0 / 0.5);
   color-scheme: dark;
 }
 
@@ -107,6 +110,7 @@ html[data-theme="light"] {
   --shadow-card: var(--elev-sm);
   --shadow-pop: var(--elev-md);
   --shadow-dialog: var(--elev-lg);
+  --shadow-bar: var(--elev-up);
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-display: var(--font-calistoga), Georgia, "Times New Roman", serif;
   --font-logo: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;

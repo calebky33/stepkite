@@ -22,7 +22,7 @@ export default function Contact() {
           the account page has a delete button that does it straight away.
         </p>
         <p>
-          <Link href="/account" className="text-primary underline underline-offset-2">
+          <Link href="/account" className="text-primary underline-offset-4 hover:underline">
             Go to your account
           </Link>
         </p>

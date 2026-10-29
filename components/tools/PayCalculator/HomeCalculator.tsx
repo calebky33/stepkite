@@ -23,7 +23,7 @@ export function HomeCalculator() {
             <PayCalculator country={code} />
             <Link
               href={`/${code}`}
-              className="inline-flex min-h-11 items-center self-start text-base text-primary underline underline-offset-2"
+              className="inline-flex min-h-11 items-center self-start text-base text-primary underline-offset-4 hover:underline"
             >
               More about pay in {COUNTRY_INFO[code].name}
             </Link>

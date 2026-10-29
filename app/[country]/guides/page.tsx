@@ -42,7 +42,7 @@ export default async function GuidesPage({ params }: Props) {
               <Badge>Draft for human rewrite</Badge>
               <Link
                 href={`/${country}/guides/${guide.slug}`}
-                className="inline-flex min-h-11 items-center text-lg font-semibold text-primary underline underline-offset-4"
+                className="inline-flex min-h-11 items-center text-lg font-semibold text-primary underline-offset-4 hover:underline"
               >
                 {guide.title}
               </Link>

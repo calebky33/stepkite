@@ -10,6 +10,7 @@ import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/components/ui/cn";
 import { COUNTRY_INFO, isCountry, type CountryCode } from "@/lib/countries";
 import { CountrySwitcher } from "./CountrySwitcher";
+import { ToolsMenu } from "./ToolsMenu";
 
 type ItemKey = "pay" | "cv" | "tools" | "pricing";
 
@@ -94,6 +95,12 @@ export function Header() {
     { key: "pricing", href: "/pricing", label: "Pricing and features" },
   ];
 
+  const toolLinks = [
+    { href: `/${country}/salary-calculator`, label: "Take-home pay calculator" },
+    { href: `/${country}/cv`, label: info.cvName === "résumé" ? "Résumé builder" : "CV builder" },
+    { href: `/${country}/tracker`, label: "Job tracker" },
+  ];
+
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
@@ -138,6 +145,18 @@ export function Header() {
         <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">
           {items.map((item) => {
             const active = isActive(pathname, country, item.key);
+            if (item.key === "tools") {
+              return (
+                <ToolsMenu
+                  key={item.key}
+                  layout="popover"
+                  links={toolLinks}
+                  pathname={pathname}
+                  active={active}
+                  className={LINK_CLASS}
+                />
+              );
+            }
             return (
               <Link
                 key={item.key}
@@ -191,6 +210,19 @@ export function Header() {
         >
           {items.map((item) => {
             const active = isActive(pathname, country, item.key);
+            if (item.key === "tools") {
+              return (
+                <ToolsMenu
+                  key={item.key}
+                  layout="inline"
+                  links={toolLinks}
+                  pathname={pathname}
+                  active={active}
+                  onNavigate={() => setOpenedPath(null)}
+                  className={LINK_CLASS}
+                />
+              );
+            }
             return (
               <Link
                 key={item.key}

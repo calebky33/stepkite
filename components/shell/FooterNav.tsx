@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { COUNTRY_INFO, isCountry, type CountryCode } from "@/lib/countries";
 
 const LINK_CLASS =
-  "inline-flex min-h-11 items-center text-base text-bg/75 underline-offset-2 hover:text-bg hover:underline";
+  "inline-flex min-h-11 items-center text-base text-ink-muted underline-offset-4 hover:text-ink-fg hover:underline";
 
 type FooterLink = { href: string; label: string };
 
@@ -18,7 +18,7 @@ function countryFrom(pathname: string): CountryCode {
 function Column({ title, links, label }: { title: string; links: FooterLink[]; label?: string }) {
   return (
     <nav aria-label={label ?? title}>
-      <h2 className="text-sm font-semibold text-bg">{title}</h2>
+      <h2 className="text-sm font-semibold text-ink-fg">{title}</h2>
       <ul>
         {links.map((item) => (
           <li key={item.href}>

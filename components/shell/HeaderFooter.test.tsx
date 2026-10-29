@@ -40,10 +40,40 @@ describe("Header", () => {
   it("announces a section match as current without claiming it is the page", () => {
     pathname = "/uk/tracker";
     render(<Header />);
-    expect(screen.getByRole("link", { name: "Tools" }).getAttribute("aria-current")).toBe("true");
+    expect(screen.getByRole("button", { name: "Tools" })).toBeTruthy();
     expect(
       screen.getByRole("link", { name: "CV builder" }).getAttribute("aria-current"),
     ).toBeNull();
+  });
+
+  it("opens the Tools menu, lists real routes and closes on Escape", () => {
+    pathname = "/in";
+    render(<Header />);
+    const button = screen.getByRole("button", { name: "Tools" });
+    expect(button.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByRole("link", { name: "Job tracker" })).toBeNull();
+    fireEvent.click(button);
+    expect(button.getAttribute("aria-expanded")).toBe("true");
+    expect(
+      screen.getByRole("link", { name: "Take-home pay calculator" }).getAttribute("href"),
+    ).toBe("/in/salary-calculator");
+    expect(
+      screen.getAllByRole("link", { name: "CV builder" }).map((a) => a.getAttribute("href")),
+    ).toEqual(["/in/cv", "/in/cv"]);
+    expect(screen.getByRole("link", { name: "Job tracker" }).getAttribute("href")).toBe(
+      "/in/tracker",
+    );
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(button.getAttribute("aria-expanded")).toBe("false");
+    expect(document.activeElement).toBe(button);
+  });
+
+  it("offers the Tools menu inside the mobile menu", () => {
+    render(<Header />);
+    fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
+    const buttons = screen.getAllByRole("button", { name: "Tools" });
+    fireEvent.click(buttons[buttons.length - 1]!);
+    expect(screen.getAllByRole("link", { name: "Job tracker" }).length).toBe(1);
   });
 
   it("keeps the links in the current country", () => {
@@ -126,6 +156,8 @@ describe("Footer", () => {
     expect(screen.getByRole("link", { name: "Product updates" }).getAttribute("href")).toBe(
       "#product-updates",
     );
+    expect(screen.getByRole("heading", { name: "Supported countries" })).toBeTruthy();
+    expect(screen.getByText("Career tools, designed around you.")).toBeTruthy();
     expect(screen.getByLabelText("Email address")).toBeTruthy();
     expect(screen.getByText(/not connected yet/i)).toBeTruthy();
   });

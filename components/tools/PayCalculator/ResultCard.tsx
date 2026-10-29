@@ -207,7 +207,7 @@ function MissingNotice({
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center break-all text-primary underline underline-offset-2"
+              className="inline-flex min-h-11 items-center break-all text-primary underline-offset-4 hover:underline"
             >
               {host}
             </a>
@@ -395,7 +395,7 @@ function ReadyNotes({
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center break-all text-primary underline underline-offset-2"
+                className="inline-flex min-h-11 items-center break-all text-primary underline-offset-4 hover:underline"
               >
                 Source: {hostOf(url) ?? "official page"}
               </a>

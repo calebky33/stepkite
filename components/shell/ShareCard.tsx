@@ -42,7 +42,7 @@ export function ShareCard({ country, gross }: ShareCardProps) {
           href={path}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex min-h-11 items-center text-base text-primary underline underline-offset-2"
+          className="inline-flex min-h-11 items-center text-base text-primary underline-offset-4 hover:underline"
         >
           Open the image
         </a>

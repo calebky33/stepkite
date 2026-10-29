@@ -3,7 +3,7 @@ import { Calculator, FileText, LayoutGrid, Scale, Target, type LucideIcon } from
 import { StatusPill, type Status } from "@/components/shell/StatusPill";
 
 const LINK =
-  "inline-flex min-h-11 items-center text-base font-semibold text-primary underline underline-offset-4";
+  "inline-flex min-h-11 items-center text-base font-semibold text-primary underline-offset-4 hover:underline";
 
 type Tile = {
   href: string;

@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const LINK =
-  "inline-flex min-h-11 items-center text-base font-semibold text-primary underline underline-offset-4";
+  "inline-flex min-h-11 items-center text-base font-semibold text-primary underline-offset-4 hover:underline";
 
 export function CrossPromo() {
   return (

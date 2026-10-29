@@ -1,8 +1,12 @@
 "use client";
 
+import { CurrencyInput } from "@/components/ui/CurrencyInput";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { COUNTRY_INFO } from "@/lib/countries";
 import type { FieldsProps } from "./fieldTypes";
+
+const info = COUNTRY_INFO.uk;
 
 const REGIONS = [
   { value: "england", label: "England" },
@@ -60,6 +64,15 @@ export function UkFields({ values, errors, onChange }: FieldsProps) {
         options={STUDENT_LOANS}
         value={values.studentLoan}
         onValueChange={(v) => onChange("studentLoan", v)}
+      />
+      <CurrencyInput
+        label="Other deductions"
+        hint="Total for a year. Not counted yet."
+        error={errors.otherDeductions}
+        locale={info.locale}
+        currency={info.currency}
+        value={values.otherDeductions ? Number(values.otherDeductions) : null}
+        onValueChange={(n) => onChange("otherDeductions", n === null ? "" : String(n))}
       />
     </div>
   );

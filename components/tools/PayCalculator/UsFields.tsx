@@ -1,8 +1,12 @@
 "use client";
 
+import { CurrencyInput } from "@/components/ui/CurrencyInput";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { COUNTRY_INFO } from "@/lib/countries";
 import type { FieldsProps } from "./fieldTypes";
+
+const info = COUNTRY_INFO.us;
 
 /** Placeholder list of the largest states. The full list arrives with the state rates. */
 const STATES = [
@@ -66,6 +70,15 @@ export function UsFields({ values, errors, onChange }: FieldsProps) {
           onValueChange={(v) => onChange("payFrequency", v)}
         />
       </div>
+      <CurrencyInput
+        label="Other deductions"
+        hint="Total for a year. Not counted yet."
+        error={errors.otherDeductions}
+        locale={info.locale}
+        currency={info.currency}
+        value={values.otherDeductions ? Number(values.otherDeductions) : null}
+        onValueChange={(n) => onChange("otherDeductions", n === null ? "" : String(n))}
+      />
     </div>
   );
 }

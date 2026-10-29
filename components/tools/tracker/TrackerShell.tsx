@@ -266,7 +266,7 @@ export function TrackerShell() {
                               href={job.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex min-h-11 items-center text-sm font-semibold text-primary underline underline-offset-4"
+                              className="inline-flex min-h-11 items-center text-sm font-semibold text-primary underline-offset-4 hover:underline"
                             >
                               Open job ad
                             </a>

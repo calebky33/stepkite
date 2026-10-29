@@ -19,7 +19,7 @@ export default function ErrorPage({
         <Button onClick={() => retry()}>Try again</Button>
         <Link
           href="/"
-          className="inline-flex min-h-11 items-center text-base text-primary underline underline-offset-2"
+          className="inline-flex min-h-11 items-center text-base text-primary underline-offset-4 hover:underline"
         >
           Go to the home page
         </Link>

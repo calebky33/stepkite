@@ -56,7 +56,7 @@ export function AccountPanel() {
         </p>
         <Link
           href="/sign-in"
-          className="inline-flex min-h-11 items-center self-start text-base text-primary underline underline-offset-2"
+          className="inline-flex min-h-11 items-center self-start text-base text-primary underline-offset-4 hover:underline"
         >
           Go to sign in
         </Link>

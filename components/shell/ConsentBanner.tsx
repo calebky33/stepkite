@@ -71,7 +71,7 @@ export function ConsentBanner() {
         <p className="max-w-prose text-base">
           Can we use optional cookies for page statistics and ads? Saying no is fine and every tool
           still works. We never record the salary you type.{" "}
-          <Link href="/cookies" className="text-primary underline underline-offset-2">
+          <Link href="/cookies" className="text-primary underline-offset-4 hover:underline">
             Read about cookies
           </Link>
         </p>

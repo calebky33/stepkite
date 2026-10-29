@@ -91,7 +91,7 @@ export function MatchShell({ country }: { country: CountryCode }) {
               No {cvName} saved yet.{" "}
               <Link
                 href={`/${country}/cv`}
-                className="font-semibold text-primary underline underline-offset-4"
+                className="font-semibold text-primary underline-offset-4 hover:underline"
               >
                 Build one first.
               </Link>

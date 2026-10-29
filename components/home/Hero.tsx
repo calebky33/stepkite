@@ -35,7 +35,7 @@ export function Hero() {
           </ul>
         </div>
 
-        <div className="relative min-w-0 rounded-card bg-text p-4 pb-0 text-bg shadow-pop md:p-6 md:pb-0">
+        <div className="relative min-w-0 rounded-card on-ink bg-ink p-4 pb-0 text-ink-fg shadow-pop md:p-6 md:pb-0">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-semibold">CV builder</p>
             <Badge>Preview</Badge>
@@ -46,7 +46,7 @@ export function Hero() {
           <div
             role="group"
             aria-label="Example calculator"
-            className="absolute inset-x-4 bottom-[-32px] ml-auto flex max-w-xs flex-col gap-3 rounded-card border border-border bg-surface p-4 text-text shadow-dialog sm:right-6 sm:left-auto md:bottom-[-40px]"
+            className="on-light absolute inset-x-4 bottom-[-32px] ml-auto flex max-w-xs flex-col gap-3 rounded-card border border-border bg-surface p-4 text-text shadow-dialog sm:right-6 sm:left-auto md:bottom-[-40px]"
           >
             <div className="flex items-center justify-between gap-2">
               <p className="text-sm font-semibold">Take-home calculator</p>
@@ -58,6 +58,9 @@ export function Hero() {
               <dt className="text-muted">Salary</dt>
               <dd className="text-right font-medium tabular-nums">£45,000 a year</dd>
             </dl>
+            <Link href="#calculator" className={buttonStyles("primary", "w-full")}>
+              Calculate
+            </Link>
             <p className="rounded-input bg-surface-2 px-3 py-2 text-sm text-muted">
               Rates not loaded yet
             </p>

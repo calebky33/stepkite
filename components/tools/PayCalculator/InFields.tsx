@@ -48,6 +48,15 @@ export function InFields({ values, errors, onChange }: FieldsProps) {
         We assume the standard provident fund deduction from your basic pay. The exact rate appears
         once it is checked.
       </p>
+      <CurrencyInput
+        label="Other deductions"
+        hint="Total for a year. Not counted yet."
+        error={errors.otherDeductions}
+        locale={info.locale}
+        currency={info.currency}
+        value={amount("otherDeductions")}
+        onValueChange={setAmount("otherDeductions")}
+      />
       {oldRegime ? (
         <div className="flex flex-col gap-4">
           <div className="grid gap-4 sm:grid-cols-2">

@@ -20,7 +20,7 @@ export default function SignIn() {
           this device until then.
         </p>
         <p>
-          <Link href="/" className="text-primary underline underline-offset-2">
+          <Link href="/" className="text-primary underline-offset-4 hover:underline">
             Back to the calculator
           </Link>
         </p>

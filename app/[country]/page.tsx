@@ -105,7 +105,7 @@ export default async function CountryHubPage({ params }: Props) {
                   >
                     <Link
                       href={link.href}
-                      className="inline-flex min-h-11 flex-wrap items-center gap-x-2 text-base font-semibold text-primary underline underline-offset-4"
+                      className="inline-flex min-h-11 flex-wrap items-center gap-x-2 text-base font-semibold text-primary underline-offset-4 hover:underline"
                     >
                       {link.label}
                       {link.note ? (

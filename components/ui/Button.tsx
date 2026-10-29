@@ -12,7 +12,7 @@ const styles: Record<Variant, string> = {
     "relative bg-primary text-primary-fg shadow-[inset_0_0_0_1px_rgb(0_0_0/0.22),0_1px_2px_rgb(17_24_39/0.12)] hover:-translate-y-px disabled:hover:translate-y-0 disabled:hover:after:opacity-0 after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:opacity-0 after:shadow-[0_4px_10px_rgb(17_24_39/0.16)] after:transition-opacity after:duration-150 after:ease-[var(--ease-out)] hover:after:opacity-100",
   secondary: "border border-border-strong bg-surface text-text shadow-card hover:bg-surface-2",
   ghost: "text-primary hover:bg-surface-2",
-  dark: "bg-text text-bg shadow-card hover:opacity-90",
+  dark: "border border-ink-line bg-ink text-ink-fg shadow-card hover:opacity-90 focus-visible:outline-ink-focus",
 };
 
 /**

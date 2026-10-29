@@ -12,12 +12,19 @@ export type BuiltOptions = {
 };
 
 export const DEFAULT_VALUES: Record<CountryCode, FieldValues> = {
-  uk: { region: "england", pensionPercent: "", pensionType: "net-pay", studentLoan: "none" },
+  uk: {
+    region: "england",
+    pensionPercent: "",
+    pensionType: "net-pay",
+    studentLoan: "none",
+    otherDeductions: "",
+  },
   us: {
     region: "california",
     filingStatus: "single",
     retirementPercent: "",
     payFrequency: "biweekly",
+    otherDeductions: "",
   },
   in: {
     regime: "new",
@@ -27,6 +34,7 @@ export const DEFAULT_VALUES: Record<CountryCode, FieldValues> = {
     hraReceived: "",
     rentPaid: "",
     metro: "metro",
+    otherDeductions: "",
   },
 };
 
@@ -37,9 +45,9 @@ const PERCENT_KEYS: Record<CountryCode, readonly string[]> = {
 };
 
 const AMOUNT_KEYS: Record<CountryCode, readonly string[]> = {
-  uk: [],
-  us: [],
-  in: ["section80c", "section80d", "hraReceived", "rentPaid"],
+  uk: ["otherDeductions"],
+  us: ["otherDeductions"],
+  in: ["section80c", "section80d", "hraReceived", "rentPaid", "otherDeductions"],
 };
 
 /** Only the old regime reads these. */

@@ -36,7 +36,7 @@ export default function About() {
           your browser, so the salary you type is not sent anywhere.
         </p>
         <p>
-          <Link href="/" className="text-primary underline underline-offset-2">
+          <Link href="/" className="text-primary underline-offset-4 hover:underline">
             Try the calculator
           </Link>
         </p>

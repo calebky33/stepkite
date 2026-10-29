@@ -72,7 +72,7 @@ export function Select({
               position="popper"
               sideOffset={4}
               className={cn(
-                "sk-anim sk-pop z-50 w-[var(--radix-select-trigger-width)] overflow-hidden rounded-input border border-border bg-surface text-text shadow-pop",
+                "sk-anim sk-pop z-50 w-[var(--radix-select-trigger-width)] min-w-56 overflow-hidden rounded-card border border-border bg-surface text-text shadow-pop",
                 "max-h-[min(20rem,var(--radix-select-content-available-height))] origin-[var(--radix-select-content-transform-origin)]",
               )}
             >

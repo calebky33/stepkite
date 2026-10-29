@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { COUNTRY_INFO, isCountry, type CountryCode } from "@/lib/countries";
 
 const LINK_CLASS =
-  "inline-flex min-h-11 items-center text-base text-muted underline-offset-2 hover:text-text hover:underline";
+  "inline-flex min-h-11 items-center text-base text-bg/75 underline-offset-2 hover:text-bg hover:underline";
 
 type FooterLink = { href: string; label: string };
 
@@ -17,7 +18,7 @@ function countryFrom(pathname: string): CountryCode {
 function Column({ title, links, label }: { title: string; links: FooterLink[]; label?: string }) {
   return (
     <nav aria-label={label ?? title}>
-      <h2 className="text-sm font-semibold">{title}</h2>
+      <h2 className="text-sm font-semibold text-bg">{title}</h2>
       <ul>
         {links.map((item) => (
           <li key={item.href}>
@@ -32,7 +33,7 @@ function Column({ title, links, label }: { title: string; links: FooterLink[]; l
 }
 
 /** The three country-aware footer columns. Kept small and separate from the static footer. */
-export function FooterNav() {
+export function FooterNav({ children }: { children?: ReactNode }) {
   const pathname = usePathname() ?? "/";
   const country = countryFrom(pathname);
   const info = COUNTRY_INFO[country];
@@ -56,10 +57,11 @@ export function FooterNav() {
   ];
 
   return (
-    <div className="grid gap-8 py-8 md:grid-cols-3">
+    <div className="grid gap-8 py-8 md:grid-cols-4">
       <Column title="Tools" links={tools} />
       <Column title="Explore" links={explore} />
       <Column title="Stepkite" label="Company" links={company} />
+      {children}
     </div>
   );
 }

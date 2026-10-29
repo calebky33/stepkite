@@ -35,7 +35,9 @@ describe("IconButton", () => {
 describe("Input", () => {
   it("wires label, hint and error", () => {
     const { rerender } = render(<Input label="Annual salary" hint="Before tax" />);
-    expect(screen.getByRole("textbox", { name: "Annual salary", description: "Before tax" })).toBeTruthy();
+    expect(
+      screen.getByRole("textbox", { name: "Annual salary", description: "Before tax" }),
+    ).toBeTruthy();
     rerender(<Input label="Annual salary" error="Enter a number." />);
     const field = screen.getByLabelText("Annual salary");
     expect(field.getAttribute("aria-invalid")).toBe("true");
@@ -77,7 +79,9 @@ describe("Table", () => {
     expect(screen.getByRole("table", { name: "Tax breakdown" })).toBeTruthy();
     expect(screen.getAllByRole("columnheader")).toHaveLength(2);
     expect(screen.getByRole("cell", { name: "3,486" })).toBeTruthy();
-    expect(screen.getByRole("region", { name: "Tax breakdown" }).getAttribute("tabindex")).toBe("0");
+    expect(screen.getByRole("region", { name: "Tax breakdown" }).getAttribute("tabindex")).toBe(
+      "0",
+    );
   });
 });
 

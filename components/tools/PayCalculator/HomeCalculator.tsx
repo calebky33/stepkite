@@ -1,40 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { Tabs } from "@/components/ui/Tabs";
 import { COUNTRY_INFO, type CountryCode } from "@/lib/countries";
 import { PayCalculator } from "./PayCalculator";
 
 const SHORT_NAME: Record<CountryCode, string> = { uk: "UK", us: "US", in: "India" };
+const CODES: CountryCode[] = ["uk", "us", "in"];
 
-/** The home page calculator with a country picker. Starts on the UK. */
+/** The home page calculator with a country tab for each market. Starts on the UK. */
 export function HomeCalculator() {
-  const [country, setCountry] = useState<CountryCode>("uk");
-  const info = COUNTRY_INFO[country];
-
   return (
-    <div className="flex flex-col gap-8">
-      <SegmentedControl<CountryCode>
-        label="Country"
-        value={country}
-        onValueChange={setCountry}
-        className="max-w-sm"
-        options={[
-          { value: "uk", label: SHORT_NAME.uk },
-          { value: "us", label: SHORT_NAME.us },
-          { value: "in", label: SHORT_NAME.in },
-        ]}
-      />
-      <PayCalculator key={country} country={country} />
-      <div className="flex flex-wrap gap-x-6">
-        <Link
-          href={`/${country}`}
-          className="inline-flex min-h-11 items-center text-base text-primary underline underline-offset-2"
-        >
-          More about pay in {info.name}
-        </Link>
-      </div>
-    </div>
+    <Tabs
+      label="Country"
+      defaultValue="uk"
+      className="gap-8"
+      tabs={CODES.map((code) => ({
+        value: code,
+        label: SHORT_NAME[code],
+        content: (
+          <div className="flex flex-col gap-8">
+            <PayCalculator country={code} />
+            <Link
+              href={`/${code}`}
+              className="inline-flex min-h-11 items-center self-start text-base text-primary underline underline-offset-2"
+            >
+              More about pay in {COUNTRY_INFO[code].name}
+            </Link>
+          </div>
+        ),
+      }))}
+    />
   );
 }

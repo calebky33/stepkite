@@ -32,7 +32,9 @@ describe("Header", () => {
     expect(screen.getByRole("link", { name: "CV builder" }).getAttribute("aria-current")).toBe(
       "page",
     );
-    expect(screen.getByRole("link", { name: "Pricing" }).getAttribute("aria-current")).toBeNull();
+    expect(
+      screen.getByRole("link", { name: "Pricing and features" }).getAttribute("aria-current"),
+    ).toBeNull();
   });
 
   it("announces a section match as current without claiming it is the page", () => {

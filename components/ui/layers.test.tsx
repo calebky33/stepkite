@@ -50,9 +50,13 @@ describe("Tabs", () => {
     expect(first.getAttribute("aria-selected")).toBe("true");
     first.focus();
     fireEvent.keyDown(first, { key: "ArrowRight" });
-    await vi.waitFor(() => expect(document.activeElement).toBe(screen.getByRole("tab", { name: "Details" })));
     await vi.waitFor(() =>
-      expect(screen.getByRole("tab", { name: "Details" }).getAttribute("aria-selected")).toBe("true"),
+      expect(document.activeElement).toBe(screen.getByRole("tab", { name: "Details" })),
+    );
+    await vi.waitFor(() =>
+      expect(screen.getByRole("tab", { name: "Details" }).getAttribute("aria-selected")).toBe(
+        "true",
+      ),
     );
     expect(screen.getByRole("tabpanel")).toBeTruthy();
   });

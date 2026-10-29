@@ -157,7 +157,9 @@ export function ResultCard({ country, state, annualGross, entered, example }: Re
               )}
             </div>
           </div>
-          {state.kind === "ready" ? <ReadyNotes state={state} /> : null}
+          {state.kind === "ready" ? (
+            <ReadyNotes state={state} ratesLoaded={getRates(country).loaded} />
+          ) : null}
         </>
       )}
       {annualGross !== null && state.kind === "ready" ? (
@@ -364,7 +366,13 @@ function ReadyTable({
   );
 }
 
-function ReadyNotes({ state }: { state: Extract<ResultState, { kind: "ready" }> }) {
+function ReadyNotes({
+  state,
+  ratesLoaded,
+}: {
+  state: Extract<ResultState, { kind: "ready" }>;
+  ratesLoaded: boolean;
+}) {
   const sources = Array.from(new Set(state.result.lines.map((line) => line.source)));
   return (
     <div className="flex flex-col gap-2 rounded-input bg-surface-2 p-4">
@@ -376,7 +384,8 @@ function ReadyNotes({ state }: { state: Extract<ResultState, { kind: "ready" }> 
         </ul>
       ) : null}
       <p className="text-sm text-muted">
-        Tax year {state.taxYear}. This is an estimate. Your payslip may differ.
+        {ratesLoaded ? `Tax year ${state.taxYear}. ` : "Rates not loaded yet. "}This is an estimate.
+        Your payslip may differ.
       </p>
       {sources.length > 0 ? (
         <ul className="flex flex-col text-sm">

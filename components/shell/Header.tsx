@@ -91,7 +91,7 @@ export function Header() {
       label: info.cvName === "résumé" ? "Résumé builder" : "CV builder",
     },
     { key: "tools", href: `/${country}`, label: "Tools" },
-    { key: "pricing", href: "/pricing", label: "Pricing" },
+    { key: "pricing", href: "/pricing", label: "Pricing and features" },
   ];
 
   useEffect(() => {
@@ -159,12 +159,12 @@ export function Header() {
         <div className="flex items-center gap-2">
           <div className="hidden items-center gap-2 lg:flex">
             <CountrySwitcher />
-            <Link href={`/${country}/cv`} className={buttonStyles("primary")}>
+            <Link href={`/${country}/cv`} className={buttonStyles("dark")}>
               Build a {info.cvName}
             </Link>
           </div>
           <span className="hidden sm:block lg:hidden">
-            <Link href={`/${country}/cv`} className={buttonStyles("primary")}>
+            <Link href={`/${country}/cv`} className={buttonStyles("dark")}>
               Build {info.cvName}
             </Link>
           </span>
@@ -215,7 +215,7 @@ export function Header() {
           <Link
             href={`/${country}/cv`}
             onClick={() => setOpenedPath(null)}
-            className={buttonStyles("primary", "mt-2 w-full")}
+            className={buttonStyles("dark", "mt-2 w-full")}
           >
             Build a {info.cvName}
           </Link>

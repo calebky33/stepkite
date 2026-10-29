@@ -1,12 +1,13 @@
 import { cn } from "@/components/ui/cn";
 
-export type Status = "available" | "beta" | "coming-soon" | "draft";
+export type Status = "available" | "beta" | "coming-soon" | "draft" | "preview";
 
 const STATUS: Record<Status, { label: string; dot: string }> = {
   available: { label: "Available", dot: "bg-positive" },
   beta: { label: "Beta", dot: "bg-highlight" },
   "coming-soon": { label: "Coming soon", dot: "bg-border-strong" },
   draft: { label: "Draft", dot: "bg-tax" },
+  preview: { label: "Preview", dot: "bg-brand" },
 };
 
 /** Text label plus a coloured dot, so status never relies on colour alone. */

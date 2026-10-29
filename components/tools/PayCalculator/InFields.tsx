@@ -45,8 +45,8 @@ export function InFields({ values, errors, onChange }: FieldsProps) {
         onValueChange={(v) => onChange("region", v)}
       />
       <p className="rounded-input bg-surface-2 p-3 text-sm text-muted">
-        We assume the standard provident fund deduction from your basic pay. The exact rate
-        appears once it is checked.
+        We assume the standard provident fund deduction from your basic pay. The exact rate appears
+        once it is checked.
       </p>
       {oldRegime ? (
         <div className="flex flex-col gap-4">

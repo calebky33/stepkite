@@ -157,6 +157,13 @@ body {
   outline-color: var(--ink-focus);
 }
 
+/* The logo reads on the ink surface in both themes. */
+.on-ink {
+  --logo-a: #e5e7eb;
+  --logo-b: #7fa0ff;
+  --logo-steps: #0b0e13;
+}
+
 .on-ink .on-light :focus-visible {
   outline-color: var(--primary);
 }

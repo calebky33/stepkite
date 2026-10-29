@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 // Links are added later. Until then these are decorative placeholders: no href, no tab stop.
 // Swap each <span> for a <a href aria-label> with the same classes when the profiles exist.
 const ITEM_CLASS =
-  "inline-flex size-11 items-center justify-center rounded-input border border-ink-muted text-ink-fg";
+  "inline-flex size-9 items-center justify-center rounded-input border border-ink-muted text-ink-fg";
 
 const ICONS: Array<{ name: string; path: ReactNode }> = [
   {

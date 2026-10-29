@@ -40,7 +40,11 @@ export function NewsletterSignup() {
   };
 
   return (
-    <form onSubmit={submit} noValidate className="flex max-w-md flex-col gap-3">
+    <form
+      onSubmit={submit}
+      noValidate
+      className="flex flex-col gap-2 sm:grid sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start sm:gap-x-3 sm:gap-y-0"
+    >
       <Input
         label="Email address"
         hint="We email only when a new tool opens."
@@ -54,7 +58,7 @@ export function NewsletterSignup() {
       <Button type="submit" loading={status === "loading"} className="self-start">
         Email me updates
       </Button>
-      <p role="status" className="min-h-6 text-base">
+      <p role="status" className="min-h-5 text-sm sm:col-span-2">
         {status === "success" ? "Done. We'll email you when a new tool opens." : null}
         {status === "unavailable"
           ? "Sign-up isn't open yet, so we haven't saved your email. Check back later."

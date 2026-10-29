@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { COUNTRY_INFO, isCountry, type CountryCode } from "@/lib/countries";
 
 const LINK_CLASS =
-  "inline-flex min-h-11 items-center text-base text-ink-muted underline-offset-4 hover:text-ink-fg hover:underline";
+  "inline-flex min-h-11 items-center text-sm text-ink-muted underline-offset-4 hover:text-ink-fg hover:underline";
 
 type FooterLink = { href: string; label: string };
 
@@ -57,7 +57,7 @@ export function FooterNav({ children }: { children?: ReactNode }) {
   ];
 
   return (
-    <div className="grid gap-8 py-8 md:grid-cols-4">
+    <div className="grid grid-cols-2 gap-x-4 gap-y-2 py-3 md:grid-cols-4">
       <Column title="Tools" links={tools} />
       <Column title="Explore" links={explore} />
       <Column title="Stepkite" label="Company" links={company} />

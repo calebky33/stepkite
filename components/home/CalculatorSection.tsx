@@ -19,8 +19,8 @@ export function CalculatorSection() {
             Calculate your take-home pay
           </h2>
           <p className="mt-3 text-lg text-muted">
-            Pick a country and type your salary. Figures appear once the rates are checked against
-            the official source.
+            Type your salary and see what you keep. Figures appear once the rates are checked
+            against the official source.
           </p>
         </div>
         <div className="mt-8">

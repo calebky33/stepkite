@@ -8,23 +8,22 @@ import { SocialIcons } from "./SocialIcons";
 import { ThemeToggle } from "./ThemeToggle";
 
 const LINK_CLASS =
-  "inline-flex min-h-11 items-center text-base text-ink-muted underline-offset-4 hover:text-ink-fg hover:underline";
+  "inline-flex min-h-11 items-center text-sm text-ink-muted underline-offset-4 hover:text-ink-fg hover:underline";
 
 export function Footer() {
   return (
-    <footer className="on-ink mt-16 mb-[var(--consent-h,0px)] bg-ink pb-[max(1.5rem,env(safe-area-inset-bottom))] text-ink-fg">
-      <div className="mx-auto max-w-[1120px] px-4 py-10 md:px-6">
-        <div className="flex flex-col gap-3 border-b border-ink-line pb-8">
-          <Link
-            href="/"
-            className="inline-flex min-h-11 self-start rounded-input bg-surface px-3 py-2"
-          >
-            <Logo className="h-7 w-auto" />
-          </Link>
-          <p className="max-w-md text-sm text-ink-muted">
-            Pay and career tools for the UK, US and India. Free to use. Your CV and job list stay on
-            your device.
-          </p>
+    <footer className="on-ink mt-12 mb-[var(--consent-h,0px)] bg-ink pb-[max(1rem,env(safe-area-inset-bottom))] text-ink-fg">
+      <div className="mx-auto max-w-[1120px] px-4 pt-6 md:px-6">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-ink-line pb-4">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1">
+            <Link href="/" className="inline-flex min-h-11 items-center text-ink-fg">
+              <Logo className="h-6 w-auto" />
+            </Link>
+            <p className="max-w-md text-sm text-ink-muted">
+              Pay and career tools for the UK, US and India. Free to use. Your CV and job list stay
+              on your device.
+            </p>
+          </div>
           <SocialIcons />
         </div>
 
@@ -44,40 +43,40 @@ export function Footer() {
           </nav>
         </FooterNav>
 
-        <div className="on-light grid gap-6 rounded-card bg-surface p-4 text-text md:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] md:items-start md:gap-12 md:p-6">
-          <section
-            id="product-updates"
-            aria-labelledby="footer-news"
-            className="scroll-mt-[calc(var(--header-h)+1rem)] flex max-w-md flex-col gap-3"
-          >
+        <section
+          id="product-updates"
+          aria-labelledby="footer-news"
+          className="on-light scroll-mt-[calc(var(--header-h)+1rem)] grid gap-2 rounded-card bg-surface p-3 text-text md:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] md:items-start md:gap-6"
+        >
+          <div>
             <h2 id="footer-news" className="text-sm font-semibold">
               Product updates
             </h2>
-            <p className="max-w-md text-sm text-muted">
+            <p className="text-sm text-muted">
               Email sign-up is not connected yet. The form will tell you if you try.
             </p>
-            <NewsletterSignup />
-          </section>
-          <div className="flex w-full min-w-0 flex-col gap-4 border-t border-border pt-6 md:border-t-0 md:border-l md:pt-0 md:pl-12">
-            <ThemeToggle />
-            <p className="text-sm text-muted">
-              Stepkite gives estimates, not tax advice. Your actual pay may differ.
-            </p>
           </div>
-        </div>
+          <NewsletterSignup />
+        </section>
 
-        <div className="mt-6 flex flex-col gap-2 border-t border-ink-line pt-6 text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between">
-          <p>2026 Stepkite. All rights reserved.</p>
-          <nav aria-label="Legal">
-            <h2 className="sr-only">Legal</h2>
-            <Link
-              href="/cookies"
-              className="inline-flex min-h-11 items-center underline-offset-4 hover:text-ink-fg hover:underline"
-            >
-              Cookies
-            </Link>
-          </nav>
-          <p className="sm:text-right">Career tools, designed around you.</p>
+        <div className="mt-4 flex flex-col gap-1 border-t border-ink-line pt-3 text-sm text-ink-muted md:flex-row md:items-center md:justify-between md:gap-4">
+          <p>Stepkite gives estimates, not tax advice. Your actual pay may differ.</p>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <nav aria-label="Legal">
+              <h2 className="sr-only">Legal</h2>
+              <Link
+                href="/cookies"
+                className="inline-flex min-h-11 items-center underline-offset-4 hover:text-ink-fg hover:underline"
+              >
+                Cookies
+              </Link>
+            </nav>
+            <ThemeToggle />
+          </div>
+          <div className="flex flex-col gap-0.5 md:items-end">
+            <p>2026 Stepkite. All rights reserved.</p>
+            <p>Career tools, designed around you.</p>
+          </div>
         </div>
       </div>
     </footer>

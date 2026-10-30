@@ -81,6 +81,12 @@ Launch markets: UK, US, India. Business plan summary: docs/PRODUCT.md. Brand and
 - Caveman style is allowed for chat replies, commit messages and code reviews (`caveman`, `caveman-commit`, `caveman-review`). NEVER for user-facing site text, guides or emails: those follow docs/VOICE.md and the `humanizer` skill.
 - `caveman-compress` only on long notes or memory files, never on CLAUDE.md rules, docs/TAX-RULES.md or docs/VOICE.md.
 - Use `/compact` when context passes ~60%; start a new session per feature.
+- Session start: read the project memory first (`project-status-*`), then only the docs the task names. Do not read all of `docs/`.
+- One feature per session. Do not run two countries or two features in one session.
+- Reviewer scope: tax logic, auth, payments, Supabase, secrets and data handling get the full table (`reviewer`, `typescript-reviewer`, `security-reviewer` or `database-reviewer`). Copy-only or style-only edits get `copy-editor` or `test-runner` plus `pnpm check:copy`, typecheck and lint. Send a reviewer's findings back to the builder agent in one batch, not one at a time.
+- Do not load `ui-ux-pro-max` unless a task is about design choices. `emil-design-eng` only for UI or animation work.
+- Do not poll agents or repeat "still waiting" messages. Wait for the completion notice.
+- Before ending a session, update the `project-status-*` memory file with what is done, what is unverified, and the next session.
 - Final message: what changed (files), test result, agents and skills run, next step. 6 lines max.
 
 ## Project agents (.claude/agents/)

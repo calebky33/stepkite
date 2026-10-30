@@ -40,7 +40,10 @@ export function SkillsEditor({
         emptyText="No skills added yet. Add the tools and strengths you use at work."
         makeItem={() => ({ id: newId(), label: "", items: [] })}
         renderEntry={(group, _index, update) => {
-          const text = texts[group.id] ?? group.items.join(", ");
+          const shown = group.items.join(", ");
+          const kept = texts[group.id];
+          // After an undo the stored items win over the typed text.
+          const text = kept !== undefined && parse(kept).join(", ") === shown ? kept : shown;
           const tooMany = parse(text).length > MAX_SKILLS;
           return (
             <>

@@ -7,7 +7,10 @@ export type Block =
   | { key: string; kind: "experience"; id: string; heading: boolean }
   | { key: string; kind: "impact"; heading: boolean }
   | { key: string; kind: "education"; id: string; heading: boolean }
-  | { key: string; kind: "skills"; id: string; heading: boolean };
+  | { key: string; kind: "skills"; id: string; heading: boolean }
+  | { key: string; kind: "certifications"; id: string; heading: boolean }
+  | { key: string; kind: "interests"; heading: boolean }
+  | { key: string; kind: "references"; id: string; heading: boolean };
 
 export type Page = { blocks: Block[]; usedPx: number };
 
@@ -60,6 +63,30 @@ export function buildBlocks(cv: Cv): Block[] {
           heading: i === 0,
         }),
       );
+    } else if (section === "certifications") {
+      cv.certifications
+        .filter((c) => c.name.trim())
+        .forEach((item, i) =>
+          blocks.push({
+            key: `certifications-${item.id}`,
+            kind: "certifications",
+            id: item.id,
+            heading: i === 0,
+          }),
+        );
+    } else if (section === "interests") {
+      if (cv.interests.trim()) blocks.push({ key: "interests", kind: "interests", heading: true });
+    } else if (section === "references") {
+      cv.references
+        .filter((r) => r.name.trim())
+        .forEach((item, i) =>
+          blocks.push({
+            key: `references-${item.id}`,
+            kind: "references",
+            id: item.id,
+            heading: i === 0,
+          }),
+        );
     } else {
       cv.skills
         .filter((g) => g.label.trim() || g.items.length)
@@ -97,6 +124,10 @@ export function estimateHeight(cv: Cv, block: Block): number {
     const details = item?.details ? lines(item.details) * LINE_PX : 0;
     return heading + 2 * LINE_PX + details + ENTRY_GAP_PX;
   }
+  if (block.kind === "certifications" || block.kind === "references") {
+    return heading + 2 * LINE_PX + ENTRY_GAP_PX;
+  }
+  if (block.kind === "interests") return heading + lines(cv.interests) * LINE_PX + ENTRY_GAP_PX;
   const group = cv.skills.find((x) => x.id === block.id);
   return heading + lines((group?.items ?? []).join(", ")) * LINE_PX + ENTRY_GAP_PX;
 }

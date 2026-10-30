@@ -15,7 +15,13 @@ describe("usCvRules", () => {
     expect(usCvRules.sources).toEqual([]);
   });
 
-  it("is verified only when a date format is set", () => {
-    expect(usCvRules.verified).toBe(usCvRules.dateFormat !== null);
+  it("marks the rules verified only with a date format and a source", () => {
+    const rules = usCvRules;
+    if (rules.verified) {
+      expect(rules.dateFormat).not.toBeNull();
+      expect(rules.sources.length).toBeGreaterThan(0);
+    } else {
+      expect(rules.dateFormat).toBeNull();
+    }
   });
 });

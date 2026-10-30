@@ -1,3 +1,5 @@
+import { asciiDigits } from "./sanitize";
+
 /**
  * Rules based CV text parser. Pure and deterministic: no network, no AI, no guessing at numbers.
  * Every line of text in the result is copied from the input. The only values it builds are
@@ -55,10 +57,10 @@ export const LIMITS = {
   impact: 12,
 } as const;
 
-type Line = { text: string; bullet: boolean };
-type SectionId = "summary" | "experience" | "education" | "techStack" | "impact";
+export type Line = { text: string; bullet: boolean };
+export type SectionId = "summary" | "experience" | "education" | "techStack" | "impact";
 
-const HEADINGS: Record<string, SectionId | "other"> = {
+export const HEADINGS: Record<string, SectionId | "other"> = {
   summary: "summary",
   "professional summary": "summary",
   "career summary": "summary",
@@ -116,7 +118,7 @@ const HEADINGS: Record<string, SectionId | "other"> = {
 
 const BULLET_MARK = /^[•●▪▫◦·‣⁃■□▶►➢✓✔*–—-]\s+/;
 
-function toLines(text: string): Line[] {
+export function toLines(text: string): Line[] {
   return text
     .replace(/\r\n?/g, "\n")
     .split("\n")
@@ -127,7 +129,8 @@ function toLines(text: string): Line[] {
     });
 }
 
-function headingOf(line: Line): SectionId | "other" | null {
+/** The normalised heading text when the line is a known heading, like "work experience". */
+export function headingName(line: Line): string | null {
   if (line.bullet) return null;
   const trimmed = line.text.replace(/[:：]\s*$/, "").trim();
   if (!trimmed || trimmed.length > 40) return null;
@@ -137,7 +140,12 @@ function headingOf(line: Line): SectionId | "other" | null {
     .replace(/[^a-z ]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-  return HEADINGS[key] ?? null;
+  return key in HEADINGS ? key : null;
+}
+
+export function headingOf(line: Line): SectionId | "other" | null {
+  const name = headingName(line);
+  return name ? (HEADINGS[name] ?? null) : null;
 }
 
 const MONTH_NAMES = [
@@ -203,7 +211,8 @@ function tidy(text: string): string {
   return text.replace(/^[\s,|;:()[\]–—-]+|[\s,|;:()[\]–—-]+$/g, "").trim();
 }
 
-function findDate(text: string, allowSingleYear: boolean): Dated | null {
+function findDate(original: string, allowSingleYear: boolean): Dated | null {
+  const text = asciiDigits(original);
   const range = RANGE.exec(text);
   if (range?.[1] && range[2]) {
     const from = parseToken(range[1]);
@@ -457,7 +466,7 @@ function impactOf(
   const impact: string[] = [];
   const skipped: string[] = [];
   for (const text of groupLines(lines)) {
-    if (!/\d/.test(text) || text.length > LIMITS.bullet) {
+    if (!/\p{Nd}/u.test(text) || text.length > LIMITS.bullet) {
       skipped.push(text);
     } else if (impact.length >= LIMITS.impact) {
       skipped.push(text);
@@ -465,7 +474,7 @@ function impactOf(
       impact.push(text);
     }
   }
-  if (skipped.some((s) => /\d/.test(s))) {
+  if (skipped.some((s) => /\p{Nd}/u.test(s))) {
     warnings.push(
       "Some achievement lines with numbers were left out because they were too long or over the limit of 12.",
     );

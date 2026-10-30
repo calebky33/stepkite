@@ -3,7 +3,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const db = vi.hoisted(() => ({ read: vi.fn(), write: vi.fn() }));
 
-vi.mock("@/lib/storage/db", () => ({ readItem: db.read, writeItem: db.write }));
+vi.mock("@/lib/storage/db", () => ({
+  readItem: db.read,
+  writeItem: db.write,
+  removeItem: vi.fn().mockResolvedValue({ ok: true, value: null }),
+  listIds: vi.fn().mockResolvedValue({ ok: true, value: [] }),
+  readAll: vi.fn().mockResolvedValue({ ok: true, value: { items: [], skipped: 0 } }),
+  clearEverything: vi.fn().mockResolvedValue({ ok: true, value: null }),
+}));
+
+/** Writes to the CV collection only. Earlier copies are written to their own collection. */
+const cvWrites = () => db.write.mock.calls.filter((call) => call[0] === "cvs");
 
 import { CvBuilderShell } from "./CvBuilderShell";
 
@@ -17,20 +27,20 @@ beforeEach(() => {
 });
 
 describe("CvBuilderShell", () => {
-  it("renders the editor with labelled fields and a disabled download", async () => {
+  it("renders the editor with labelled fields and a PDF button", async () => {
     render(<CvBuilderShell country="uk" />);
     await screen.findByLabelText("Full name");
     expect(screen.getByLabelText("Email")).toBeTruthy();
-    const download = screen.getByRole("button", { name: "Download CV" }) as HTMLButtonElement;
-    expect(download.disabled).toBe(true);
+    const download = screen.getByRole("button", { name: "Download PDF" });
+    expect(download.getAttribute("aria-disabled")).toBe("true");
     const reason = document.getElementById(download.getAttribute("aria-describedby") ?? "");
-    expect(reason?.textContent).toBe("PDF download is not connected yet.");
+    expect(reason?.textContent).toContain("Add your name or a section first");
     expect(screen.getByRole("radio", { name: "Preview" })).toBeTruthy();
   });
 
   it("uses résumé wording for the US", async () => {
     render(<CvBuilderShell country="us" />);
-    expect(await screen.findByRole("button", { name: "Download résumé" })).toBeTruthy();
+    expect(await screen.findByLabelText("Name of this résumé")).toBeTruthy();
   });
 
   it("shows typed text in the preview and saves after the pause", async () => {
@@ -38,9 +48,9 @@ describe("CvBuilderShell", () => {
     await screen.findByLabelText("Full name");
     type("Full name", "Asha Rao");
     expect(screen.getByRole("region", { name: "CV preview" }).textContent).toContain("Asha Rao");
-    expect(db.write).not.toHaveBeenCalled();
+    expect(cvWrites()).toHaveLength(0);
     await waitFor(() => expect(status()).toContain("Saved on this device"), { timeout: 2000 });
-    expect(db.write).toHaveBeenCalledTimes(1);
+    expect(cvWrites()).toHaveLength(1);
   });
 
   it("says so when the browser cannot store anything", async () => {
@@ -61,11 +71,11 @@ describe("CvBuilderShell", () => {
     await screen.findByLabelText("Full name");
     type("Full name", "A");
     await new Promise((resolve) => setTimeout(resolve, 700));
-    expect(db.write).not.toHaveBeenCalled();
+    expect(cvWrites()).toHaveLength(0);
     expect(status()).toContain("could not read the saved version");
     fireEvent.click(screen.getByRole("button", { name: "Start a new CV" }));
     type("Full name", "AB");
-    await waitFor(() => expect(db.write).toHaveBeenCalled(), { timeout: 2000 });
+    await waitFor(() => expect(cvWrites().length).toBeGreaterThan(0), { timeout: 2000 });
   });
 
   it("flags a missing start month on a job", async () => {
@@ -83,14 +93,14 @@ describe("CvBuilderShell", () => {
     const picker = screen.getByRole("group", { name: "Template" });
     expect(within(picker).getAllByRole("radio")).toHaveLength(3);
     fireEvent.click(within(picker).getByRole("radio", { name: /Compact/ }));
-    await waitFor(() => expect(db.write).toHaveBeenCalled(), { timeout: 2000 });
-    expect(db.write.mock.calls[0]?.[3].templateId).toBe("compact");
+    await waitFor(() => expect(cvWrites().length).toBeGreaterThan(0), { timeout: 2000 });
+    expect(cvWrites()[0]?.[3].templateId).toBe("compact");
   });
 
-  it("keeps the PDF message plain and offers no ad slot", async () => {
+  it("keeps the PDF note plain and offers no ad slot", async () => {
     render(<CvBuilderShell country="uk" />);
     await screen.findByLabelText("Full name");
-    expect(screen.getByText("PDF download is not connected yet.")).toBeTruthy();
+    expect(screen.getByText(/Add your name or a section first/)).toBeTruthy();
     expect(screen.queryByText("Advertisement")).toBeNull();
   });
 });

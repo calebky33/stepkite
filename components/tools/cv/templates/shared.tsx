@@ -1,7 +1,7 @@
-import type { ComponentType, CSSProperties, ReactNode } from "react";
+import { useId, type ComponentType, type CSSProperties, type ReactNode } from "react";
 import type { Block } from "@/lib/cv/paginate";
 import type { Cv } from "@/lib/cv/schema";
-import { clampStyle, fontStack } from "@/lib/cv/style";
+import { bodyPx, clampStyle, fontStack, lineHeightFor } from "@/lib/cv/style";
 
 export type TemplateProps = { cv: Cv; blocks: readonly Block[]; locale: string };
 
@@ -14,13 +14,40 @@ export type TemplateDef = {
   placeholder?: boolean;
 };
 
-export type Labels = { summary: string; experience: string; education: string; skills: string };
+export type Labels = {
+  summary: string;
+  experience: string;
+  education: string;
+  skills: string;
+  certifications: string;
+  interests: string;
+  references: string;
+  impact: string;
+  /** Joins two dates in a range: "Mar 2021 to Jun 2023". */
+  to: string;
+  /** Ends an open range: "Mar 2021 to present". */
+  present: string;
+};
+
+/**
+ * Every word a template prints that is not the person's own text lives in a Labels set.
+ * English only for now. To translate, add a set here and pick it in labelsFor by content locale.
+ */
+const COMMON_LABELS = {
+  certifications: "Certifications",
+  interests: "Interests",
+  references: "References",
+  impact: "Quantified impact",
+  to: "to",
+  present: "present",
+} as const;
 
 const DEFAULT_LABELS: Labels = {
   summary: "Summary",
   experience: "Experience",
   education: "Education",
   skills: "Skills",
+  ...COMMON_LABELS,
 };
 
 const UK_LABELS: Labels = {
@@ -28,6 +55,15 @@ const UK_LABELS: Labels = {
   experience: "Work experience",
   education: "Education",
   skills: "Skills",
+  ...COMMON_LABELS,
+};
+
+const IN_LABELS: Labels = {
+  summary: "Career objective",
+  experience: "Experience",
+  education: "Education",
+  skills: "Skills",
+  ...COMMON_LABELS,
 };
 
 export type Variant = {
@@ -38,7 +74,7 @@ export type Variant = {
   density: number;
   /** Title and dates share one line. */
   inlineDates: boolean;
-  /** Section headings. Defaults suit the US and India placeholders. */
+  /** Words and section headings. Without this the US set is used. */
   labels?: Labels;
   /** Name drawn in the accent colour. */
   accentName?: boolean;
@@ -111,10 +147,34 @@ export const VARIANTS = {
     density: 0.92,
     inlineDates: true,
   },
+  inClassic: {
+    center: false,
+    upperHeadings: false,
+    headingRule: true,
+    density: 1,
+    inlineDates: false,
+    labels: IN_LABELS,
+  },
+  inModern: {
+    center: false,
+    upperHeadings: true,
+    headingRule: false,
+    density: 1,
+    inlineDates: true,
+    labels: IN_LABELS,
+    accentName: true,
+    headingBar: true,
+  },
+  inCompact: {
+    center: false,
+    upperHeadings: true,
+    headingRule: true,
+    density: 0.92,
+    inlineDates: true,
+    labels: IN_LABELS,
+  },
 } satisfies Record<string, Variant>;
 
-/** Page text size in CSS pixels at 100 percent, about 10 point. */
-const BASE_PX = 13.5;
 const GAP_PX = { compact: 6, normal: 10, roomy: 16 } as const;
 const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
 
@@ -127,12 +187,24 @@ function formatMonth(value: string | null, locale: string): string {
   }).format(new Date(`${value}-01T00:00:00Z`));
 }
 
-function range(start: string | null, end: string | null, locale: string, open: string): string {
+function range(start: string | null, end: string | null, locale: string, labels: Labels): string {
   const from = formatMonth(start, locale);
   const to = formatMonth(end, locale);
-  if (from && to) return `${from} to ${to}`;
-  if (from) return `${from} to ${open}`;
+  if (from && to) return `${from} ${labels.to} ${to}`;
+  if (from) return `${from} ${labels.to} ${labels.present}`;
   return to;
+}
+
+/** Translated sets by language code. Empty until a translation is written. */
+const LABELS_BY_LANGUAGE: Readonly<Record<string, Labels>> = {};
+
+/** Picks the label set: a translation for the content language, else the country set. */
+function labelsFor(variant: Variant, locale: string): Labels {
+  const language = locale.split("-")[0]?.toLowerCase() ?? "en";
+  if (language !== "en" && Object.hasOwn(LABELS_BY_LANGUAGE, language)) {
+    return LABELS_BY_LANGUAGE[language] ?? DEFAULT_LABELS;
+  }
+  return variant.labels ?? DEFAULT_LABELS;
 }
 
 /**
@@ -148,11 +220,14 @@ export function TemplateBody({
   const style = clampStyle(cv.style);
   const gap = GAP_PX[style.spacing] * variant.density;
   const accent = style.accent;
-  const labels = variant.labels ?? DEFAULT_LABELS;
+  const labels = labelsFor(variant, locale);
+  const uid = useId();
+  const headId = (key: string) => `${uid}-${key}`;
   const align = variant.center ? "text-center" : "text-start";
 
-  const heading = (text: string): ReactNode => (
+  const heading = (text: string, key: string): ReactNode => (
     <h3
+      id={headId(key)}
       className={`mb-1 font-bold [break-after:avoid] ${variant.upperHeadings ? "uppercase tracking-wide" : ""} ${
         variant.headingRule ? "border-b border-ink/20 pb-0.5" : ""
       } ${variant.headingBar ? "border-s-4 ps-2" : ""}`}
@@ -222,8 +297,8 @@ export function TemplateBody({
     }
     if (block.kind === "summary") {
       return (
-        <section aria-label={block.heading ? labels.summary : undefined}>
-          {block.heading ? heading(labels.summary) : null}
+        <section aria-labelledby={block.heading ? headId("summary") : undefined}>
+          {block.heading ? heading(labels.summary, "summary") : null}
           <p dir="auto" className="whitespace-pre-wrap">
             {cv.summary}
           </p>
@@ -235,9 +310,9 @@ export function TemplateBody({
       if (!job) return null;
       const title = [job.role, job.employer, job.location].filter(Boolean).join(", ");
       return (
-        <section aria-label={block.heading ? labels.experience : undefined}>
-          {block.heading ? heading(labels.experience) : null}
-          {titleRow(title, range(job.start, job.end, locale, "present"))}
+        <section aria-labelledby={block.heading ? headId("experience") : undefined}>
+          {block.heading ? heading(labels.experience, "experience") : null}
+          {titleRow(title, range(job.start, job.end, locale, labels))}
           <ul className="list-disc ps-5">
             {job.bullets
               .filter((b) => b.trim())
@@ -252,8 +327,8 @@ export function TemplateBody({
     }
     if (block.kind === "impact") {
       return (
-        <section aria-label={block.heading ? "Quantified impact" : undefined}>
-          {block.heading ? heading("Quantified impact") : null}
+        <section aria-labelledby={block.heading ? headId("impact") : undefined}>
+          {block.heading ? heading(labels.impact, "impact") : null}
           <ul className="list-disc ps-5">
             {cv.impact
               .filter((line) => line.trim())
@@ -271,9 +346,9 @@ export function TemplateBody({
       if (!item) return null;
       const title = [item.qualification, item.institution].filter(Boolean).join(", ");
       return (
-        <section aria-label={block.heading ? labels.education : undefined}>
-          {block.heading ? heading(labels.education) : null}
-          {titleRow(title, range(item.start, item.end, locale, "present"))}
+        <section aria-labelledby={block.heading ? headId("education") : undefined}>
+          {block.heading ? heading(labels.education, "education") : null}
+          {titleRow(title, range(item.start, item.end, locale, labels))}
           {item.details ? (
             <p dir="auto" className="whitespace-pre-wrap">
               {item.details}
@@ -282,11 +357,49 @@ export function TemplateBody({
         </section>
       );
     }
+    if (block.kind === "certifications") {
+      const item = cv.certifications.find((x) => x.id === block.id);
+      if (!item) return null;
+      const detail = [item.issuer, formatMonth(item.date, locale)].filter(Boolean).join(", ");
+      return (
+        <section aria-labelledby={block.heading ? headId("certifications") : undefined}>
+          {block.heading ? heading(labels.certifications, "certifications") : null}
+          <p dir="auto">
+            <span className="font-semibold">{item.name}</span>
+            {detail ? <span>{`, ${detail}`}</span> : null}
+          </p>
+        </section>
+      );
+    }
+    if (block.kind === "interests") {
+      return (
+        <section aria-labelledby={block.heading ? headId("interests") : undefined}>
+          {block.heading ? heading(labels.interests, "interests") : null}
+          <p dir="auto" className="whitespace-pre-wrap">
+            {cv.interests}
+          </p>
+        </section>
+      );
+    }
+    if (block.kind === "references") {
+      const item = cv.references.find((x) => x.id === block.id);
+      if (!item) return null;
+      const detail = [item.role, item.contact].filter(Boolean).join(", ");
+      return (
+        <section aria-labelledby={block.heading ? headId("references") : undefined}>
+          {block.heading ? heading(labels.references, "references") : null}
+          <p dir="auto">
+            <span className="font-semibold">{item.name}</span>
+            {detail ? <span>{`, ${detail}`}</span> : null}
+          </p>
+        </section>
+      );
+    }
     const group = cv.skills.find((x) => x.id === block.id);
     if (!group) return null;
     return (
-      <section aria-label={block.heading ? labels.skills : undefined}>
-        {block.heading ? heading(labels.skills) : null}
+      <section aria-labelledby={block.heading ? headId("skills") : undefined}>
+        {block.heading ? heading(labels.skills, "skills") : null}
         <p dir="auto">
           {group.label ? <span className="font-semibold">{group.label}: </span> : null}
           {group.items.join(", ")}
@@ -297,8 +410,8 @@ export function TemplateBody({
 
   const root: CSSProperties = {
     fontFamily: fontStack(style.fontPair),
-    fontSize: BASE_PX * style.fontScale * variant.density,
-    lineHeight: 1.4,
+    fontSize: bodyPx(style.fontScale, variant.density),
+    lineHeight: lineHeightFor(JSON.stringify(cv)),
   };
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { COUNTRY_INFO, type CountryCode } from "@/lib/countries";
 import { exampleCv } from "@/lib/cv/example";
 import { buildBlocks, estimateHeight, paginate } from "@/lib/cv/paginate";
@@ -35,7 +35,22 @@ function sameHeights(a: Record<string, number>, b: Record<string, number>): bool
  * Blocks are measured in a hidden copy at the real content width, then placed on pages so no
  * entry is cut in two. Until a block is measured (first paint, tests) a height estimate is used.
  */
-export function PagedPreview({ cv: userCv, country }: { cv: Cv; country: CountryCode }) {
+export function PagedPreview({
+  cv: userCv,
+  country,
+  printRef,
+  onLayout,
+  printing = false,
+}: {
+  cv: Cv;
+  country: CountryCode;
+  /** Points at a copy of the same pages at true size, for the PDF export. */
+  printRef?: RefObject<HTMLDivElement | null>;
+  /** Reports the page count, and whether the preview shows the example instead of the CV. */
+  onLayout?: (info: { pages: number; empty: boolean }) => void;
+  /** The print copy exists only while a print is under way. */
+  printing?: boolean;
+}) {
   const isEmpty = useMemo(() => buildBlocks(userCv).length === 0, [userCv]);
   const cv = useMemo(() => (isEmpty ? exampleCv(userCv) : userCv), [isEmpty, userCv]);
   const info = COUNTRY_INFO[country];
@@ -75,14 +90,22 @@ export function PagedPreview({ cv: userCv, country }: { cv: Cv; country: Country
     const root = measureRef.current;
     if (!root) return;
     const next: Record<string, number> = {};
-    root.querySelectorAll<HTMLElement>("[data-block]").forEach((el) => {
+    const found = root.querySelectorAll<HTMLElement>("[data-block]");
+    found.forEach((el) => {
       if (el.offsetHeight > 0) next[el.dataset.block ?? ""] = el.offsetHeight;
     });
+    // Nothing measured while blocks exist means the copy has no layout right now. Keep the
+    // last good heights instead of falling back to guesses.
+    if (found.length > 0 && Object.keys(next).length === 0) return;
     setMeasured((prev) => (sameHeights(prev, next) ? prev : next));
   }, [cv, Template, contentW, scale]);
 
   const pages = paginate(blocks, (b) => measured[b.key] ?? estimateHeight(cv, b), contentH);
   const total = pages.length;
+
+  useEffect(() => {
+    onLayout?.({ pages: total, empty: isEmpty });
+  }, [onLayout, total, isEmpty]);
 
   return (
     <div className="relative flex min-w-0 flex-col gap-3 rounded-card border border-border bg-surface-2 p-4 sm:p-6">
@@ -149,6 +172,28 @@ export function PagedPreview({ cv: userCv, country }: { cv: Cv; country: Country
           })}
         </div>
       </div>
+      {printRef && printing ? (
+        // Not shown on screen. react-to-print clones this node into a print frame, so the
+        // wrapper is hidden but the node itself is not.
+        <div className="hidden" aria-hidden="true">
+          <div ref={printRef}>
+            {pages.map((page, index) => (
+              <div
+                key={index}
+                className="cv-print-page bg-white"
+                style={{
+                  width: `${paper.width}mm`,
+                  height: `${paper.height - 0.3}mm`,
+                  padding: `${style.marginMm}mm`,
+                  boxSizing: "border-box",
+                }}
+              >
+                <Template cv={cv} blocks={page.blocks} locale={info.locale} />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
       {/* Hidden copy used only to measure block heights at the real content width. */}
       <div
         ref={measureRef}

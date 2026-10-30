@@ -113,11 +113,21 @@ describe("US templates", () => {
   });
 
   it("separates contact details so email and phone never join", () => {
-    const cv = fullCv();
+    const base = fullCv();
+    const cv = {
+      ...base,
+      contact: { ...base.contact, phone: base.contact.phone || "07700 900123" },
+    };
     const t = resolveTemplate("us", "classic");
     const { container } = render(<t.Component cv={cv} blocks={buildBlocks(cv)} locale="en-US" />);
-    const text = container.textContent ?? "";
-    expect(text).toContain(cv.contact.email + " |");
+    const spans = [...container.querySelectorAll("header p > span")];
+    const email = spans.find((el) => el.textContent?.startsWith(cv.contact.email));
+    const phone = spans.find((el) => el.textContent?.startsWith(cv.contact.phone));
+    expect(email).toBeTruthy();
+    expect(phone).toBeTruthy();
+    expect(email).not.toBe(phone);
+    // The bar between items is decoration, hidden from screen readers.
+    expect(email?.querySelector('[aria-hidden="true"]')).toBeTruthy();
   });
 
   it("lists the three templates in the picker and reports a change", () => {

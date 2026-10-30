@@ -1,4 +1,4 @@
-import { createStore, del, get, keys, set, type UseStore } from "idb-keyval";
+import { clear, createStore, del, entries, get, keys, set, type UseStore } from "idb-keyval";
 import type { ZodType } from "zod";
 
 /**
@@ -6,7 +6,16 @@ import type { ZodType } from "zod";
  * unless the user signs in and turns on sync (CLAUDE.md rule 3).
  */
 export type StorageResult<T> =
-  { ok: true; value: T } | { ok: false; reason: "unavailable" | "invalid" | "missing" };
+  { ok: true; value: T } | { ok: false; reason: "unavailable" | "invalid" | "missing" | "full" };
+
+export type Collection = "cvs" | "jobs" | "cv-snapshots" | "cv-bin" | "cv-feedback";
+export const COLLECTIONS: readonly Collection[] = [
+  "cvs",
+  "jobs",
+  "cv-snapshots",
+  "cv-bin",
+  "cv-feedback",
+];
 
 const stores = new Map<string, UseStore>();
 
@@ -20,7 +29,7 @@ function storeFor(name: string): UseStore | null {
 }
 
 export async function readItem<T>(
-  collection: "cvs" | "jobs",
+  collection: Collection,
   id: string,
   schema: ZodType<T>,
 ): Promise<StorageResult<T>> {
@@ -37,7 +46,7 @@ export async function readItem<T>(
 }
 
 export async function writeItem<T>(
-  collection: "cvs" | "jobs",
+  collection: Collection,
   id: string,
   schema: ZodType<T>,
   value: T,
@@ -49,15 +58,15 @@ export async function writeItem<T>(
   try {
     await set(id, parsed.data, store);
     return { ok: true, value: null };
-  } catch {
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "QuotaExceededError") {
+      return { ok: false, reason: "full" };
+    }
     return { ok: false, reason: "unavailable" };
   }
 }
 
-export async function removeItem(
-  collection: "cvs" | "jobs",
-  id: string,
-): Promise<StorageResult<null>> {
+export async function removeItem(collection: Collection, id: string): Promise<StorageResult<null>> {
   const store = storeFor(collection);
   if (!store) return { ok: false, reason: "unavailable" };
   try {
@@ -68,12 +77,47 @@ export async function removeItem(
   }
 }
 
-export async function listIds(collection: "cvs" | "jobs"): Promise<StorageResult<string[]>> {
+export async function listIds(collection: Collection): Promise<StorageResult<string[]>> {
   const store = storeFor(collection);
   if (!store) return { ok: false, reason: "unavailable" };
   try {
     const all = await keys(store);
     return { ok: true, value: all.map(String) };
+  } catch {
+    return { ok: false, reason: "unavailable" };
+  }
+}
+
+/** Every item in a collection that passes the schema. `skipped` counts items that did not. */
+export async function readAll<T>(
+  collection: Collection,
+  schema: ZodType<T>,
+): Promise<StorageResult<{ items: T[]; skipped: number }>> {
+  const store = storeFor(collection);
+  if (!store) return { ok: false, reason: "unavailable" };
+  try {
+    const all = await entries(store);
+    const items: T[] = [];
+    let skipped = 0;
+    for (const [, raw] of all) {
+      const parsed = schema.safeParse(raw);
+      if (parsed.success) items.push(parsed.data);
+      else skipped += 1;
+    }
+    return { ok: true, value: { items, skipped } };
+  } catch {
+    return { ok: false, reason: "unavailable" };
+  }
+}
+
+/** Erases every collection on this device. Used by "Delete my data". */
+export async function clearEverything(): Promise<StorageResult<null>> {
+  try {
+    for (const name of COLLECTIONS) {
+      const store = storeFor(name);
+      if (store) await clear(store);
+    }
+    return { ok: true, value: null };
   } catch {
     return { ok: false, reason: "unavailable" };
   }

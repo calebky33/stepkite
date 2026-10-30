@@ -14,7 +14,13 @@ describe("ukCvRules", () => {
     expect(ukCvRules.spelling).toBe("en-GB");
   });
 
-  it("is verified only when a date format is set", () => {
-    expect(ukCvRules.verified).toBe(ukCvRules.dateFormat !== null);
+  it("marks the rules verified only with a date format and a source", () => {
+    const rules = ukCvRules;
+    if (rules.verified) {
+      expect(rules.dateFormat).not.toBeNull();
+      expect(rules.sources.length).toBeGreaterThan(0);
+    } else {
+      expect(rules.dateFormat).toBeNull();
+    }
   });
 });

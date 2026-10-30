@@ -6,7 +6,7 @@ import { ToolLinks } from "@/components/tools/ToolLinks";
 import { COUNTRY_INFO } from "@/lib/countries";
 import { SALARY_CONTENT } from "@/lib/content/salaryCalculator";
 import { countryParams, requireCountry, type CountryParams } from "@/lib/routes";
-import { SITE_URL, stubMetadata } from "@/lib/seo";
+import { INDEXABLE_PATHS, SITE_URL, stubMetadata } from "@/lib/seo";
 import { getRates } from "@/lib/tax";
 
 type Props = { params: Promise<CountryParams> };
@@ -41,7 +41,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
   };
   // Stay out of search results until the rates have been checked against the official source.
-  return getRates(country).loaded ? meta : stubMetadata(meta);
+  // Index only when the rates are loaded and the path is on the reviewed list in lib/seo.ts.
+  const indexable =
+    getRates(country).loaded && INDEXABLE_PATHS.includes(`/${country}/salary-calculator`);
+  return indexable ? meta : stubMetadata(meta);
 }
 
 function jsonLdString(data: object): string {

@@ -37,8 +37,8 @@ describe("payInputSchema", () => {
   });
 });
 
-// Countries whose engines are built. The UK engine is covered in lib/tax/uk.
-const BUILT: readonly string[] = ["uk"];
+// Countries whose engines are built. They are covered in lib/tax/uk and lib/tax/in.
+const BUILT: readonly string[] = ["uk", "in"];
 const STUBS = COUNTRIES.filter((c) => !BUILT.includes(c));
 
 describe("stub engines", () => {

@@ -25,6 +25,8 @@ export interface PayLine {
   amount: number;
   /** Official page the rule comes from. */
   source: string;
+  /** Short human name for the source link, for example "GOV.UK income tax rates". No dashes or slashes. */
+  sourceLabel?: string;
 }
 
 export interface PayResult {
@@ -41,6 +43,10 @@ export interface Sourced<T> {
   value: T;
   source: string;
   verifiedOn: string;
+  /** More official pages that state the same rule. */
+  alsoSources?: readonly string[];
+  /** Set when the page could not be read in full and the figure rests on a search excerpt or an older page. */
+  unverifiedNote?: string;
 }
 
 /** What a `rates.<year>.ts` file holds. `loaded` stays false until the tax-engine agent fetches official figures. */

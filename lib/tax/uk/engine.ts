@@ -174,11 +174,11 @@ export const ukEngine: PayEngine = (rawInput): EngineOutcome => {
   }
 
     const lines: PayLine[] = [
-    { key: "incomeTax", label: "Income tax", amount: round2(incomeTax), source: taxSource },
-    { key: "ni", label: "National Insurance", amount: round2(ni), source: SRC_NI },
+    { key: "incomeTax", label: "Income tax", amount: round2(incomeTax), source: taxSource, sourceLabel: scottish ? "GOV.UK Scottish income tax" : "GOV.UK income tax rates" },
+    { key: "ni", label: "National Insurance", amount: round2(ni), source: SRC_NI, sourceLabel: "GOV.UK rates and thresholds for employers" },
   ];
   if (loan > 0)
-    lines.push({ key: "studentLoan", label: loanLabel, amount: round2(loan), source: SRC_NI });
+    lines.push({ key: "studentLoan", label: loanLabel, amount: round2(loan), source: SRC_NI, sourceLabel: "GOV.UK rates and thresholds for employers" });
   if (pension > 0) {
     // Relief at source: only 80 percent leaves your pay.
     const cost = ras > 0 ? pension * (1 - ukRates.reliefAtSourceRate.value) : pension;
@@ -187,6 +187,7 @@ export const ukEngine: PayEngine = (rawInput): EngineOutcome => {
       label: pensionType === "salary-sacrifice" ? "Pension (salary sacrifice)" : "Pension",
       amount: round2(cost),
       source: SRC_PENSION,
+      sourceLabel: "GOV.UK pension tax relief",
     });
   }
 

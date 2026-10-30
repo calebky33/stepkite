@@ -39,18 +39,18 @@ export function InFields({ values, errors, onChange }: FieldsProps) {
       />
       <Select
         label="State"
-        hint="Professional tax depends on your state."
+        hint="Professional tax is only included for Telangana so far."
         options={STATES}
         value={values.region}
         onValueChange={(v) => onChange("region", v)}
       />
       <p className="rounded-input bg-surface-2 p-3 text-sm text-muted">
-        We assume the standard provident fund deduction from your basic pay. The exact rate appears
-        once it is checked.
+        We take provident fund as 12% of your basic pay, with no wage cap. We assume basic pay is
+        half of your CTC.
       </p>
       <CurrencyInput
         label="Other deductions"
-        hint="Total for a year. Not counted yet."
+        hint="Total for a year. We don't take this off your pay yet."
         error={errors.otherDeductions}
         locale={info.locale}
         currency={info.currency}
@@ -82,7 +82,7 @@ export function InFields({ values, errors, onChange }: FieldsProps) {
           <div className="grid gap-4 sm:grid-cols-2">
             <CurrencyInput
               label="HRA you receive"
-              hint="Shown on your payslip. Not counted yet."
+              hint="Total HRA for the year, from your payslip. Used under the old regime."
               error={errors.hraReceived}
               locale={info.locale}
               currency={info.currency}
@@ -91,7 +91,7 @@ export function InFields({ values, errors, onChange }: FieldsProps) {
             />
             <CurrencyInput
               label="Rent you pay"
-              hint="Total rent for the year. Not counted yet."
+              hint="Total rent for the year. Used under the old regime."
               error={errors.rentPaid}
               locale={info.locale}
               currency={info.currency}

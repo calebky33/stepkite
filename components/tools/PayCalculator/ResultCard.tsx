@@ -71,6 +71,19 @@ function capitalise(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
+/** Host plus the last path part, so two pages on one site read differently. */
+function sourceLabel(url: string): string {
+  try {
+    const { hostname, pathname } = new URL(url);
+    const host = hostname.replace(/^www\./, "");
+    const page = pathname.split("/").filter(Boolean).pop();
+    // Only a plain word slug reads well. File names and ids fall back to the host.
+    return page && /^[a-z][a-z-]*$/.test(page) ? `${host}, ${page.replace(/-/g, " ")}` : host;
+  } catch {
+    return "official page";
+  }
+}
+
 function hostOf(url: string | undefined): string | null {
   if (!url) return null;
   try {
@@ -387,7 +400,9 @@ function ReadyNotes({
         timeZone: "UTC",
       })
     : null;
-  const sources = Array.from(new Set(state.result.lines.map((line) => line.source)));
+  const sources = Array.from(
+    new Map(state.result.lines.map((line) => [line.source, line.sourceLabel] as const)),
+  );
   return (
     <div className="flex flex-col gap-2 rounded-input bg-surface-2 p-4">
       {state.result.assumptions.length > 0 ? (
@@ -404,7 +419,7 @@ function ReadyNotes({
       </p>
       {sources.length > 0 ? (
         <ul className="flex flex-col text-sm">
-          {sources.map((url) => (
+          {sources.map(([url, label]) => (
             <li key={url}>
               <a
                 href={url}
@@ -412,7 +427,7 @@ function ReadyNotes({
                 rel="noopener noreferrer"
                 className="inline-flex min-h-11 items-center break-all text-primary underline-offset-4 hover:underline"
               >
-                Source: {hostOf(url) ?? "official page"}
+                Source: {label ?? sourceLabel(url)}
               </a>
             </li>
           ))}

@@ -68,7 +68,7 @@ export function Suite() {
             <h3 className="font-display text-[22px] leading-tight">Take-home pay</h3>
             <p className="max-w-[34rem] text-base text-muted">
               See each deduction between your pay before tax and the money in your bank, including
-              pension. The UK is ready. India is still being checked and the US is not built yet.
+              pension. Works for the UK, the US and India.
             </p>
             <CountryLink path="/salary-calculator" className={`${LINK} mt-2`}>
               Calculate my pay

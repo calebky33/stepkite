@@ -66,7 +66,7 @@ export const SALARY_CONTENT: Partial<Record<CountryCode, SalaryCalculatorContent
       {
         question: "Which states are included?",
         answer:
-          "State tax is worked out for Texas, Florida, Pennsylvania, Illinois, Georgia, North Carolina and Michigan. Texas and Florida have no state tax on wages. Treat North Carolina and Michigan as rougher estimates, because some of their 2026 figures rest on partial sources and the calculator says so when you pick them.",
+          "State tax is worked out for Texas, Florida, Pennsylvania, Illinois, Georgia, North Carolina and Michigan. Texas and Florida have no state tax on wages. Where a state's tax is left out, the calculator says so next to your result.",
       },
       {
         question: "What about California, New York and Ohio?",

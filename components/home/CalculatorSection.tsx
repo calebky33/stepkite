@@ -16,8 +16,7 @@ export function CalculatorSection() {
             Calculate your take-home pay
           </h2>
           <p className="mt-3 text-lg text-muted">
-            Type your salary and see what you keep. UK figures use the official 2026 to 27 rates.
-            India is still being checked and the US is not built yet.
+            Type your salary and see what you keep. Pick the UK, the US or India.
           </p>
         </div>
         <div className="mt-8">

@@ -1,30 +1,38 @@
 import { TemplateBody, VARIANTS, type TemplateDef, type TemplateProps } from "../shared";
 
-function UkPlain(props: TemplateProps) {
-  return <TemplateBody {...props} variant={VARIANTS.plain} />;
+function UkClassic(props: TemplateProps) {
+  return <TemplateBody {...props} variant={VARIANTS.ukClassic} />;
+}
+
+function UkModern(props: TemplateProps) {
+  return <TemplateBody {...props} variant={VARIANTS.ukModern} />;
 }
 
 function UkCompact(props: TemplateProps) {
-  return <TemplateBody {...props} variant={VARIANTS.compact} />;
+  return <TemplateBody {...props} variant={VARIANTS.ukCompact} />;
 }
 
-function UkCentred(props: TemplateProps) {
-  return <TemplateBody {...props} variant={VARIANTS.centred} />;
-}
-
-/** Placeholder designs. Final templates replace these once country rules are signed off. */
+/**
+ * Three single column, text only layouts. Section order comes from cv.sectionOrder, not from
+ * the template. Dates are shown as short month and year, for example "Mar 2021".
+ */
 export const UK_TEMPLATES: TemplateDef[] = [
-  { id: "plain", name: "Plain", description: "Left aligned, one column.", Component: UkPlain },
+  {
+    id: "classic",
+    name: "Classic",
+    description: "Ruled headings, dates on their own line.",
+    Component: UkClassic,
+  },
+  {
+    id: "modern",
+    name: "Modern",
+    description: "Coloured name and heading bars.",
+    Component: UkModern,
+  },
   {
     id: "compact",
     name: "Compact",
-    description: "Tighter, fits more on a page.",
+    description: "Tighter, fits more on two pages.",
     Component: UkCompact,
-  },
-  {
-    id: "sidebar-free",
-    name: "No sidebar",
-    description: "Centred heading, one column.",
-    Component: UkCentred,
   },
 ];

@@ -10,6 +10,24 @@ export type TemplateDef = {
   name: string;
   description: string;
   Component: ComponentType<TemplateProps>;
+  /** True while the design is a stand in. Shown as a badge in the picker. */
+  placeholder?: boolean;
+};
+
+export type Labels = { summary: string; experience: string; education: string; skills: string };
+
+const DEFAULT_LABELS: Labels = {
+  summary: "Summary",
+  experience: "Experience",
+  education: "Education",
+  skills: "Skills",
+};
+
+const UK_LABELS: Labels = {
+  summary: "Personal statement",
+  experience: "Work experience",
+  education: "Education",
+  skills: "Skills",
 };
 
 export type Variant = {
@@ -20,6 +38,12 @@ export type Variant = {
   density: number;
   /** Title and dates share one line. */
   inlineDates: boolean;
+  /** Section headings. Defaults suit the US and India placeholders. */
+  labels?: Labels;
+  /** Name drawn in the accent colour. */
+  accentName?: boolean;
+  /** Accent bar at the start of each heading. */
+  headingBar?: boolean;
 };
 
 export const VARIANTS = {
@@ -37,6 +61,32 @@ export const VARIANTS = {
     headingRule: true,
     density: 1,
     inlineDates: false,
+  },
+  ukClassic: {
+    center: false,
+    upperHeadings: false,
+    headingRule: true,
+    density: 1,
+    inlineDates: false,
+    labels: UK_LABELS,
+  },
+  ukModern: {
+    center: false,
+    upperHeadings: true,
+    headingRule: false,
+    density: 1,
+    inlineDates: true,
+    labels: UK_LABELS,
+    accentName: true,
+    headingBar: true,
+  },
+  ukCompact: {
+    center: false,
+    upperHeadings: true,
+    headingRule: true,
+    density: 0.92,
+    inlineDates: true,
+    labels: UK_LABELS,
   },
 } satisfies Record<string, Variant>;
 
@@ -75,44 +125,58 @@ export function TemplateBody({
   const style = clampStyle(cv.style);
   const gap = GAP_PX[style.spacing] * variant.density;
   const accent = style.accent;
+  const labels = variant.labels ?? DEFAULT_LABELS;
   const align = variant.center ? "text-center" : "text-start";
 
   const heading = (text: string): ReactNode => (
     <h3
-      className={`mb-1 font-bold ${variant.upperHeadings ? "uppercase tracking-wide" : ""} ${
+      className={`mb-1 font-bold [break-after:avoid] ${variant.upperHeadings ? "uppercase tracking-wide" : ""} ${
         variant.headingRule ? "border-b border-ink/20 pb-0.5" : ""
-      }`}
-      style={{ color: accent, fontSize: variant.upperHeadings ? "0.9em" : "1.1em" }}
+      } ${variant.headingBar ? "border-s-4 ps-2" : ""}`}
+      style={{
+        color: accent,
+        borderColor: accent,
+        fontSize: variant.upperHeadings ? "0.9em" : "1.1em",
+      }}
     >
       {text}
     </h3>
   );
 
   const titleRow = (title: string, dates: string): ReactNode =>
-    variant.inlineDates ? (
+    !title ? null : variant.inlineDates ? (
       <p className="flex flex-wrap justify-between gap-x-4 font-semibold">
         <span dir="auto">{title}</span>
-        {dates ? <span className="font-normal text-ink/70">{dates}</span> : null}
+        {dates ? <span className="font-normal text-ink/70 print:text-ink">{dates}</span> : null}
       </p>
     ) : (
       <>
         <p dir="auto" className="font-semibold">
           {title}
         </p>
-        {dates ? <p className="text-ink/70">{dates}</p> : null}
+        {dates ? <p className="text-ink/70 print:text-ink">{dates}</p> : null}
       </>
     );
 
   const render = (block: Block): ReactNode => {
     if (block.kind === "header") {
-      const bits = [cv.contact.email, cv.contact.phone, cv.contact.city].filter(Boolean);
+      const bits = [
+        cv.contact.email,
+        cv.contact.phone,
+        cv.contact.city,
+        ...cv.contact.links.map((l) => l.url || l.label),
+      ].filter(Boolean);
       return (
         <header className={align}>
           {cv.contact.fullName ? (
             <h2
               dir="auto"
               className="font-extrabold"
-              style={{ fontSize: "1.8em", lineHeight: 1.15 }}
+              style={{
+                fontSize: "1.8em",
+                lineHeight: 1.15,
+                color: variant.accentName ? accent : undefined,
+              }}
             >
               {cv.contact.fullName}
             </h2>
@@ -120,10 +184,13 @@ export function TemplateBody({
           {bits.length ? (
             <p
               dir="auto"
-              className={`flex flex-wrap gap-x-4 text-ink/70 ${variant.center ? "justify-center" : ""}`}
+              className={`flex flex-wrap gap-x-2 text-ink/70 print:text-ink ${variant.center ? "justify-center" : ""}`}
             >
               {bits.map((bit, i) => (
-                <span key={`${i}-${bit}`}>{bit}</span>
+                <span key={`${i}-${bit}`}>
+                  {bit}
+                  {i < bits.length - 1 ? <span aria-hidden="true"> |</span> : null}
+                </span>
               ))}
             </p>
           ) : null}
@@ -132,8 +199,8 @@ export function TemplateBody({
     }
     if (block.kind === "summary") {
       return (
-        <section aria-label="Summary">
-          {block.heading ? heading("Summary") : null}
+        <section aria-label={block.heading ? labels.summary : undefined}>
+          {block.heading ? heading(labels.summary) : null}
           <p dir="auto" className="whitespace-pre-wrap">
             {cv.summary}
           </p>
@@ -145,14 +212,14 @@ export function TemplateBody({
       if (!job) return null;
       const title = [job.role, job.employer, job.location].filter(Boolean).join(", ");
       return (
-        <section aria-label="Experience">
-          {block.heading ? heading("Experience") : null}
-          {titleRow(title || "Untitled job", range(job.start, job.end, locale, "present"))}
+        <section aria-label={block.heading ? labels.experience : undefined}>
+          {block.heading ? heading(labels.experience) : null}
+          {titleRow(title, range(job.start, job.end, locale, "present"))}
           <ul className="list-disc ps-5">
             {job.bullets
               .filter((b) => b.trim())
               .map((b, i) => (
-                <li key={`${job.id}-${i}`} dir="auto">
+                <li key={`${job.id}-${i}`} dir="auto" className="[orphans:2] [widows:2]">
                   {b}
                 </li>
               ))}
@@ -162,13 +229,13 @@ export function TemplateBody({
     }
     if (block.kind === "impact") {
       return (
-        <section aria-label="Quantified impact">
+        <section aria-label={block.heading ? "Quantified impact" : undefined}>
           {block.heading ? heading("Quantified impact") : null}
           <ul className="list-disc ps-5">
             {cv.impact
               .filter((line) => line.trim())
               .map((line, i) => (
-                <li key={`impact-${i}`} dir="auto">
+                <li key={`impact-${i}`} dir="auto" className="[orphans:2] [widows:2]">
                   {line}
                 </li>
               ))}
@@ -181,12 +248,9 @@ export function TemplateBody({
       if (!item) return null;
       const title = [item.qualification, item.institution].filter(Boolean).join(", ");
       return (
-        <section aria-label="Education">
-          {block.heading ? heading("Education") : null}
-          {titleRow(
-            title || "Untitled qualification",
-            range(item.start, item.end, locale, "present"),
-          )}
+        <section aria-label={block.heading ? labels.education : undefined}>
+          {block.heading ? heading(labels.education) : null}
+          {titleRow(title, range(item.start, item.end, locale, "present"))}
           {item.details ? (
             <p dir="auto" className="whitespace-pre-wrap">
               {item.details}
@@ -198,8 +262,8 @@ export function TemplateBody({
     const group = cv.skills.find((x) => x.id === block.id);
     if (!group) return null;
     return (
-      <section aria-label="Skills">
-        {block.heading ? heading("Skills") : null}
+      <section aria-label={block.heading ? labels.skills : undefined}>
+        {block.heading ? heading(labels.skills) : null}
         <p dir="auto">
           {group.label ? <span className="font-semibold">{group.label}: </span> : null}
           {group.items.join(", ")}

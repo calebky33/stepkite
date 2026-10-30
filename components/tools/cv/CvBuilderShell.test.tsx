@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const db = vi.hoisted(() => ({ read: vi.fn(), write: vi.fn() }));
@@ -76,11 +76,13 @@ describe("CvBuilderShell", () => {
     expect(screen.getByRole("alert").textContent).toContain("Choose a start month.");
   });
 
-  it("marks each template as a placeholder and saves the chosen one", async () => {
+  it("offers three finished UK templates and saves the chosen one", async () => {
     render(<CvBuilderShell country="uk" />);
     await screen.findByLabelText("Full name");
-    expect(screen.getAllByText("Placeholder template")).toHaveLength(3);
-    fireEvent.click(screen.getByRole("radio", { name: /Compact/ }));
+    expect(screen.queryByText("Placeholder template")).toBeNull();
+    const picker = screen.getByRole("group", { name: "Template" });
+    expect(within(picker).getAllByRole("radio")).toHaveLength(3);
+    fireEvent.click(within(picker).getByRole("radio", { name: /Compact/ }));
     await waitFor(() => expect(db.write).toHaveBeenCalled(), { timeout: 2000 });
     expect(db.write.mock.calls[0]?.[3].templateId).toBe("compact");
   });

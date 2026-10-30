@@ -14,17 +14,25 @@ function InCentred(props: TemplateProps) {
 
 /** Placeholder designs. Final templates replace these once country rules are signed off. */
 export const IN_TEMPLATES: TemplateDef[] = [
-  { id: "plain", name: "Plain", description: "Left aligned, one column.", Component: InPlain },
+  {
+    id: "plain",
+    name: "Plain",
+    description: "Left aligned, one column.",
+    Component: InPlain,
+    placeholder: true,
+  },
   {
     id: "compact",
     name: "Compact",
     description: "Tighter, fits more on a page.",
     Component: InCompact,
+    placeholder: true,
   },
   {
     id: "sidebar-free",
     name: "No sidebar",
     description: "Centred heading, one column.",
     Component: InCentred,
+    placeholder: true,
   },
 ];

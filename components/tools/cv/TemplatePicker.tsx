@@ -33,11 +33,14 @@ export function TemplatePicker({
               value={t.id}
               checked={current === t.id}
               onChange={() => onChange(t.id)}
+              aria-describedby={`${group}-${t.id}`}
               className="sr-only"
             />
             <span className="font-semibold [overflow-wrap:anywhere]">{t.name}</span>
-            <span className="text-sm text-muted [overflow-wrap:anywhere]">{t.description}</span>
-            <Badge>Placeholder template</Badge>
+            <span id={`${group}-${t.id}`} className="text-sm text-muted [overflow-wrap:anywhere]">
+              {t.description}
+            </span>
+            {t.placeholder ? <Badge>Placeholder template</Badge> : null}
           </label>
         ))}
       </div>

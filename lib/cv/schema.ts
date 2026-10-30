@@ -84,6 +84,9 @@ export function emptyCv(id: string, country: Cv["country"], nowIso: string): Cv 
     id,
     title: "",
     country,
+    // Kept as "plain": the template registry lives in components and imports this file's types,
+    // so reading it here would invert the layering. resolveTemplate maps unknown ids to the
+    // country's first template.
     templateId: "plain",
     style: { accent: "#1a3fd1", fontPair: "system", fontScale: 1, spacing: "normal", marginMm: 18 },
     contact: { fullName: "", email: "", phone: "", city: "", links: [] },

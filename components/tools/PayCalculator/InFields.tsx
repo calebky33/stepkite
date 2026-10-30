@@ -6,14 +6,43 @@ import { Select } from "@/components/ui/Select";
 import { COUNTRY_INFO } from "@/lib/countries";
 import type { FieldsProps } from "./fieldTypes";
 
-/** Placeholder list for professional tax. The full list arrives with the state rates. */
-const STATES = [
-  { value: "maharashtra", label: "Maharashtra" },
-  { value: "karnataka", label: "Karnataka" },
+/** All 28 states and 8 union territories, by name. The value is the key the engine reads. */
+export const STATES = [
+  { value: "andaman-and-nicobar-islands", label: "Andaman and Nicobar Islands" },
+  { value: "andhra-pradesh", label: "Andhra Pradesh" },
+  { value: "arunachal-pradesh", label: "Arunachal Pradesh" },
+  { value: "assam", label: "Assam" },
+  { value: "bihar", label: "Bihar" },
+  { value: "chandigarh", label: "Chandigarh" },
+  { value: "chhattisgarh", label: "Chhattisgarh" },
+  { value: "dadra-and-nagar-haveli-and-daman-and-diu", label: "Dadra and Nagar Haveli and Daman and Diu" },
   { value: "delhi", label: "Delhi" },
+  { value: "goa", label: "Goa" },
+  { value: "gujarat", label: "Gujarat" },
+  { value: "haryana", label: "Haryana" },
+  { value: "himachal-pradesh", label: "Himachal Pradesh" },
+  { value: "jammu-and-kashmir", label: "Jammu and Kashmir" },
+  { value: "jharkhand", label: "Jharkhand" },
+  { value: "karnataka", label: "Karnataka" },
+  { value: "kerala", label: "Kerala" },
+  { value: "ladakh", label: "Ladakh" },
+  { value: "lakshadweep", label: "Lakshadweep" },
+  { value: "madhya-pradesh", label: "Madhya Pradesh" },
+  { value: "maharashtra", label: "Maharashtra" },
+  { value: "manipur", label: "Manipur" },
+  { value: "meghalaya", label: "Meghalaya" },
+  { value: "mizoram", label: "Mizoram" },
+  { value: "nagaland", label: "Nagaland" },
+  { value: "odisha", label: "Odisha" },
+  { value: "puducherry", label: "Puducherry" },
+  { value: "punjab", label: "Punjab" },
+  { value: "rajasthan", label: "Rajasthan" },
+  { value: "sikkim", label: "Sikkim" },
   { value: "tamil-nadu", label: "Tamil Nadu" },
   { value: "telangana", label: "Telangana" },
-  { value: "gujarat", label: "Gujarat" },
+  { value: "tripura", label: "Tripura" },
+  { value: "uttar-pradesh", label: "Uttar Pradesh" },
+  { value: "uttarakhand", label: "Uttarakhand" },
   { value: "west-bengal", label: "West Bengal" },
 ];
 
@@ -39,7 +68,7 @@ export function InFields({ values, errors, onChange }: FieldsProps) {
       />
       <Select
         label="State"
-        hint="Professional tax is only included for Telangana so far."
+        hint="Professional tax is only included for Telangana so far. Other states pay none in this estimate."
         options={STATES}
         value={values.region}
         onValueChange={(v) => onChange("region", v)}

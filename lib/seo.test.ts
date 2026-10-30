@@ -9,7 +9,12 @@ describe("seo", () => {
   });
 
   it("keeps stub routes out of the sitemap", () => {
-    const urls = sitemap().map((entry) => entry.url);
+    // The UK calculator has loaded, sourced rates, so it is the one finished tool page.
+    const finished = ["/uk/salary-calculator"];
+    const urls = sitemap()
+      .map((entry) => entry.url)
+      .filter((url) => !finished.some((path) => url.endsWith(path)));
+    expect(sitemap().map((entry) => entry.url)).toContain(`${SITE_URL}/uk/salary-calculator`);
     for (const stub of [
       "/salary",
       "/salary-calculator",
@@ -23,7 +28,7 @@ describe("seo", () => {
     for (const country of ["uk", "us", "in"]) {
       expect(urls.some((url) => url.includes(`/${country}`))).toBe(false);
     }
-    expect(urls).toHaveLength(INDEXABLE_PATHS.length);
+    expect(urls).toHaveLength(INDEXABLE_PATHS.length - finished.length);
     // The homepage carries the finished platform introduction, so it is indexable.
     expect(INDEXABLE_PATHS).toContain("/");
     expect(urls).toContain(SITE_URL);

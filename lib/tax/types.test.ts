@@ -37,13 +37,17 @@ describe("payInputSchema", () => {
   });
 });
 
+// Countries whose engines are built. The UK engine is covered in lib/tax/uk.
+const BUILT: readonly string[] = ["uk"];
+const STUBS = COUNTRIES.filter((c) => !BUILT.includes(c));
+
 describe("stub engines", () => {
-  it.each(COUNTRIES)("%s reports missing rates and invents no figures", async (country) => {
+  it.each(STUBS)("%s reports missing rates and invents no figures", async (country) => {
     const outcome = (await loadEngine(country))({ ...base, country });
     expect(outcome.status).toBe("rates-missing");
   });
 
-  it.each(COUNTRIES)("%s rates file holds no numbers until verified", (country) => {
+  it.each(STUBS)("%s rates file holds no numbers until verified", (country) => {
     const rates = getRates(country);
     expect(rates.loaded).toBe(false);
     expect(rates.officialSources.length).toBeGreaterThan(0);

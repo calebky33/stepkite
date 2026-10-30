@@ -47,6 +47,8 @@ export interface Sourced<T> {
 export interface RatesFile {
   taxYear: string;
   loaded: boolean;
+  /** ISO date the figures were last checked against the official sources. */
+  verifiedOn?: string;
   /** Official pages the figures will come from. */
   officialSources: readonly string[];
 }

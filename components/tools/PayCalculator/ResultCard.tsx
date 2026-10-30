@@ -158,7 +158,11 @@ export function ResultCard({ country, state, annualGross, entered, example }: Re
             </div>
           </div>
           {state.kind === "ready" ? (
-            <ReadyNotes state={state} ratesLoaded={getRates(country).loaded} />
+            <ReadyNotes
+              state={state}
+              ratesLoaded={getRates(country).loaded}
+              verifiedOn={getRates(country).verifiedOn}
+            />
           ) : null}
         </>
       )}
@@ -369,10 +373,20 @@ function ReadyTable({
 function ReadyNotes({
   state,
   ratesLoaded,
+  verifiedOn,
 }: {
   state: Extract<ResultState, { kind: "ready" }>;
   ratesLoaded: boolean;
+  verifiedOn?: string;
 }) {
+  const checked = verifiedOn
+    ? new Date(verifiedOn).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
+      })
+    : null;
   const sources = Array.from(new Set(state.result.lines.map((line) => line.source)));
   return (
     <div className="flex flex-col gap-2 rounded-input bg-surface-2 p-4">
@@ -384,8 +398,9 @@ function ReadyNotes({
         </ul>
       ) : null}
       <p className="text-sm text-muted">
-        {ratesLoaded ? `Tax year ${state.taxYear}. ` : "Rates not loaded yet. "}This is an estimate.
-        Your payslip may differ.
+        {ratesLoaded ? `Tax year ${state.taxYear}. ` : "Rates not loaded yet. "}
+        {checked ? `Figures checked on ${checked}. ` : ""}This is an estimate. Your payslip may
+        differ.
       </p>
       {sources.length > 0 ? (
         <ul className="flex flex-col text-sm">

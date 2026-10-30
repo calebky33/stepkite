@@ -9,7 +9,7 @@ Tick items as they ship. One Claude Code session per line where possible.
 - [x] Country routing, layout, header/footer, consent banner (UK/EU)
 
 ## Weeks 3–4: UK calculator
-- [ ] `/new-calculator uk`
+- [x] `/new-calculator uk`
 - [ ] Share card + OG image
 - [ ] Salary-level pages (selected amounts), sitemap
 

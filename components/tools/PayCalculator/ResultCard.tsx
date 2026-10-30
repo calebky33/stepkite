@@ -272,7 +272,7 @@ function PendingTable({ country, view }: { country: CountryCode; view: ResultVie
   );
 }
 
-function slicesFor(result: PayResult): DonutSlice[] {
+export function slicesFor(result: PayResult): DonutSlice[] {
   return [
     ...result.lines.map((line): DonutSlice => ({
       key: line.key,

@@ -8,15 +8,46 @@ import { join, extname, relative } from "node:path";
 const ARGS = process.argv.slice(2);
 const DIRS = ARGS.length ? ARGS : ["app", "components", "content"];
 const EXT = new Set([".tsx", ".ts", ".jsx", ".mdx", ".md", ".json"]);
-const SKIP = /node_modules|\.next|\.test\.|\.spec\.|__tests__/;
+// components/shadcn holds vendored shadcn output: Tailwind class strings, no user-facing text.
+const SKIP = /node_modules|\.next|\.test\.|\.spec\.|__tests__|components[\\/]shadcn/;
 
 const BANNED = [
-  "delve", "elevate", "unlock", "unleash", "empower", "seamless", "leverage", "robust",
-  "cutting-edge", "game-changer", "game changer", "revolutioni[sz]e", "supercharge", "harness",
-  "embark", "tapestry", "realm", "in today's fast-paced", "look no further", "it's important to note",
-  "rest assured", "we've got you covered", "next level", "stand out from the crowd", "dream job",
-  "crafted with care", "effortless", "all-in-one", "next-gen", "ai-powered", "oops",
-  "something went wrong", "hang tight", "join thousands", "it's not just", "24/7",
+  "delve",
+  "elevate",
+  "unlock",
+  "unleash",
+  "empower",
+  "seamless",
+  "leverage",
+  "robust",
+  "cutting-edge",
+  "game-changer",
+  "game changer",
+  "revolutioni[sz]e",
+  "supercharge",
+  "harness",
+  "embark",
+  "tapestry",
+  "realm",
+  "in today's fast-paced",
+  "look no further",
+  "it's important to note",
+  "rest assured",
+  "we've got you covered",
+  "next level",
+  "stand out from the crowd",
+  "dream job",
+  "crafted with care",
+  "effortless",
+  "all-in-one",
+  "next-gen",
+  "ai-powered",
+  "oops",
+  "something went wrong",
+  "hang tight",
+  "join thousands",
+  "it's not just",
+  "24/7",
 ].map((w) => new RegExp(`\\b${w}`, "i"));
 // Any pictographic emoji, except the legal marks (c) (r) (tm).
 const EMOJI = /(?![©®™])\p{Extended_Pictographic}/u;
@@ -25,7 +56,33 @@ const DASH = /[—–]|\s-\s/;
 const SLASH = /[A-Za-z)]\s*\/\s*[A-Za-z0-9(]|[A-Za-z0-9)]\s*\/\s*[A-Za-z(]/;
 
 // Words that appear in sentences but never in a list of CSS classes.
-const STOPWORDS = new Set(["a", "an", "and", "or", "the", "to", "of", "for", "in", "on", "with", "your", "you", "per", "is", "are", "it", "this", "that", "not", "no", "yes", "by", "at", "from"]);
+const STOPWORDS = new Set([
+  "a",
+  "an",
+  "and",
+  "or",
+  "the",
+  "to",
+  "of",
+  "for",
+  "in",
+  "on",
+  "with",
+  "your",
+  "you",
+  "per",
+  "is",
+  "are",
+  "it",
+  "this",
+  "that",
+  "not",
+  "no",
+  "yes",
+  "by",
+  "at",
+  "from",
+]);
 
 // "bg-black/50 md:w-1/2 flex" is a class list, not prose.
 function isClassLike(s) {
@@ -48,12 +105,17 @@ function codeParts(line, ext) {
   if (/^import\b/.test(t) || /^export\b.*\bfrom\b/.test(t) || /\brequire\(/.test(t)) return []; // module paths
   if (/\b(cn|clsx|cva|twMerge|classNames)\(/.test(t)) return [];
   // JSX text that Prettier wrapped onto its own line: words, no code punctuation.
-  if ((ext === ".tsx" || ext === ".jsx") && /[A-Za-z]\s+[A-Za-z]/.test(t) && !/[=;{}()<>"`]/.test(t)) {
+  if (
+    (ext === ".tsx" || ext === ".jsx") &&
+    /[A-Za-z]\s+[A-Za-z]/.test(t) &&
+    !/[=;{}()<>"`]/.test(t)
+  ) {
     return [clean(t)].filter((s) => !isClassLike(s));
   }
   const stripped = line.replace(/\b(className|class)=(\{?)(["'`])(?:\\.|(?!\3).)*\3\}?/g, "");
   const parts = [];
-  for (const m of stripped.matchAll(/(["'`])((?:\\.|(?!\1).)*)\1/g)) if (m[2].includes(" ")) parts.push(m[2]);
+  for (const m of stripped.matchAll(/(["'`])((?:\\.|(?!\1).)*)\1/g))
+    if (m[2].includes(" ")) parts.push(m[2]);
   for (const m of stripped.matchAll(/>([^<>{}]*[A-Za-z][^<>{}]*)</g)) parts.push(m[1]);
   return parts.map(clean).filter((s) => !isClassLike(s));
 }
@@ -92,7 +154,8 @@ function walk(p, explicit) {
       const text = prose.join("\n");
       const bad = BANNED.find((r) => r.test(text));
       if (bad) hits.push(`${at}  "${text.match(bad)[0]}"  ${show}`);
-      else if (!/^\s*(\/\/|\/\*|\*)/.test(line) && EMOJI.test(line)) hits.push(`${at}  emoji  ${show}`);
+      else if (!/^\s*(\/\/|\/\*|\*)/.test(line) && EMOJI.test(line))
+        hits.push(`${at}  emoji  ${show}`);
       else if (prose.some((s) => DASH.test(s))) hits.push(`${at}  dash  ${show}`);
       else if (prose.some((s) => SLASH.test(s))) hits.push(`${at}  slash  ${show}`);
     });

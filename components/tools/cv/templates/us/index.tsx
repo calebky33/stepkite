@@ -1,38 +1,38 @@
 import { TemplateBody, VARIANTS, type TemplateDef, type TemplateProps } from "../shared";
 
-function UsPlain(props: TemplateProps) {
-  return <TemplateBody {...props} variant={VARIANTS.plain} />;
+function UsClassic(props: TemplateProps) {
+  return <TemplateBody {...props} variant={VARIANTS.usClassic} />;
+}
+
+function UsModern(props: TemplateProps) {
+  return <TemplateBody {...props} variant={VARIANTS.usModern} />;
 }
 
 function UsCompact(props: TemplateProps) {
-  return <TemplateBody {...props} variant={VARIANTS.compact} />;
+  return <TemplateBody {...props} variant={VARIANTS.usCompact} />;
 }
 
-function UsCentred(props: TemplateProps) {
-  return <TemplateBody {...props} variant={VARIANTS.centred} />;
-}
-
-/** Placeholder designs. Final templates replace these once country rules are signed off. */
+/**
+ * Three single column, text only layouts. Section order comes from cv.sectionOrder, not from
+ * the template. Dates are shown as short month and year, for example "Mar 2021 to present".
+ */
 export const US_TEMPLATES: TemplateDef[] = [
   {
-    id: "plain",
-    name: "Plain",
-    description: "Left aligned, one column.",
-    Component: UsPlain,
-    placeholder: true,
+    id: "classic",
+    name: "Classic",
+    description: "Ruled headings, dates on their own line.",
+    Component: UsClassic,
+  },
+  {
+    id: "modern",
+    name: "Modern",
+    description: "Coloured name and heading bars.",
+    Component: UsModern,
   },
   {
     id: "compact",
     name: "Compact",
-    description: "Tighter, fits more on a page.",
+    description: "Tighter, fits more on one page.",
     Component: UsCompact,
-    placeholder: true,
-  },
-  {
-    id: "sidebar-free",
-    name: "No sidebar",
-    description: "Centred heading, one column.",
-    Component: UsCentred,
-    placeholder: true,
   },
 ];

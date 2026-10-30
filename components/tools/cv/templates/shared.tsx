@@ -88,6 +88,29 @@ export const VARIANTS = {
     inlineDates: true,
     labels: UK_LABELS,
   },
+  usClassic: {
+    center: false,
+    upperHeadings: false,
+    headingRule: true,
+    density: 1,
+    inlineDates: false,
+  },
+  usModern: {
+    center: false,
+    upperHeadings: true,
+    headingRule: false,
+    density: 1,
+    inlineDates: true,
+    accentName: true,
+    headingBar: true,
+  },
+  usCompact: {
+    center: false,
+    upperHeadings: true,
+    headingRule: true,
+    density: 0.92,
+    inlineDates: true,
+  },
 } satisfies Record<string, Variant>;
 
 /** Page text size in CSS pixels at 100 percent, about 10 point. */

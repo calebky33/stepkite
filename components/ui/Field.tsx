@@ -14,17 +14,27 @@ type FieldProps = {
   error?: string;
   /** Use "span" when the control is not a native labelable element. */
   labelAs?: "label" | "span";
+  /** Keeps the label for screen readers and hides it on screen. */
+  hideLabel?: boolean;
   className?: string;
   children: (control: FieldControlProps) => ReactNode;
 };
 
 /** Shared label, hint and error wiring. The error replaces the hint and is announced. */
-export function Field({ label, hint, error, labelAs = "label", className, children }: FieldProps) {
+export function Field({
+  label,
+  hint,
+  error,
+  labelAs = "label",
+  hideLabel,
+  className,
+  children,
+}: FieldProps) {
   const id = useId();
   const labelId = `${id}-label`;
   const noteId = `${id}-note`;
   const note = error ?? hint;
-  const labelClass = "text-sm font-semibold [overflow-wrap:anywhere]";
+  const labelClass = cn("text-sm font-semibold [overflow-wrap:anywhere]", hideLabel && "sr-only");
   return (
     <div className={cn("flex min-w-0 flex-col gap-1", className)}>
       {labelAs === "label" ? (

@@ -10,6 +10,7 @@ type SegmentedControlProps<T extends string> = {
   label: string;
   hint?: string;
   error?: string;
+  hideLabel?: boolean;
   options: SegmentOption<T>[];
   value?: T;
   defaultValue?: T;
@@ -23,6 +24,7 @@ export function SegmentedControl<T extends string>({
   label,
   hint,
   error,
+  hideLabel,
   options,
   value,
   defaultValue,
@@ -57,7 +59,14 @@ export function SegmentedControl<T extends string>({
   };
 
   return (
-    <Field label={label} hint={hint} error={error} labelAs="span" className={className}>
+    <Field
+      label={label}
+      hint={hint}
+      error={error}
+      labelAs="span"
+      hideLabel={hideLabel}
+      className={className}
+    >
       {(control) => (
         <div
           role="radiogroup"

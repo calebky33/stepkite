@@ -55,7 +55,7 @@ export function NewsletterSignup() {
         error={fieldError}
         onChange={(e) => setEmail(e.target.value)}
       />
-      <Button type="submit" loading={status === "loading"} className="self-start">
+      <Button type="submit" loading={status === "loading"} className="self-start sm:mt-6">
         Email me updates
       </Button>
       <p role="status" className="min-h-5 text-sm sm:col-span-2">

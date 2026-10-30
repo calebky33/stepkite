@@ -1,8 +1,6 @@
-import { CountryLink } from "@/components/shell/CountryLink";
 import Link from "next/link";
-
-const LINK =
-  "inline-flex min-h-11 items-center text-base font-semibold text-primary underline-offset-4 hover:underline";
+import { CountryLink } from "@/components/shell/CountryLink";
+import { buttonStyles } from "@/components/ui/Button";
 
 export function CrossPromo() {
   return (
@@ -10,36 +8,27 @@ export function CrossPromo() {
       aria-labelledby="next-step"
       className="mx-auto max-w-[1120px] px-4 py-12 md:px-6 md:py-16"
     >
-      <h2
-        id="next-step"
-        className="font-display text-[28px] leading-tight tracking-tight md:text-4xl [overflow-wrap:anywhere]"
-      >
-        Check your pay, then build your CV.
-      </h2>
-      <div className="mt-8 grid gap-6 md:grid-cols-2">
-        <p className="text-lg text-muted md:col-span-2">
-          Work out what you take home, then put your experience into a clear CV.
-        </p>
-        <article className="flex flex-col rounded-card border border-border bg-surface-2 p-6 md:p-8">
-          <h3 className="font-display text-[22px] leading-tight">
-            Know what you&apos;ll take home.
-          </h3>
-          <p className="mt-2 text-base text-muted">
-            See each deduction between your pay before tax and the money in your bank.
+      <div className="flex flex-col gap-6 rounded-card border border-border bg-surface p-6 shadow-card md:flex-row md:items-center md:justify-between md:p-8">
+        <div className="max-w-xl">
+          <h2
+            id="next-step"
+            className="font-display text-[28px] leading-tight tracking-tight [overflow-wrap:anywhere]"
+          >
+            Check your pay, then build your CV.
+          </h2>
+          <p className="mt-3 text-base text-muted">
+            Know what you would take home, then put your experience on a page that updates as you
+            type.
           </p>
-          <Link href="#calculator" className={`${LINK} mt-auto pt-5`}>
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row md:shrink-0">
+          <Link href="#calculator" className={buttonStyles("secondary")}>
             See the calculator
           </Link>
-        </article>
-        <article className="flex flex-col rounded-card border border-border bg-surface p-6 shadow-card md:p-8">
-          <h3 className="font-display text-[22px] leading-tight">Put your experience into a CV.</h3>
-          <p className="mt-2 text-base text-muted">
-            See the page change as you type. Your work saves on this device.
-          </p>
-          <CountryLink path="/cv" className={`${LINK} mt-auto pt-5`}>
+          <CountryLink path="/cv" className={buttonStyles("primary")}>
             Build a CV
           </CountryLink>
-        </article>
+        </div>
       </div>
     </section>
   );

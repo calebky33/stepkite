@@ -9,18 +9,15 @@ export function CalculatorSection() {
     >
       <div className="mx-auto max-w-[1120px] px-4 py-12 md:px-6 md:py-16">
         <div className="max-w-2xl">
-          <p className="inline-flex rounded-full border border-border bg-surface px-3 py-0.5 text-sm font-semibold">
-            Take-home calculator
-          </p>
           <h2
             id="calculator-heading"
-            className="mt-3 font-display text-[28px] leading-tight tracking-tight md:text-4xl [overflow-wrap:anywhere]"
+            className="font-display text-[28px] leading-tight tracking-tight md:text-4xl [overflow-wrap:anywhere]"
           >
             Calculate your take-home pay
           </h2>
           <p className="mt-3 text-lg text-muted">
-            Type your salary and see what you keep. Figures appear once the rates are checked
-            against the official source.
+            Type your salary and see what you keep. UK figures use the official 2026 to 27 rates.
+            India is still being checked and the US is not built yet.
           </p>
         </div>
         <div className="mt-8">

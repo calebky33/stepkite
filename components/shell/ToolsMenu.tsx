@@ -91,7 +91,7 @@ export function ToolsMenu({
           aria-hidden="true"
           size={16}
           className={cn(
-            "shrink-0 transition-transform duration-150 ease-[var(--ease-out)]",
+            "shrink-0 origin-center transition-transform duration-150 ease-[var(--ease-out)]",
             open && "rotate-180",
           )}
         />

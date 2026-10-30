@@ -191,7 +191,7 @@ function MissingNotice({
       {entered ? (
         <p className="flex flex-wrap items-center gap-2 text-base text-muted">
           {example ? <Badge>Example</Badge> : null}
-          <span>
+          <span className="min-w-0 [overflow-wrap:anywhere]">
             {example ? "Salary of" : "You entered"}{" "}
             <span className="font-semibold tabular-nums text-text">{entered}</span>.
           </span>
@@ -440,8 +440,10 @@ export function NetBar({ country, state }: NetBarProps) {
         href={`#${BREAKDOWN_ID}`}
         className="flex min-h-11 items-center justify-between gap-4 text-base"
       >
-        <span className="min-w-0 text-muted">{capitalise(info.takeHomeTerm)} a month</span>
-        <span className="font-sans text-[22px] font-semibold tabular-nums">{month}</span>
+        <span className="min-w-0 text-muted [overflow-wrap:anywhere]">
+          {capitalise(info.takeHomeTerm)} a month
+        </span>
+        <span className="shrink-0 font-sans text-[22px] font-semibold tabular-nums">{month}</span>
       </a>
     </div>
   );

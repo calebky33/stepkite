@@ -56,7 +56,7 @@ export function ThemeToggle() {
   return (
     <SegmentedControl<Theme>
       label="Theme"
-            value={theme}
+      value={theme}
       onValueChange={choose}
       options={[
         { value: "system", label: "System" },

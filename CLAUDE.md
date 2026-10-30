@@ -64,6 +64,10 @@ Launch markets: UK, US, India. Business plan summary: docs/PRODUCT.md. Brand and
 | Before every merge or deploy                                                                                                                                                                                                                             | `reviewer` agent, then `/ship-check`                                                 |
 | Project agents live in `.claude/agents/`; `react-reviewer`, `typescript-reviewer`, `security-reviewer`, `database-reviewer`, `build-error-resolver` are installed globally. Fix every BLOCKING finding; list anything left unfixed in the final message. |
 
+## Loaded automatically every session
+
+`scripts/hooks/session-start.mjs` (SessionStart hook in `.claude/settings.json`) prints a primer: which docs to read, which skills and agents fit each task, and the RTK and caveman defaults. Global `~/.claude/settings.json` runs `rtk hook claude` on every Bash call. `emil-design-eng` is required for any UI work; `ui-ux-pro-max` is optional and web rules only.
+
 ## Token & time discipline (always)
 
 - Plan briefly, then act. No long explanations unless asked.

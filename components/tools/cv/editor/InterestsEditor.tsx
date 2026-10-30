@@ -2,9 +2,11 @@ import { Card } from "@/components/ui/Card";
 import { TextArea } from "./TextArea";
 
 export function InterestsEditor({
+  doc = "CV",
   value,
   onChange,
 }: {
+  doc?: string;
   value: string;
   onChange: (value: string) => void;
 }) {
@@ -13,7 +15,7 @@ export function InterestsEditor({
       <h2 className="text-lg font-semibold">Interests</h2>
       <TextArea
         label="Interests outside work"
-        hint="Optional. One or two lines. Leave it empty and it will not appear on your CV."
+        hint={`Optional. One or two lines. Leave it empty and it will not appear on your ${doc}.`}
         maxLength={500}
         value={value}
         onChange={(e) => onChange(e.target.value)}

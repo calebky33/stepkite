@@ -47,7 +47,7 @@ function groupsFor(country: CountryCode): HubGroup[] {
         { href: `${base}/tracker`, label: "Track your applications" },
         {
           href: `${base}/match`,
-          label: "Match your CV to a job ad",
+          label: `Match your ${info.cvName} to a job ad`,
           note: "Not available yet",
         },
         { href: `${base}/guides`, label: "Guides" },

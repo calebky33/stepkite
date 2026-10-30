@@ -28,14 +28,14 @@ export const GUIDES: readonly Guide[] = [
   {
     slug: "resume-length",
     country: "us",
-    title: "How long should your résumé be?",
-    summary: "Your résumé runs onto a second page and you can't tell what to cut.",
+    title: "How long should your resume be?",
+    summary: "Your resume runs onto a second page and you can't tell what to cut.",
     paragraphs: [
-      "A résumé that gives old roles as much room as recent ones hides the work you most want read.",
+      "A resume that gives old roles as much room as recent ones hides the work you most want read.",
       "A person will check this guide against current careers service advice and add sources before it is published.",
       "Until then, cut anything older than your last three roles to a single line.",
     ],
-    next: { label: "Start your résumé", path: "cv" },
+    next: { label: "Start your resume", path: "cv" },
   },
   {
     slug: "ctc-to-in-hand",

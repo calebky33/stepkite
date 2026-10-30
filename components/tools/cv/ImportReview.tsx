@@ -69,7 +69,7 @@ export function ImportReview({
   const reason = blocked
     ? "Fix the fields marked in red, or drop those items."
     : kept === 0
-      ? "Keep at least one item to create your CV."
+      ? `Keep at least one item to create your ${doc}.`
       : "";
 
   const requestClose = () => {
@@ -272,7 +272,7 @@ export function ImportReview({
       <Dialog
         open={leaving}
         onOpenChange={setLeaving}
-        title="Leave without creating a CV?"
+        title={`Leave without creating a ${doc}?`}
         description="Your edits here will be lost. Nothing was saved."
         footer={
           <>

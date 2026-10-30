@@ -45,6 +45,55 @@ export const SALARY_CONTENT: Partial<Record<CountryCode, SalaryCalculatorContent
       },
     ],
   },
+  us: {
+    title: "US salary calculator: paycheck after tax",
+    description:
+      "Estimate your US take-home paycheck after federal tax, Social Security, Medicare, 401(k) and state tax where it applies. Free, with 2026 figures from the IRS.",
+    h1: "US salary calculator",
+    intro:
+      "Enter your salary, pick your filing status and state, and see your paycheck after tax. The calculator uses 2026 federal brackets and the standard deduction, then takes off Social Security and Medicare. Add a pre-tax 401(k) contribution to see how it changes your pay. Nothing you type leaves this device.",
+    faqs: [
+      {
+        question: "How does the calculator work out my paycheck?",
+        answer:
+          "It starts with your salary and takes off any pre-tax 401(k) contribution. It then applies the standard deduction for your filing status and the federal brackets for 2026. Social Security and Medicare come off your pay, along with Additional Medicare tax for higher earners, and then state tax where we have confirmed figures.",
+      },
+      {
+        question: "Where do the figures come from?",
+        answer:
+          "Federal figures come from the IRS: Revenue Procedure 2025-32, the IRS tax topics on Social Security and Medicare, and the IRS announcement of the 2026 401(k) limit. State figures come from each state's own revenue department. Your result shows the tax year and the date we last checked the figures.",
+      },
+      {
+        question: "Which states are included?",
+        answer:
+          "State tax is worked out for Texas, Florida, Pennsylvania, Illinois, Georgia, North Carolina and Michigan. Texas and Florida have no state tax on wages. Treat North Carolina and Michigan as rougher estimates, because some of their 2026 figures rest on partial sources and the calculator says so when you pick them.",
+      },
+      {
+        question: "What about California, New York and Ohio?",
+        answer:
+          "For now the calculator counts federal tax and FICA only for these three states. We have not yet confirmed their 2026 state figures from an official source, so we do not guess. Your real paycheck will be lower than the result by the amount of your state tax.",
+      },
+      {
+        question: "Are city or county taxes included?",
+        answer:
+          "No. Local income taxes are not included, so if your city or county charges one, your paycheck will be lower than the result.",
+      },
+      {
+        question: "Does a 401(k) contribution lower my tax?",
+        answer:
+          "A traditional pre-tax 401(k) contribution lowers the pay your federal income tax is based on, but not the pay Social Security and Medicare are based on. Some states, such as Pennsylvania, still tax that money. The calculator follows these rules for each state it covers.",
+      },
+      {
+        question: "Why is my paycheck different?",
+        answer:
+          "Your W-4, health insurance, other pre-tax benefits, bonuses, local taxes and your pay frequency can all change the figure. This is an estimate, not tax advice, so your pay stub is the final word.",
+      },
+      {
+        question: "Is my salary stored anywhere?",
+        answer: "No. The sum runs in your browser, and your salary never goes to a server.",
+      },
+    ],
+  },
   in: {
     title: "India salary calculator: CTC to in-hand pay",
     description:

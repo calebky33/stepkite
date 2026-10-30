@@ -38,9 +38,9 @@ describe("CvBuilderShell", () => {
     expect(screen.getByRole("radio", { name: "Preview" })).toBeTruthy();
   });
 
-  it("uses résumé wording for the US", async () => {
+  it("uses resume wording for the US", async () => {
     render(<CvBuilderShell country="us" />);
-    expect(await screen.findByLabelText("Name of this résumé")).toBeTruthy();
+    expect(await screen.findByLabelText("Name of this resume")).toBeTruthy();
   });
 
   it("shows typed text in the preview and saves after the pause", async () => {

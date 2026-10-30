@@ -48,7 +48,7 @@ describe("country hub", () => {
 
   it("uses local words", async () => {
     await renderHub("us");
-    expect(screen.getByRole("link", { name: "Build your résumé" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Build your resume" })).toBeTruthy();
   });
 
   it.each(COUNTRIES)("only lists routes that have a page file for %s", (country) => {

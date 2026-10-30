@@ -3,7 +3,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import { COUNTRY_INFO, isCountry, type CountryCode } from "@/lib/countries";
+import { COUNTRY_INFO, cvLabelTitle, isCountry, type CountryCode } from "@/lib/countries";
+import { FooterGroup } from "./FooterGroup";
 
 const LINK_CLASS =
   "inline-flex min-h-11 items-center text-sm text-ink-muted underline-offset-4 hover:text-ink-fg hover:underline";
@@ -17,8 +18,7 @@ function countryFrom(pathname: string): CountryCode {
 
 function Column({ title, links, label }: { title: string; links: FooterLink[]; label?: string }) {
   return (
-    <nav aria-label={label ?? title}>
-      <h2 className="text-sm font-semibold text-ink-fg">{title}</h2>
+    <FooterGroup title={title} label={label}>
       <ul>
         {links.map((item) => (
           <li key={item.href}>
@@ -28,7 +28,7 @@ function Column({ title, links, label }: { title: string; links: FooterLink[]; l
           </li>
         ))}
       </ul>
-    </nav>
+    </FooterGroup>
   );
 }
 
@@ -40,7 +40,7 @@ export function FooterNav({ children }: { children?: ReactNode }) {
 
   const tools: FooterLink[] = [
     { href: `/${country}/salary-calculator`, label: "Take-home calculator" },
-    { href: `/${country}/cv`, label: info.cvName === "résumé" ? "Résumé builder" : "CV builder" },
+    { href: `/${country}/cv`, label: `${cvLabelTitle(info.code)} builder` },
     { href: `/${country}/compare/offers`, label: "Offer comparison" },
     { href: `/${country}`, label: "All tools" },
   ];
@@ -57,7 +57,7 @@ export function FooterNav({ children }: { children?: ReactNode }) {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-2 py-3 md:grid-cols-4">
+    <div className="grid grid-cols-1 gap-x-4 py-1 lg:grid-cols-4 lg:gap-y-2 lg:py-3">
       <Column title="Tools" links={tools} />
       <Column title="Explore" links={explore} />
       <Column title="Stepkite" label="Company" links={company} />

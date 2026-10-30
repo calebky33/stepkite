@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { Dialog } from "@/components/ui/Dialog";
 import { Input } from "@/components/ui/Input";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { COUNTRY_INFO, type CountryCode } from "@/lib/countries";
+import { COUNTRY_INFO, cvLabelTitle, type CountryCode } from "@/lib/countries";
 import { BACKUP_MAX_BYTES, buildBackup, IMPORT_MESSAGES, parseBackup } from "@/lib/cv/backup";
 import type { Cv } from "@/lib/cv/schema";
 import {
@@ -35,9 +35,6 @@ type Confirm =
 
 const STORAGE_FULL =
   "This device has no storage space left, so nothing was saved. Free some space and try again.";
-
-const UNAVAILABLE =
-  "Saving is not available in this browser, so we cannot show saved CVs. A private window can cause this.";
 
 function label(cv: Cv): string {
   return cv.title.trim() || "Untitled";
@@ -68,6 +65,8 @@ export function CvListScreen({
   onImport: () => void;
 }) {
   const doc = COUNTRY_INFO[country].cvName;
+  const docs = `${doc}s`;
+  const UNAVAILABLE = `Saving is not available in this browser, so we cannot show saved ${docs}. A private window can cause this.`;
   const [load, setLoad] = useState<Load>({ state: "loading" });
   const [confirm, setConfirm] = useState<Confirm | null>(null);
   const [name, setName] = useState("");
@@ -93,7 +92,7 @@ export function CvListScreen({
   const run = async (
     action: () => Promise<{ ok: boolean; reason?: string }>,
     done: string,
-    failed = "That did not work. Your CVs on this device were not changed.",
+    failed = `That did not work. Your ${docs} on this device were not changed.`,
   ) => {
     setBusy(true);
     setProblem("");
@@ -158,7 +157,7 @@ export function CvListScreen({
     return (
       <div aria-busy="true" className="flex flex-col gap-4">
         <p className="sr-only" role="status">
-          Loading your saved CVs
+          Loading your saved {docs}
         </p>
         <Skeleton className="h-20 w-full" />
         <Skeleton className="h-20 w-full" />
@@ -199,8 +198,8 @@ export function CvListScreen({
         {load.state === "ready" && load.skipped > 0 ? (
           <p role="alert" className="text-sm text-danger">
             {load.skipped === 1
-              ? "One saved CV could not be read, so it is not shown. It has not been deleted."
-              : `${load.skipped} saved CVs could not be read, so they are not shown. None have been deleted.`}
+              ? `One saved ${doc} could not be read, so it is not shown. It has not been deleted.`
+              : `${load.skipped} saved ${docs} could not be read, so they are not shown. None have been deleted.`}
           </p>
         ) : null}
       </div>
@@ -291,7 +290,7 @@ export function CvListScreen({
           Backup and your data
         </h3>
         <p className="text-sm text-muted">
-          A backup is one file with all your CVs. It never leaves your device unless you move it.
+          A backup is one file with all your {docs}. It never leaves your device unless you move it.
         </p>
         <div className="flex flex-wrap gap-2">
           <Button
@@ -299,10 +298,10 @@ export function CvListScreen({
             disabled={load.state !== "ready" || load.all.length === 0}
             onClick={exportAll}
           >
-            Export all CVs
+            Export all {docs}
           </Button>
           <Button variant="secondary" onClick={() => fileInput.current?.click()}>
-            Import CVs
+            Import {docs}
           </Button>
           <input
             ref={fileInput}
@@ -326,7 +325,7 @@ export function CvListScreen({
       <Dialog
         open={confirm?.kind === "delete"}
         onOpenChange={(open) => !open && setConfirm(null)}
-        title="Delete this CV?"
+        title={`Delete this ${doc}?`}
         description={
           confirm?.kind === "delete"
             ? `"${label(confirm.cv)}" moves to Recently deleted. You can restore it for 30 days.`
@@ -354,7 +353,7 @@ export function CvListScreen({
       <Dialog
         open={confirm?.kind === "rename"}
         onOpenChange={(open) => !open && setConfirm(null)}
-        title="Rename this CV"
+        title={`Rename this ${doc}`}
         footer={
           <>
             <Button variant="secondary" onClick={() => setConfirm(null)}>
@@ -384,7 +383,7 @@ export function CvListScreen({
           }}
         >
           <Input
-            label="CV name"
+            label={`${cvLabelTitle(country)} name`}
             hint="For example Graduate UK."
             maxLength={120}
             value={name}
@@ -395,10 +394,10 @@ export function CvListScreen({
       <Dialog
         open={confirm?.kind === "import"}
         onOpenChange={(open) => !open && setConfirm(null)}
-        title="Replace the CVs on this device?"
+        title={`Replace the ${docs} on this device?`}
         description={
           confirm?.kind === "import"
-            ? `The file has ${confirm.cvs.length} ${confirm.cvs.length === 1 ? "CV" : "CVs"}. They replace what is saved here. Your current CVs go to Recently deleted for 30 days.`
+            ? `The file has ${confirm.cvs.length} ${confirm.cvs.length === 1 ? doc : docs}. They replace what is saved here. Your current ${docs} go to Recently deleted for 30 days.`
             : undefined
         }
         footer={
@@ -414,7 +413,7 @@ export function CvListScreen({
                   void run(
                     () => replaceAllCvs(cvs),
                     "Backup imported.",
-                    "Some CVs could not be replaced. Your earlier CVs are in Recently deleted. Try again.",
+                    `Some ${docs} could not be replaced. Your earlier ${docs} are in Recently deleted. Try again.`,
                   );
                 }
               }}
@@ -428,7 +427,7 @@ export function CvListScreen({
         open={confirm?.kind === "wipe"}
         onOpenChange={(open) => !open && setConfirm(null)}
         title="Delete all your data?"
-        description="This erases every CV, earlier copy and deleted CV from this device. It cannot be undone. Export first if you want to keep a copy."
+        description={`This erases every ${doc}, earlier copy and deleted ${doc} from this device. It cannot be undone. Export first if you want to keep a copy.`}
         footer={
           <>
             <Button variant="secondary" onClick={() => setConfirm(null)}>

@@ -71,7 +71,7 @@ describe("PagedPreview", () => {
 
   it("keeps real text, one column, and no images or tables", () => {
     render(<PagedPreview cv={worstCase("us")} country="us" />);
-    const region = screen.getByRole("region", { name: "résumé preview" });
+    const region = screen.getByRole("region", { name: "resume preview" });
     expect(region.querySelector("img, table, svg")).toBeNull();
     expect(region.textContent).toContain("مرحبا");
     expect(region.querySelector('[dir="auto"]')).not.toBeNull();

@@ -134,6 +134,26 @@ describe("Footer", () => {
     expect(screen.getByRole("heading", { name: "Stepkite" })).toBeTruthy();
   });
 
+  it("starts the link groups collapsed and toggles them", () => {
+    render(<Footer />);
+    const toggles = ["Tools", "Explore", "Stepkite", "Supported countries"].map((name) =>
+      screen.getByRole("button", { name }),
+    );
+    for (const toggle of toggles) {
+      expect(toggle.getAttribute("aria-expanded")).toBe("false");
+      const panel = document.getElementById(toggle.getAttribute("aria-controls") ?? "");
+      expect(panel).toBeTruthy();
+      expect(panel?.firstElementChild?.className).toContain("invisible");
+    }
+    const first = toggles[0]!;
+    fireEvent.click(first);
+    expect(first.getAttribute("aria-expanded")).toBe("true");
+    const panel = document.getElementById(first.getAttribute("aria-controls") ?? "");
+    expect(panel?.firstElementChild?.className).not.toContain("invisible");
+    fireEvent.click(first);
+    expect(first.getAttribute("aria-expanded")).toBe("false");
+  });
+
   it("links to the real tool routes for the current country", () => {
     pathname = "/in/cv";
     render(<Footer />);

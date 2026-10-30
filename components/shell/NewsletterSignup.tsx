@@ -43,7 +43,7 @@ export function NewsletterSignup() {
     <form
       onSubmit={submit}
       noValidate
-      className="flex flex-col gap-2 sm:grid sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start sm:gap-x-3 sm:gap-y-0"
+      className="flex flex-col gap-2 min-[360px]:grid min-[360px]:grid-cols-[minmax(0,1fr)_auto] min-[360px]:items-start min-[360px]:gap-x-2 min-[360px]:gap-y-0 sm:gap-x-3 max-lg:[&_p:not([role])]:text-ink-muted"
     >
       <Input
         label="Email address"
@@ -55,10 +55,10 @@ export function NewsletterSignup() {
         error={fieldError}
         onChange={(e) => setEmail(e.target.value)}
       />
-      <Button type="submit" loading={status === "loading"} className="self-start sm:mt-6">
+      <Button type="submit" loading={status === "loading"} className="self-start min-[360px]:mt-6">
         Email me updates
       </Button>
-      <p role="status" className="min-h-5 text-sm sm:col-span-2">
+      <p role="status" className="min-h-5 text-sm min-[360px]:col-span-2">
         {status === "success" ? "Done. We'll email you when a new tool opens." : null}
         {status === "unavailable"
           ? "Sign-up isn't open yet, so we haven't saved your email. Check back later."

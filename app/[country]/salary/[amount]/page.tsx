@@ -44,8 +44,7 @@ export default async function SalaryAmountPage({ params }: Props) {
         What a {money} salary leaves you in {info.name}
       </h1>
       <p className="max-w-prose text-muted">
-        The full breakdown for {money} arrives with the official rates. Until then, change the
-        figure below to try your own.
+        See what {money} comes to after tax below. Change the figure to try your own.
       </p>
       <PayCalculator country={country} initialGross={gross} />
       <ToolLinks country={country} />

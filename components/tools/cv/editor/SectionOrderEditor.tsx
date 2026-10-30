@@ -24,9 +24,11 @@ export function fullOrder(order: readonly SectionKey[]): SectionKey[] {
 }
 
 export function SectionOrderEditor({
+  doc = "CV",
   order,
   onChange,
 }: {
+  doc?: string;
   order: readonly SectionKey[];
   onChange: (next: SectionKey[]) => void;
 }) {
@@ -41,7 +43,7 @@ export function SectionOrderEditor({
   return (
     <Card className="flex flex-col gap-4">
       <h2 className="text-lg font-semibold">Section order</h2>
-      <p className="text-sm text-muted">Sections with nothing in them do not appear on your CV.</p>
+      <p className="text-sm text-muted">Sections with nothing in them do not appear on your {doc}.</p>
       <p className="sr-only" aria-live="polite">
         {note}
       </p>

@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/Table";
 import { useCountTween } from "@/components/ui/useCountTween";
-import { COUNTRY_INFO, formatMoney, type CountryCode } from "@/lib/countries";
+import { COUNTRY_INFO, cvLabel, formatMoney, type CountryCode } from "@/lib/countries";
 import { getRates } from "@/lib/tax";
 import type { PayResult } from "@/lib/tax/types";
 import { Donut, type DonutSlice } from "./Donut";
@@ -186,7 +186,7 @@ export function ResultCard({ country, state, annualGross, entered, example }: Re
         href={`/${country}/cv`}
         className="inline-flex min-h-11 w-full items-center justify-center rounded-input bg-primary px-4 py-2 text-base font-semibold text-primary-fg transition-[transform,scale,translate,opacity] duration-150 ease-[var(--ease-out)] active:scale-[0.97] hover:opacity-90 sm:w-fit"
       >
-        Build a {info.cvName}
+        Build a {cvLabel(country)}
       </Link>
     </Card>
   );

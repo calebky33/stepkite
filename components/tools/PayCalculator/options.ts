@@ -20,7 +20,7 @@ export const DEFAULT_VALUES: Record<CountryCode, FieldValues> = {
     otherDeductions: "",
   },
   us: {
-    region: "california",
+    region: "texas",
     filingStatus: "single",
     retirementPercent: "",
     payFrequency: "biweekly",

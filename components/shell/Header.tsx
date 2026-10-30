@@ -8,7 +8,7 @@ import { buttonStyles } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/components/ui/cn";
-import { COUNTRY_INFO, isCountry, type CountryCode } from "@/lib/countries";
+import { COUNTRY_INFO, cvLabelTitle, isCountry, type CountryCode } from "@/lib/countries";
 import { useSavedCountry } from "@/lib/countryPreference";
 import { CountrySwitcher } from "./CountrySwitcher";
 import { ToolsMenu } from "./ToolsMenu";
@@ -90,7 +90,7 @@ export function Header() {
     {
       key: "cv",
       href: `/${country}/cv`,
-      label: info.cvName === "résumé" ? "Résumé builder" : "CV builder",
+      label: `${cvLabelTitle(info.code)} builder`,
     },
     { key: "tools", href: `/${country}`, label: "Tools" },
     { key: "pricing", href: "/pricing", label: "Pricing and features" },
@@ -98,7 +98,7 @@ export function Header() {
 
   const toolLinks = [
     { href: `/${country}/salary-calculator`, label: "Take-home pay calculator" },
-    { href: `/${country}/cv`, label: info.cvName === "résumé" ? "Résumé builder" : "CV builder" },
+    { href: `/${country}/cv`, label: `${cvLabelTitle(info.code)} builder` },
     { href: `/${country}/tracker`, label: "Job tracker" },
   ];
 

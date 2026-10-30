@@ -184,11 +184,11 @@ export function CvEditorScreen({
         setVersionError(
           result.reason === "full"
             ? "This device has no storage space left. Free some space and try again."
-            : "We could not save that version. Your current CV is not affected.",
+            : `We could not save that version. Your current ${doc} is not affected.`,
         );
       }
     } catch {
-      setVersionError("We could not save that version. Your current CV is not affected.");
+      setVersionError(`We could not save that version. Your current ${doc} is not affected.`);
     }
   };
 
@@ -229,16 +229,16 @@ export function CvEditorScreen({
         <MSkills items={cv.skills} onChange={onSkills} />
       </div>
       <div id={sectionDomId("certifications")}>
-        <MCertifications items={cv.certifications} onChange={onCertifications} />
+        <MCertifications doc={doc} items={cv.certifications} onChange={onCertifications} />
       </div>
       <div id={sectionDomId("interests")}>
-        <MInterests value={cv.interests} onChange={onInterests} />
+        <MInterests doc={doc} value={cv.interests} onChange={onInterests} />
       </div>
       <div id={sectionDomId("references")}>
         <MReferences items={cv.references} onChange={onReferences} />
       </div>
       {report ? <AtsPanel report={report} doc={doc} /> : null}
-      <MSectionOrder order={cv.sectionOrder} onChange={onOrder} />
+      <MSectionOrder doc={doc} order={cv.sectionOrder} onChange={onOrder} />
     </div>
   );
 

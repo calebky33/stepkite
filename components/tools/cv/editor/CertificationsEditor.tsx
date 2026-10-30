@@ -8,9 +8,11 @@ type Item = Cv["certifications"][number];
 const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
 
 export function CertificationsEditor({
+  doc = "CV",
   items,
   onChange,
 }: {
+  doc?: string;
   items: readonly Item[];
   onChange: (next: Item[]) => void;
 }) {
@@ -23,7 +25,7 @@ export function CertificationsEditor({
         max={15}
         onChange={onChange}
         addLabel="Add a certification"
-        emptyText="No certifications added. Leave this empty and it will not appear on your CV."
+        emptyText={`No certifications added. Leave this empty and it will not appear on your ${doc}.`}
         makeItem={() => ({ id: crypto.randomUUID(), name: "", issuer: "", date: null })}
         renderEntry={(item, _index, update) => (
           <>

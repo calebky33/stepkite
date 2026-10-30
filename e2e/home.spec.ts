@@ -21,7 +21,7 @@ test("the mobile menu opens, closes with Escape and keeps the tools inside the c
   const menu = page.locator("#site-menu");
   await expect(menu).toBeVisible();
   await expect(menu.getByRole("navigation", { name: "Mobile" })).toBeVisible();
-  await expect(menu.getByRole("link", { name: "Résumé builder" })).toHaveAttribute(
+  await expect(menu.getByRole("link", { name: "Resume builder" })).toHaveAttribute(
     "href",
     "/us/cv",
   );

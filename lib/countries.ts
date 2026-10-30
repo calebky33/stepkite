@@ -34,7 +34,7 @@ export const COUNTRY_INFO: Record<CountryCode, CountryInfo> = {
     name: "United States",
     currency: "USD",
     locale: "en-US",
-    cvName: "résumé",
+    cvName: "resume",
     takeHomeTerm: "take-home pay",
     paper: "Letter",
     salaryLevels: [40000, 60000, 80000, 100000, 150000],
@@ -68,4 +68,15 @@ export function formatMoney(amount: number, country: CountryCode): string {
     currency: info.currency,
     maximumFractionDigits: 0,
   }).format(amount);
+}
+
+/** The word for the document in running text: "resume" in the US, "CV" elsewhere. */
+export function cvLabel(country: CountryCode): string {
+  return COUNTRY_INFO[country].cvName;
+}
+
+/** Same word for the start of a sentence or a title: "Resume" or "CV". */
+export function cvLabelTitle(country: CountryCode): string {
+  const label = cvLabel(country);
+  return label.charAt(0).toUpperCase() + label.slice(1);
 }

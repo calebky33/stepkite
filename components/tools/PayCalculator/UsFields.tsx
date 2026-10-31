@@ -4,22 +4,40 @@ import { CurrencyInput } from "@/components/ui/CurrencyInput";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { COUNTRY_INFO } from "@/lib/countries";
+import { usStates } from "@/lib/tax/us/states.2026";
 import type { FieldsProps } from "./fieldTypes";
 
 const info = COUNTRY_INFO.us;
 
-/** Placeholder list of the largest states. The full list arrives with the state rates. */
-const STATES = [
-  { value: "california", label: "California" },
-  { value: "texas", label: "Texas" },
-  { value: "florida", label: "Florida" },
-  { value: "new-york", label: "New York" },
-  { value: "pennsylvania", label: "Pennsylvania" },
-  { value: "illinois", label: "Illinois" },
-  { value: "ohio", label: "Ohio" },
-  { value: "georgia", label: "Georgia" },
-  { value: "north-carolina", label: "North Carolina" },
-  { value: "michigan", label: "Michigan" },
+/** The ten largest states by population come first, then every other state and DC by name. */
+export const LARGEST = [
+  "california",
+  "texas",
+  "florida",
+  "new-york",
+  "pennsylvania",
+  "illinois",
+  "ohio",
+  "georgia",
+  "north-carolina",
+  "michigan",
+];
+
+/** Built from the rates file, so a state moves out of "not counted yet" the moment it is sourced. */
+function stateOption(slug: string) {
+  const rule = usStates[slug];
+  return {
+    value: slug,
+    label: rule.kind === "pending" ? `${rule.name} (state tax not included)` : rule.name,
+  };
+}
+
+export const STATES = [
+  ...LARGEST.filter((slug) => Object.hasOwn(usStates, slug)).map(stateOption),
+  ...Object.entries(usStates)
+    .filter(([slug]) => !LARGEST.includes(slug))
+    .sort(([, a], [, b]) => a.name.localeCompare(b.name, "en-US"))
+    .map(([slug]) => stateOption(slug)),
 ];
 
 const FILING_STATUSES = [
@@ -36,11 +54,17 @@ const FREQUENCIES = [
 ];
 
 export function UsFields({ values, errors, onChange }: FieldsProps) {
+  const chosen =
+    values.region && Object.hasOwn(usStates, values.region) ? usStates[values.region] : undefined;
+  const stateHint =
+    chosen?.kind === "pending"
+      ? "State tax is not included for this state yet."
+      : "The ten largest states are first. City taxes are not counted.";
   return (
     <div className="flex flex-col gap-4">
       <Select
         label="State"
-        hint="More states arrive with the state tax rates."
+        hint={stateHint}
         options={STATES}
         value={values.region}
         onValueChange={(v) => onChange("region", v)}
@@ -72,7 +96,7 @@ export function UsFields({ values, errors, onChange }: FieldsProps) {
       </div>
       <CurrencyInput
         label="Other deductions"
-        hint="Total for a year. Not counted yet."
+        hint="A yearly total, taken off after tax."
         error={errors.otherDeductions}
         locale={info.locale}
         currency={info.currency}

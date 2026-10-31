@@ -23,7 +23,8 @@ const EPFO_CEILING_OLD = "https://www.epfindia.gov.in/site_docs/PDFs/MiscPDFs/Wa
 const EPFO_CEILING_NEW = "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2313829&reg=48&lang=2";
 const GAZETTE_CEILING =
   "https://www.labour.gov.in/static/uploads/2026/09/2b0f1dbbd3769fc388416186ec145328.pdf";
-const SOCIAL_SECURITY_CODE = "https://www.indiacode.nic.in/bitstream/123456789/16823/1/aA2020-36.pdf";
+const SOCIAL_SECURITY_CODE =
+  "https://www.indiacode.nic.in/bitstream/123456789/16823/1/aA2020-36.pdf";
 const GRATUITY_ACT_1972 =
   "https://www.labour.gov.in/static/uploads/2025/06/23e3be0e31de495acd1698ed85007ec1.pdf";
 const BLOCKED =
@@ -35,7 +36,12 @@ function sourced<T>(
   source: string,
   extra: { alsoSources?: readonly string[]; unverifiedNote?: string } = {},
 ): Sourced<T> {
-  return { value, source, verifiedOn: VERIFIED, ...extra };
+  const { alsoSources, unverifiedNote } = extra;
+  const base = alsoSources ? { value, source, alsoSources } : { value, source };
+  // A note means the figure was not read in full, so it carries no verification date.
+  return unverifiedNote === undefined
+    ? { ...base, verifiedOn: VERIFIED }
+    : { ...base, unverifiedNote };
 }
 
 /** One slice of taxable income. `upTo` is the top of the slice, null for the open top slice. */
@@ -154,10 +160,14 @@ export const inRates: InRates = {
         MEMO,
       ),
       standardDeduction: sourced(50_000, SECTION_19),
-      rebate: sourced({ incomeLimit: 500_000, maxRebate: 12_500, marginalRelief: false }, SECTION_156, {
-        alsoSources: [SALARIED],
-        unverifiedNote: BLOCKED,
-      }),
+      rebate: sourced(
+        { incomeLimit: 500_000, maxRebate: 12_500, marginalRelief: false },
+        SECTION_156,
+        {
+          alsoSources: [SALARIED],
+          unverifiedNote: BLOCKED,
+        },
+      ),
       surcharge: sourced([...NEW_SURCHARGE, { above: 50_000_000, rate: 0.37 }], MEMO),
     },
   },

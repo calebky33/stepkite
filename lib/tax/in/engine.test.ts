@@ -62,7 +62,9 @@ describe("rates file", () => {
     ];
     for (const s of sourced) {
       expect(s.source).toMatch(/^https:\/\//);
-      expect(s.verifiedOn).toBe("2026-10-30");
+      // A figure has a verification date or an unverified note, never both.
+      if (s.unverifiedNote === undefined) expect(s.verifiedOn).toBe("2026-10-30");
+      else expect(s.verifiedOn).toBeUndefined();
     }
   });
 });
@@ -430,7 +432,12 @@ describe("options and labels", () => {
 describe("limits, validation and source notes", () => {
   it("HRA is limited to the pay left in CTC after basic, PF and gratuity", () => {
     // Basic 90 percent leaves nothing for HRA, so a large HRA and rent give no exemption.
-    const a = run(20 * LAKH, { regime: "old", basicPercent: 90, hraReceived: 1_000_000, rentPaid: 1_000_000 });
+    const a = run(20 * LAKH, {
+      regime: "old",
+      basicPercent: 90,
+      hraReceived: 1_000_000,
+      rentPaid: 1_000_000,
+    });
     const b = run(20 * LAKH, { regime: "old", basicPercent: 90 });
     expect(line(a, "incomeTax")).toBe(line(b, "incomeTax"));
   });
@@ -467,7 +474,13 @@ describe("limits, validation and source notes", () => {
     const cases = [
       run(1),
       run(CRORE),
-      run(CRORE, { regime: "old", rentPaid: 10_000_000, hraReceived: 10_000_000, section80c: 10_000_000, section80d: 10_000_000 }),
+      run(CRORE, {
+        regime: "old",
+        rentPaid: 10_000_000,
+        hraReceived: 10_000_000,
+        section80c: 10_000_000,
+        section80d: 10_000_000,
+      }),
     ];
     for (const r of cases) {
       expect(Number.isFinite(r.net)).toBe(true);

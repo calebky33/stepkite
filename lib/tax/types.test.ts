@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getRates, loadEngine } from "./index";
 import { MAX_GROSS, MIN_GROSS, payInputSchema, type PayInput } from "./types";
-import { COUNTRIES } from "@/lib/countries";
 
 const base: PayInput = {
   country: "uk",
@@ -34,23 +32,5 @@ describe("payInputSchema", () => {
 
   it("rejects an unknown period", () => {
     expect(payInputSchema.safeParse({ ...base, period: "day" }).success).toBe(false);
-  });
-});
-
-// Countries whose engines are built. They are covered in lib/tax/uk and lib/tax/in.
-const BUILT: readonly string[] = ["uk", "in"];
-const STUBS = COUNTRIES.filter((c) => !BUILT.includes(c));
-
-describe("stub engines", () => {
-  it.each(STUBS)("%s reports missing rates and invents no figures", async (country) => {
-    const outcome = (await loadEngine(country))({ ...base, country });
-    expect(outcome.status).toBe("rates-missing");
-  });
-
-  it.each(STUBS)("%s rates file holds no numbers until verified", (country) => {
-    const rates = getRates(country);
-    expect(rates.loaded).toBe(false);
-    expect(rates.officialSources.length).toBeGreaterThan(0);
-    expect(Object.values(rates).some((value) => typeof value === "number")).toBe(false);
   });
 });

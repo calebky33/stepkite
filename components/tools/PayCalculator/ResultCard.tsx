@@ -174,7 +174,8 @@ export function ResultCard({ country, state, annualGross, entered, example }: Re
             <ReadyNotes
               state={state}
               ratesLoaded={getRates(country).loaded}
-              verifiedOn={getRates(country).verifiedOn}
+              // US state figures are not all read in full, so one date would overstate the checks.
+              verifiedOn={country === "us" ? undefined : getRates(country).verifiedOn}
             />
           ) : null}
         </>
@@ -401,7 +402,11 @@ function ReadyNotes({
       })
     : null;
   const sources = Array.from(
-    new Map(state.result.lines.map((line) => [line.source, line.sourceLabel] as const)),
+    new Map(
+      state.result.lines.flatMap((line) =>
+        line.source ? [[line.source, line.sourceLabel] as const] : [],
+      ),
+    ),
   );
   return (
     <div className="flex flex-col gap-2 rounded-input bg-surface-2 p-4">

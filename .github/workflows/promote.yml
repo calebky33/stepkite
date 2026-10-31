@@ -1,0 +1,47 @@
+name: Promote worker version
+
+# Moves traffic between the current version and a new one.
+# ONE INPUT PER RUN. Run three times for 10, 50, 100. Rollback runs with the last-good id at 100.
+# The owner reads the new version id and the current id from the Cloudflare dashboard first.
+
+on:
+  workflow_dispatch:
+    inputs:
+      new_version_id:
+        description: "New version id (the one to promote)"
+        required: true
+        type: string
+      current_version_id:
+        description: "Current version id (serves the rest of the traffic)"
+        required: true
+        type: string
+      new_percent:
+        description: "Traffic percent for the new version"
+        required: true
+        type: choice
+        options: ["10", "50", "100"]
+
+concurrency:
+  group: worker-promote
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            versions deploy
+            ${{ inputs.new_version_id }}@${{ inputs.new_percent }}%
+            ${{ inputs.current_version_id }}@${{ 100 - fromJSON(inputs.new_percent) }}%
+            --yes
+            --message "promote ${{ inputs.new_version_id }} to ${{ inputs.new_percent }}%"
+      - name: Note
+        run: |
+          echo "${{ inputs.new_version_id }} is now at ${{ inputs.new_percent }}% traffic." >> "$GITHUB_STEP_SUMMARY"
+          echo "Watch https://dash.cloudflare.com for errors and CSP console violations before the next step." >> "$GITHUB_STEP_SUMMARY"

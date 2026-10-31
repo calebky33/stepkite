@@ -1,0 +1,48 @@
+name: Upload Worker version
+
+# Builds the OpenNext Worker and uploads a NEW VERSION serving zero traffic.
+# The commit SHA shows in /api/health version so smoke.mjs can tie the marker to it.
+# Promote traffic later with the "Promote worker version" workflow.
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: worker-upload
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Preflight checks
+        run: |
+          pnpm typecheck
+          pnpm lint
+          pnpm check:copy
+          pnpm test
+          pnpm build
+      - name: Build OpenNext worker
+        run: pnpm exec opennextjs-cloudflare build
+      - name: Upload worker version
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: versions upload --tag ${{ github.sha }} --message "ci upload ${{ github.sha }}"
+      - name: Note
+        run: |
+          echo "A new version was uploaded with 0% traffic." >> "$GITHUB_STEP_SUMMARY"
+          echo "Promote it with the 'Promote worker version' workflow." >> "$GITHUB_STEP_SUMMARY"
+          echo "Open https://dash.cloudflare.com to find the version id in Workers and Pages > stepkite > Deployments." >> "$GITHUB_STEP_SUMMARY"

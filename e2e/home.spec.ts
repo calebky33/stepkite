@@ -4,10 +4,10 @@ test("home page shows the logo, the headline and the tool sections", async ({ pa
   await page.goto("/");
   await expect(page.getByRole("banner").getByRole("img", { name: "Stepkite" })).toBeVisible();
   await expect(
-    page.getByRole("heading", { level: 1, name: /make your next career move/i }),
+    page.getByRole("heading", { level: 1, name: /know your pay/i }),
   ).toBeVisible();
-  await expect(page.getByRole("heading", { level: 2, name: /everything you need/i })).toBeVisible();
-  await expect(page.getByRole("heading", { level: 2, name: /take-home pay/i })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: /two tools work today/i })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: /calculate your take-home pay/i })).toBeVisible();
 });
 
 test("the mobile menu opens, closes with Escape and keeps the tools inside the country", async ({

@@ -122,7 +122,7 @@ export function ResultCard({ country, state, annualGross, entered, example }: Re
         <ResultSkeleton />
       ) : (
         <>
-          <div aria-live="polite" className="flex min-h-28 flex-col gap-2">
+          <div aria-live="polite" aria-atomic="true" className="flex min-h-28 flex-col gap-2">
             {state.kind === "empty" ? (
               <p className="text-base text-muted">Type a salary to see your {info.takeHomeTerm}.</p>
             ) : null}
@@ -369,7 +369,7 @@ function ReadyTable({
         </TableRow>
         {result.lines.map((line) => (
           <TableRow key={line.key} {...hover(line.key)}>
-            <TableCell>{line.label}</TableCell>
+            <TableCell className="[overflow-wrap:anywhere]">{line.label}</TableCell>
             <TableCell numeric>{formatMoney(line.amount / divisor, country)}</TableCell>
           </TableRow>
         ))}
@@ -393,27 +393,29 @@ function ReadyNotes({
   ratesLoaded: boolean;
   verifiedOn?: string;
 }) {
-  const checked = verifiedOn
-    ? new Date(verifiedOn).toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-        timeZone: "UTC",
-      })
-    : null;
-  const sources = Array.from(
-    new Map(
-      state.result.lines.flatMap((line) =>
-        line.source ? [[line.source, line.sourceLabel] as const] : [],
-      ),
-    ),
-  );
+  const verifiedDate = verifiedOn ? new Date(verifiedOn) : null;
+  const checked =
+    verifiedDate && !Number.isNaN(verifiedDate.getTime())
+      ? verifiedDate.toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+          timeZone: "UTC",
+        })
+      : null;
+  // One link per URL; keep the first label given for it.
+  const sourceMap = new Map<string, string | undefined>();
+  for (const line of state.result.lines) {
+    if (!line.source) continue;
+    if (!sourceMap.get(line.source)) sourceMap.set(line.source, line.sourceLabel);
+  }
+  const sources = Array.from(sourceMap);
   return (
-    <div className="flex flex-col gap-2 rounded-input bg-surface-2 p-4">
+    <div className="flex min-w-0 flex-col gap-2 rounded-input bg-surface-2 p-4">
       {state.result.assumptions.length > 0 ? (
-        <ul className="list-disc pl-5 text-sm text-muted">
-          {state.result.assumptions.map((text) => (
-            <li key={text}>{text}</li>
+        <ul className="list-disc pl-5 text-sm text-muted [overflow-wrap:anywhere]">
+          {state.result.assumptions.map((text, index) => (
+            <li key={`${index}-${text}`}>{text}</li>
           ))}
         </ul>
       ) : null}

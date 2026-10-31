@@ -44,6 +44,17 @@ Rollback is always allowed. After it, open the cause as a bug before the next at
 - An uptime monitor on `/api/health` and one calculator page, with an alert to the owner.
 - Confirm the Worker sees the public host (`request.url`) so the job preview Origin check and self-host block use the right name.
 - Security headers are set (`next.config.ts`, and the CSP in `proxy.ts`). The CSP is enforced. See Security headers below.
+- Bot protection (Turnstile and WAF). See Bot protection below.
+
+## Bot protection
+
+Three layers, owner-side setup:
+
+1. **Turnstile widget on the newsletter form** (code is in). Create a widget at https://dash.cloudflare.com, Turnstile, Add site, mode Managed, domains `stepkite.com` plus any staging host. Copy the sitekey and secret. Set the sitekey as a build-time variable in GitHub Actions secrets: `NEXT_PUBLIC_TURNSTILE_SITEKEY`. Set the secret on the Worker: `wrangler secret put TURNSTILE_SECRET` (and `TURNSTILE_HOSTNAMES` as a plain variable, comma-separated allowlist of frontend hostnames). Without the sitekey the widget does not render and the server skips verification, so the newsletter still works until the owner sets them.
+2. **Bot Fight Mode** (free). Dashboard, stepkite zone, Security, Bots, toggle Bot Fight Mode. Blocks known bots on every route with no code change.
+3. **WAF Rate Limiting rule** (free tier gets a few). Dashboard, Security, WAF, Rate limiting rules. Add one rule per path: `/api/job-preview` 10 req/min per IP, `/api/newsletter` 5 req/min per IP, action Block. Match on URI Path.
+
+TLS fingerprint (JA3 or JA4) blocking is a WAF Custom Rule, same screen, if more bot abuse appears after launch.
 
 ## Security headers
 

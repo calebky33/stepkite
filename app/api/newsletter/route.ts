@@ -1,7 +1,11 @@
 import { z } from "zod";
 import { rateLimit } from "@/lib/rateLimit";
+import { verifyTurnstile } from "@/lib/turnstile";
 
-const bodySchema = z.object({ email: z.email().max(254) });
+const bodySchema = z.object({
+  email: z.email().max(254),
+  turnstile: z.string().min(1).max(2048).optional(),
+});
 const MAX_REQUEST_BYTES = 4096;
 
 function reply(body: Record<string, string>, status: number): Response {
@@ -52,6 +56,18 @@ export async function POST(request: Request): Promise<Response> {
   } catch {
     json = null;
   }
-  if (!bodySchema.safeParse(json).success) return reply({ error: "invalid_email" }, 400);
+  const parsed = bodySchema.safeParse(json);
+  if (!parsed.success) return reply({ error: "invalid_email" }, 400);
+  const verify = await verifyTurnstile({
+    secret: process.env.TURNSTILE_SECRET,
+    token: parsed.data.turnstile,
+    remoteIp: request.headers.get("cf-connecting-ip"),
+    expectedAction: "newsletter",
+    expectedHostnames: (process.env.TURNSTILE_HOSTNAMES ?? "")
+      .split(",")
+      .map((h) => h.trim())
+      .filter(Boolean),
+  });
+  if (!verify.ok) return reply({ error: "challenge_failed" }, 403);
   return reply({ error: "not_available_yet" }, 503);
 }

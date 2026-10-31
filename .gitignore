@@ -49,3 +49,8 @@ next-env.d.ts
 # playwright
 /test-results/
 /playwright-report/
+
+# Local release markers (scripts/preflight.mjs, scripts/smoke.mjs)
+.claude/.preflight-ok
+.claude/.smoke-ok
+litellm-*

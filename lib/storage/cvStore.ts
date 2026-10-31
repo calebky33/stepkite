@@ -8,6 +8,7 @@ import {
   readItem,
   removeItem,
   writeItem,
+  type StorageFailure,
   type StorageResult,
 } from "./db";
 
@@ -115,7 +116,9 @@ export async function restoreCv(id: string): Promise<StorageResult<Cv>> {
   if (!entry.ok) return entry;
   const saved = await saveCv(entry.value.cv);
   if (!saved.ok) return saved;
-  await removeItem("cv-bin", id);
+  // The CV is saved. If the bin copy stays, report it so the caller can retry: a retry is safe.
+  const removed = await removeItem("cv-bin", id);
+  if (!removed.ok) return removed;
   return { ok: true, value: entry.value.cv };
 }
 
@@ -142,17 +145,14 @@ export async function maybeSnapshot(cv: Cv, now: Date): Promise<StorageResult<bo
   return written.ok ? { ok: true, value: true } : written;
 }
 
-/** Replaces every CV on the device with the given list. Used after the user confirms an import. */
-export type ReplaceFailure = {
-  reason: "unavailable" | "invalid" | "missing" | "full";
+export type ReplaceFailure = Omit<StorageFailure, "ok" | "cause" | "remaining"> & {
   failed: string[];
 };
 
+/** Replaces every CV on the device with the given list. Used after the user confirms an import. */
 export async function replaceAllCvs(
   cvs: readonly Cv[],
-): Promise<
-  StorageResult<null> | { ok: false; reason: ReplaceFailure["reason"]; failed: string[] }
-> {
+): Promise<StorageResult<null> | ({ ok: false } & ReplaceFailure)> {
   const ids = await listIds("cvs");
   if (!ids.ok) return ids;
   const keep = new Set(cvs.map((cv) => cv.id));

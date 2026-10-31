@@ -294,6 +294,13 @@ button {
   --sk-dur-out: 200ms;
 }
 
+/* A bottom sheet on phones that becomes a side panel from 1024px. Keep it after .sk-sheet. */
+@media (min-width: 1024px) {
+  .sk-sheet-side {
+    --sk-from: translateX(100%);
+  }
+}
+
 .sk-toast {
   --sk-from: translateY(8px);
   --sk-dur: 200ms;
@@ -308,6 +315,7 @@ button {
 @media (prefers-reduced-motion: reduce) {
   .sk-pop,
   .sk-sheet,
+  .sk-sheet-side,
   .sk-toast {
     --sk-from: none;
   }

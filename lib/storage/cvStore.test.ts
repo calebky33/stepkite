@@ -54,6 +54,15 @@ describe("cv store", () => {
     expect(renamed.ok && renamed.value.title).toBe("New name");
   });
 
+  it("reports it when the bin copy cannot be removed after a restore", async () => {
+    await saveCv(make("a", "Keep me"));
+    await binCv("a", T0);
+    control.failRemove = ["a"];
+    expect((await restoreCv("a")).ok).toBe(false);
+    control.failRemove = [];
+    expect((await restoreCv("a")).ok).toBe(true);
+  });
+
   it("moves a deleted CV to the bin and restores it", async () => {
     await saveCv(make("a", "Keep me"));
     expect((await binCv("a", T0)).ok).toBe(true);

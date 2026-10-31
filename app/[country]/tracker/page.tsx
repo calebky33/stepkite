@@ -23,14 +23,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function TrackerPage({ params }: Props) {
-  await requireCountry(params);
+  const country = await requireCountry(params);
   return (
     <>
       <h1 className="font-display text-4xl">Track your applications</h1>
       <p className="max-w-prose text-muted">
         Your jobs are saved on this device. Nothing is sent to us.
       </p>
-      <TrackerShell />
+      <TrackerShell country={country} />
     </>
   );
 }

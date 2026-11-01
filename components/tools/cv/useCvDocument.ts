@@ -12,9 +12,11 @@ import {
   type History,
 } from "@/lib/cv/history";
 import { storedCvSchema, type Cv } from "@/lib/cv/schema";
+import { readSandboxDraft, writeSandboxDraft } from "@/lib/cv/sandbox";
 import { clampStyle } from "@/lib/cv/style";
 import { maybeSnapshot, saveCv } from "@/lib/storage/cvStore";
 import { readItem } from "@/lib/storage/db";
+import type { StorageResult } from "@/lib/storage/db";
 import { newCv, prepareLoaded } from "./newCv";
 
 export const AUTOSAVE_MS = 500;
@@ -26,8 +28,12 @@ export type SaveState =
  * Loads one CV from the device and keeps it saved. Edits wait 500 ms, then write. Save now,
  * hiding the tab and leaving the page all write straight away, so closing the tab mid edit
  * loses nothing. Undo and redo keep the last 50 changes in memory only.
+ *
+ * `sandbox: true` is used by the anonymous CV editor. In sandbox mode the draft reads from and
+ * writes to localStorage through lib/cv/sandbox.ts instead of IndexedDB, and no snapshots are
+ * kept (there is only one draft and it moves to the account on sign-up).
  */
-export function useCvDocument(country: CountryCode, cvId: string) {
+export function useCvDocument(country: CountryCode, cvId: string, sandbox = false) {
   const [history, setHistory] = useState<History<Cv> | null>(null);
   const [saveState, setSaveState] = useState<SaveState>("empty");
   const historyRef = useRef<History<Cv> | null>(null);
@@ -67,14 +73,20 @@ export function useCvDocument(country: CountryCode, cvId: string) {
     const run = chain.current.then(async () => {
       let result: Awaited<ReturnType<typeof saveCv>>;
       try {
-        result = await saveCv(stamped);
+        if (sandbox) {
+          result = writeSandboxDraft(stamped)
+            ? { ok: true, value: null }
+            : { ok: false, reason: "unavailable" };
+        } else {
+          result = await saveCv(stamped);
+        }
       } catch {
         result = { ok: false, reason: "unavailable" };
       }
       if (gen !== generation.current) return;
       if (result.ok) {
         if (mine === seq.current && !dirty.current) setSaveState("saved");
-        void maybeSnapshot(stamped, now);
+        if (!sandbox) void maybeSnapshot(stamped, now);
         return;
       }
       if (mine !== seq.current) return;
@@ -83,7 +95,7 @@ export function useCvDocument(country: CountryCode, cvId: string) {
     });
     chain.current = run;
     return run;
-  }, []);
+  }, [sandbox]);
 
   useEffect(() => {
     let cancelled = false;
@@ -94,11 +106,17 @@ export function useCvDocument(country: CountryCode, cvId: string) {
     latest.current = null;
     const previous = chain.current;
     void previous
-      .then(() => {
+      .then((): StorageResult<Cv> | Promise<StorageResult<Cv>> | null => {
         if (cancelled) return null;
         // The old CV leaves the screen at once, so no edit can reach it under the new id.
         commit(null);
         setSaveState("empty");
+        if (sandbox) {
+          const draft = readSandboxDraft();
+          return draft
+            ? { ok: true as const, value: draft }
+            : { ok: false as const, reason: "missing" as const };
+        }
         return readItem("cvs", cvId, storedCvSchema);
       })
       .then((result) => {
@@ -120,7 +138,7 @@ export function useCvDocument(country: CountryCode, cvId: string) {
       // Write the old CV's last edit before anything is reset for the next one.
       void persist();
     };
-  }, [country, cvId, commit, persist]);
+  }, [country, cvId, commit, persist, sandbox]);
 
   const touched = useCallback(() => {
     dirty.current = true;

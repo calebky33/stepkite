@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { CvBuilderShell } from "@/components/tools/cv/CvBuilderShell";
+import { CvGate } from "@/components/tools/cv/CvGate";
 import { COUNTRY_INFO, cvLabelTitle } from "@/lib/countries";
 import { countryParams, requireCountry, type CountryParams } from "@/lib/routes";
 import { SITE_URL, stubMetadata } from "@/lib/seo";
@@ -30,7 +30,7 @@ export default async function CvPage({ params }: Props) {
       <p className="max-w-prose text-muted">
         Your {doc} is saved on this device. Nothing is sent to us.
       </p>
-      <CvBuilderShell key={country} country={country} />
+      <CvGate key={country} country={country} />
     </>
   );
 }

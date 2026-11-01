@@ -9,7 +9,7 @@ export const metadata = stubMetadata({
   description: "Which cookies and browser storage Stepkite uses, and how to change your choice.",
 });
 
-export default function Cookies() {
+export default function CookiesPage() {
   return (
     <LegalPage
       title="Cookies"
@@ -23,22 +23,27 @@ export default function Cookies() {
           ],
         },
         {
-          heading: "Browser storage that is not a cookie",
+          heading: "Cookies that are always on",
           paragraphs: [
-            "Your theme choice (system, light or dark) is saved in your browser's local storage. It never leaves your device.",
-            "The CV builder and the job tracker save their data in your browser too.",
+            "The sign-in cookie, set by our account provider Supabase, keeps you signed in. It lasts for the length of your session.",
+            "The CSRF token cookie protects form posts from being made from other sites.",
+            "If you buy a plan, Stripe sets its own cookies on its checkout page while you pay.",
+            "These are needed for the job, so they don't wait for your choice.",
           ],
         },
         {
           heading: "Optional cookies",
           paragraphs: [
-            "Page statistics and ads are the two optional kinds. Neither is switched on yet. If we add them, they will load only after you accept.",
+            "Ads: our ad provider sets cookies to work out which ads to show on the free pages. They load only if you accept.",
+            "Page statistics: a privacy-light stats provider counts page views to tell us which pages are popular. It loads only if you accept.",
           ],
         },
         {
-          heading: "Cookies from signing in and paying",
+          heading: "Browser storage that is not a cookie",
           paragraphs: [
-            "If you sign in, our account provider sets a cookie that keeps you signed in. If you pay, Stripe sets cookies on its own checkout page. These are needed for the job, so they don't wait for your choice.",
+            "Your theme choice (system, light or dark) is saved in your browser's local storage. It never leaves your device.",
+            "Anonymous CV drafts (before you sign up) are kept in your browser's local storage. When you sign up, the draft moves onto your account.",
+            "The job tracker and signed-in CV builder keep a copy in your browser's IndexedDB so they work offline. Pro accounts also sync a copy to our server.",
           ],
         },
       ]}

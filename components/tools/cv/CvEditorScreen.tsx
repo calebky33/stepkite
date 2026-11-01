@@ -62,15 +62,22 @@ export function CvEditorScreen({
   cvId,
   onShowList,
   onImport,
+  sandbox = false,
+  onSaveOrExport,
 }: {
   country: CountryCode;
   cvId: string;
   onShowList: () => void;
   onImport: () => void;
+  /** Anonymous mode: draft lives in localStorage, no versions, no snapshots, no list. */
+  sandbox?: boolean;
+  /** Called when the user clicks Save now or Download PDF. The anonymous shell uses this to
+   *  mount the sign-up banner. */
+  onSaveOrExport?: () => void;
 }) {
   const doc = COUNTRY_INFO[country].cvName;
   const { cv, saveState, edit, undo, redo, canUndo, canRedo, saveNow, replaceWith, startNew } =
-    useCvDocument(country, cvId);
+    useCvDocument(country, cvId, sandbox);
   const [view, setView] = useState<View>("edit");
   const [dialog, setDialog] = useState<"version" | "copies" | null>(null);
   const [versionName, setVersionName] = useState("");
@@ -272,6 +279,7 @@ export function CvEditorScreen({
                 ? `Add your name or a section first. The preview is only an example.`
                 : null
             }
+            onStart={onSaveOrExport}
           />
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -289,40 +297,52 @@ export function CvEditorScreen({
             disabled={!canRedo}
             onClick={redo}
           />
-          <Button variant="secondary" onClick={() => void saveNow()}>
-            Save now
-          </Button>
           <Button
             variant="secondary"
             onClick={() => {
-              setVersionName(cv.title ? `${cv.title} copy` : "");
-              setVersionError("");
-              setDialog("version");
+              onSaveOrExport?.();
+              void saveNow();
             }}
           >
-            Save as a named version
+            Save now
           </Button>
-          <Button variant="secondary" onClick={openCopies}>
-            Earlier copies
-          </Button>
-          <Button variant="secondary" onClick={onShowList}>
-            My {doc}s
-          </Button>
+          {sandbox ? null : (
+            <>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setVersionName(cv.title ? `${cv.title} copy` : "");
+                  setVersionError("");
+                  setDialog("version");
+                }}
+              >
+                Save as a named version
+              </Button>
+              <Button variant="secondary" onClick={openCopies}>
+                Earlier copies
+              </Button>
+              <Button variant="secondary" onClick={onShowList}>
+                My {doc}s
+              </Button>
+            </>
+          )}
         </div>
         <p aria-live="polite" className="text-sm">
           {note}
         </p>
-        <p className="text-sm">
-          Already have a {doc}?{" "}
-          <button
-            type="button"
-            className="inline-flex min-h-11 items-center font-semibold text-primary underline"
-            data-cv-upload=""
-            onClick={onImport}
-          >
-            Upload it
-          </button>
-        </p>
+        {sandbox ? null : (
+          <p className="text-sm">
+            Already have a {doc}?{" "}
+            <button
+              type="button"
+              className="inline-flex min-h-11 items-center font-semibold text-primary underline"
+              data-cv-upload=""
+              onClick={onImport}
+            >
+              Upload it
+            </button>
+          </p>
+        )}
       </div>
       {saveState === "unreadable" ? (
         <Button variant="secondary" className="self-start" onClick={startNew}>

@@ -21,6 +21,7 @@ export function PdfDownload({
   rules,
   disabledReason,
   onPrintingChange,
+  onStart,
 }: {
   contentRef: RefObject<HTMLDivElement | null>;
   cvId: string;
@@ -31,6 +32,8 @@ export function PdfDownload({
   disabledReason: string | null;
   /** True while the print copy of the pages must exist in the page. */
   onPrintingChange?: (printing: boolean) => void;
+  /** Called the moment the user clicks Download PDF, before the print dialog opens. */
+  onStart?: () => void;
 }) {
   const [state, setState] = useState<State>("idle");
   const doc = rules.documentName;
@@ -82,6 +85,7 @@ export function PdfDownload({
 
   const start = useCallback(() => {
     if (disabledReason !== null || state === "working") return;
+    onStart?.();
     setState("working");
     // If the browser never reports the print as done, stop waiting after a minute.
     giveUp.current = setTimeout(() => {
@@ -97,7 +101,7 @@ export function PdfDownload({
       stopWaiting();
       setState("failed");
     }
-  }, [disabledReason, state, print, onPrintingChange, stopWaiting]);
+  }, [disabledReason, state, print, onPrintingChange, stopWaiting, onStart]);
 
   const answer = async (value: "yes" | "no") => {
     const result = await saveDownloadAnswer(cvId, value, new Date());

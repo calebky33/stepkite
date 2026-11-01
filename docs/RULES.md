@@ -19,10 +19,10 @@ Rules for building every part of Stepkite so it is simply better than what is on
 
 11. **One source of truth.** Prices and plans sit in a `plans` table with Stripe product and price ids. The pricing page, Checkout and the webhook all read the same row.
 12. **Current plan is always visible.** The pricing page and the account page show the signed-in user's current plan, next charge amount, next charge date, and a one-click Cancel button. No digging in menus.
-13. **Trial is $1 for 7 days.** Checkout displays, in large text: "Today $1.00. Then $9.99 per month starting [date]. Cancel anytime."
-14. **The trial converts to the plan the user picked.** Monthly or yearly, chosen at trial checkout. Never silently default.
-15. **One trial per customer.** Enforced per email, per card fingerprint, and per email domain. Disposable email domains are blocked. Stripe Radar is on.
-16. **Plans.** Free: build and preview, one ATS template, watermarked PDF. Monthly: $9.99. Yearly: $39 (one charge). Lifetime: $149 one-time. Any limited-time launch tier (for example $79 lifetime) carries a hard cap and a visible end date.
+13. **Trial is 7 days free, no card.** The user clicks "Start free trial", confirms email, and gets full Pro for seven days. On day 8 a plan picker loads; opt-out drops the account to the Free tier. During the trial, exports are capped at two per day as an abuse brake, and ads are hidden.
+14. **One trial per customer.** Enforced per email, per browser fingerprint, and per IP. Disposable email domains are blocked. Stripe Radar is on for all paid charges.
+15. **Plans.** Free: full builder, unlimited edits, 3 saved CVs, 1 ATS-safe template, watermarked PDF, local-only tracker, light sidebar ads on the builder page. Monthly: $9.99. Yearly: $39 (one charge). Lifetime: $149 one-time. Any limited-time launch tier (for example $79 lifetime) carries a hard cap and a visible end date.
+16. **Soft-start sandbox.** The landing page's "Build my CV" CTA opens the editor in anonymous mode, drafts saved to localStorage only. After 60 seconds of typing, or on any save or export, a non-dismissible banner asks the visitor to sign up. The draft migrates to the new account on sign-up so no work is lost.
 17. **Cancel is one click.** On the account page. No email, no chat. Access runs to the end of the paid period, then revokes. Monthly and yearly are both cancellable at any time with no further charges.
 18. **Reminders before every charge.** 48 hours before the trial converts. 48 hours before each annual renewal. For monthly, both an in-app banner and an email, both opt-out but on by default.
 19. **Receipts for every charge.** No silent charges. 14-day money-back on yearly and lifetime. The $1 trial is non-refundable. Monthly cancels at period end.

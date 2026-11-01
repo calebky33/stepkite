@@ -5,17 +5,29 @@ How Stepkite earns. Pairs with docs/RULES.md pricing section. Nothing here contr
 ## Flow
 
 ```
-visit  →  sign up or sign in   (gate, cannot be skipped)
-      →  build and preview     (free, unlimited edits, autosaved every change)
-      →  click Export / Download / Finish / pick a premium template
-      →  Stripe Checkout
-            └─ trial path:   $1 for 7 days, converts to monthly or yearly
-            └─ one-off path: $39 yearly or $149 lifetime
-      →  webhook writes entitlement in Supabase
-      →  server renders unwatermarked PDF or Word
+visit landing / calculator / guide    (open, SEO + sidebar ads)
+   └─ click "Build my CV" → anonymous SANDBOX editor
+       └─ draft in localStorage only
+       └─ at 60 s of typing OR on Save / Export → non-dismissible sign-up banner
+   └─ click Sign up / Sign in → auth gate
+       └─ Google (1 click), LinkedIn (1 click), email + password (verify email, 60 s)
+       └─ anonymous draft (if any) migrates onto the new account
+
+authenticated:
+   └─ /{country}/cv  builder (free tier shows sidebar ads, no ads on preview or export)
+       └─ click "Start free trial" → 7-day Pro, no card, ads hidden, exports capped at 2/day
+       └─ click Export PDF (free) → browser watermarked PDF
+       └─ click Export PDF (trial/Pro) → server unwatermarked PDF
+       └─ pick a premium template → paywall if not Pro
+   └─ /{country}/tracker, /{country}/match: free uses local only; Pro adds sync + metrics + AI
+
+paywall on day 8 (trial end) or on Pro-only click:
+   └─ Stripe Checkout: Monthly $9.99 / Yearly $39 / Lifetime $149
+       └─ webhook writes entitlement in Supabase
+       └─ unlock takes effect on next request
 ```
 
-Free export: a watermarked PDF rendered in the browser from one ATS-safe template. Paid export: server-rendered PDF or Word from any template.
+Free export: a watermarked PDF rendered in the browser from one ATS-safe template. Trial and Pro: server-rendered PDF or Word from any template.
 
 ## Supabase schema (owner creates the project)
 
@@ -40,11 +52,21 @@ entitlements        (one row per user, server-side truth)
   user_id uuid pk references users(id) on delete cascade
   plan_code text references plans(code)
   status text         ("none"|"trialing"|"active"|"canceled"|"past_due"|"revoked")
+  trial_started_at timestamptz null
+  trial_ends_at timestamptz null         (set when the 7-day no-card trial starts)
+  trial_exports_today int default 0      (reset at midnight UTC; cap of 2 during trial)
   current_period_end timestamptz null
-  cancel_at timestamptz null       (when access revokes)
+  cancel_at timestamptz null             (when paid access revokes)
   stripe_customer_id text
   stripe_subscription_id text null
   updated_at timestamptz default now()
+
+trial_fingerprints  (one trial per browser + IP; abuse brake)
+  fingerprint_hash text pk        (SHA-256 of browser fingerprint)
+  ip_hash text                    (SHA-256 of CF-Connecting-IP)
+  email_domain text
+  started_at timestamptz
+  user_id uuid references users(id)
 
 payments            (audit, one row per Stripe event we accepted)
   id uuid pk default gen_random_uuid()
@@ -75,19 +97,36 @@ Stripe Radar: enable. Block disposable email domains (list stays server-side in 
 - `POST /api/auth/signup` email+password sign-up (handled by Supabase JS; this doc is for reference)
 - `POST /api/auth/signin`
 - `GET  /api/auth/callback` OAuth return (Google, LinkedIn)
-- `POST /api/paywall/checkout` creates a Stripe Checkout session; body `{plan: "trial"|"monthly"|"yearly"|"lifetime"}`
+- `POST /api/trial/start` starts the 7-day no-card trial; body `{fingerprint}`; checks `trial_fingerprints` for reuse, blocks disposable email domains, writes `trial_ends_at = now + 7 days`
+- `POST /api/paywall/checkout` creates a Stripe Checkout session; body `{plan: "monthly"|"yearly"|"lifetime"}`
 - `POST /api/paywall/portal` creates a Stripe Billing Portal session for the signed-in user
 - `POST /api/stripe/webhook` the only writer to `entitlements` and `payments`
-- `GET  /api/export/pdf` entitlement-gated; checks `status in ("trialing","active") OR plan_code = "lifetime"`
-- `GET  /api/export/docx` same gate
+- `GET  /api/export/pdf` entitlement-gated; free = watermarked, trialing or active = unwatermarked; trial increments `trial_exports_today` and refuses after 2
+- `GET  /api/export/docx` Pro-only (status in `trialing`, `active`, or plan_code `lifetime`)
+- `POST /api/sandbox/migrate` moves an anonymous localStorage draft onto a freshly signed-up account
 
-Client never says "I paid". Server reads Supabase. Supabase is written by the webhook only.
+Client never says "I paid" or "I am on trial". Server reads Supabase. Supabase is written by the webhook, by `/api/trial/start`, and (for `trial_exports_today`) by the export route.
 
 ## Pages we add or refresh
 
-- `/sign-in`, `/sign-up` replace stubs. Auth-first gate on `/{country}/cv` and other paid surfaces.
-- `/pricing` the 4 cards (Free, Monthly, Yearly, Lifetime) with next-renewal copy. Signed-in users see their current plan, next charge amount, next charge date, and a Cancel button at the top of the page.
+- `/sign-in`, `/sign-up` replace stubs. Google, LinkedIn, email+password. `?next=<path>` returns the user to the gated page.
+- `/{country}/cv` soft-start sandbox mode for anonymous visitors (draft in localStorage, non-dismissible sign-up banner at 60 s or on save or export). Authenticated users see their own CVs synced via Supabase.
+- `/pricing` four cards (Free, Monthly, Yearly, Lifetime). Signed-in Pro users see their current plan, next charge amount, next charge date, and a one-click Cancel button at the top of the page. Signed-in Free users see "Start free trial" at the top.
 - `/account` same current-plan panel, plus Email, Password, Linked accounts, Delete my account.
+
+Open pages (no gate, sidebar ads allowed):
+
+- `/` landing with "Build my CV" CTA (soft-start)
+- `/{country}/salary-calculator` SEO, ads in sidebar
+- `/guides/*` SEO, ads in article body
+- `/pricing`, `/about`, `/contact`, `/terms`, `/privacy`, `/cookies`
+
+Gated pages (sign-up required):
+
+- `/{country}/cv` after the sandbox limit
+- `/{country}/tracker`
+- `/account`, `/billing`
+- Any `/api/export/*` route
 
 ## Webhook contract
 

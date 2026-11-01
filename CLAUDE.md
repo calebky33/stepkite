@@ -36,8 +36,8 @@ Launch markets: UK, US, India. Business plan summary: docs/PRODUCT.md. Brand and
 
 1. Tax engines are pure functions. Every rate constant cites its official source URL and a `verifiedOn` date. No figure from memory — fetch it.
 2. Every tax change ships with worked-example tests taken from the official source.
-3. No CV data leaves the device unless the user is signed in and opted into sync. No personal data in logs.
-4. No ads inside the CV builder. Ads only on calculator/guide pages.
+3. CV data stays on the device until the user signs in; after sign-in it syncs to Supabase under RLS. No personal data in logs. Soft-start sandbox: an anonymous visitor may draft a CV in localStorage, forced to sign up at save or export.
+4. Ads are allowed on calculator and guide pages, and on the free-tier CV builder (sidebar only; never inside the preview or any exported file). No ads during the 7-day trial or on any paid plan.
 5. Never fabricate testimonials, user counts, vacancies, or success rates in UI copy.
 6. AI matcher only rewords the user's real experience; user approves every line.
 7. Accessibility: WCAG 2.2 AA. Keyboard-usable, visible focus, labels on all inputs.

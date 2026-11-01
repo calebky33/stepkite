@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { CurrentPlanPanel } from "@/components/billing/CurrentPlanPanel";
 import { PageShell } from "@/components/shell/PageShell";
 import { SITE_URL, stubMetadata } from "@/lib/seo";
+import { PricingBillingHeader } from "./PricingBillingHeader";
 import { PricingCards } from "./PricingCards";
 
 export const metadata = stubMetadata({
@@ -17,7 +17,7 @@ export default function Pricing() {
       title="Pricing"
       lead="Pick the plan that fits. The free plan is a full builder you can use forever."
     >
-      <CurrentPlanPanel />
+      <PricingBillingHeader />
       <TrialCta />
       <PricingCards />
     </PageShell>

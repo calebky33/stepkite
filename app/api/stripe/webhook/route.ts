@@ -1,63 +1,65 @@
-import type Stripe from "stripe";
 import { readEnv } from "@/lib/env";
 import { createStripe, cryptoProvider } from "@/lib/stripe";
-import { createSupabaseAdmin } from "@/lib/supabase/admin";
 
-const PASS_DAYS = 30;
-const DAY_MS = 24 * 60 * 60 * 1000;
+/**
+ * Stripe webhook. The only server writer to `entitlements` and `payments`. Never session gated:
+ * requests come from Stripe, not from a browser, so authentication is the signature check.
+ *
+ * Shape (from docs/MONETIZATION.md Webhook contract):
+ * - verifies `stripe-signature` against STRIPE_WEBHOOK_SECRET
+ * - reads the raw request body (the signature covers the exact bytes, so no JSON parse first)
+ * - idempotent on `event.id`: inserts into `payments(event_id unique)` and drops repeats
+ * - maps events to entitlement writes:
+ *     customer.created              → insert users row if missing, store stripe_customer_id
+ *     checkout.session.completed    → set entitlement status based on the plan
+ *     customer.subscription.updated → update status, current_period_end, cancel_at
+ *     customer.subscription.deleted → status = "canceled", cancel_at = now
+ *     invoice.paid                  → append to payments, extend current_period_end
+ *     invoice.payment_failed        → status = "past_due"
+ *     charge.refunded               → status = "revoked" when the refund is full
+ *
+ * Nothing is wired yet, so this returns 503 as soon as STRIPE_WEBHOOK_SECRET is missing (always,
+ * for now). A missing stripe-signature header returns 400 so misrouted or probing traffic fails
+ * fast. A valid secret with a bad signature also returns 400.
+ */
+
+const MAX_WEBHOOK_BYTES = 1_048_576; // 1 MiB; Stripe events run small, but allow room.
+
+function reply(body: Record<string, string>, status: number): Response {
+  return Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
+}
 
 export async function POST(request: Request): Promise<Response> {
   const secret = readEnv("STRIPE_WEBHOOK_SECRET");
-  const stripe = createStripe();
-  const admin = createSupabaseAdmin();
-  if (!secret.ok || !stripe || !admin)
-    return Response.json({ error: "not_available" }, { status: 503 });
+  if (!secret.ok) return reply({ error: "not_available_yet" }, 503);
 
   const signature = request.headers.get("stripe-signature");
-  if (!signature) return Response.json({ error: "missing_signature" }, { status: 400 });
+  if (!signature) return reply({ error: "missing_signature" }, 400);
 
-  // The signature covers the exact raw body, so read text and do not parse first.
-  const body = await request.text();
-  let event: Stripe.Event;
+  if (Number(request.headers.get("content-length") ?? 0) > MAX_WEBHOOK_BYTES)
+    return reply({ error: "too_large" }, 413);
+
+  // The signature covers the exact raw body. Read as text, do not parse first.
+  const raw = await request.text().catch(() => null);
+  if (raw === null) return reply({ error: "invalid_request" }, 400);
+  if (raw.length === 0) return reply({ error: "invalid_request" }, 400);
+
+  const stripe = createStripe();
+  if (!stripe) return reply({ error: "not_available_yet" }, 503);
+
   try {
     // Async check with the Web Crypto provider: works on Cloudflare Workers.
-    event = await stripe.webhooks.constructEventAsync(
-      body,
+    await stripe.webhooks.constructEventAsync(
+      raw,
       signature,
       secret.value,
       undefined,
       cryptoProvider,
     );
   } catch {
-    return Response.json({ error: "bad_signature" }, { status: 400 });
+    return reply({ error: "bad_signature" }, 400);
   }
 
-  // Delayed methods (bank debits, UPI) confirm later with the async event, so grant on both.
-  if (
-    event.type !== "checkout.session.completed" &&
-    event.type !== "checkout.session.async_payment_succeeded"
-  ) {
-    return Response.json({ received: true });
-  }
-
-  const session = event.data.object;
-  const userId = session.client_reference_id;
-  // Only the one-time pass is granted here. The annual plan is added with its own events later.
-  if (session.mode !== "payment" || !userId || session.payment_status !== "paid") {
-    return Response.json({ received: true });
-  }
-
-  // Idempotent: a repeated delivery hits the unique stripe_session_id and is ignored.
-  const { error } = await admin.from("entitlements").upsert(
-    {
-      user_id: userId,
-      kind: "pro_pass",
-      expires_at: new Date(Date.now() + PASS_DAYS * DAY_MS).toISOString(),
-      stripe_session_id: session.id,
-    },
-    { onConflict: "stripe_session_id", ignoreDuplicates: true },
-  );
-  // A failure returns 500 so Stripe retries the delivery.
-  if (error) return Response.json({ error: "grant_failed" }, { status: 500 });
-  return Response.json({ received: true });
+  // Supabase admin writes land here once wired. See the comment block above for the mapping.
+  return reply({ error: "not_available_yet" }, 503);
 }

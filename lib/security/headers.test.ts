@@ -20,8 +20,8 @@ describe("security headers", () => {
     expect(h.get("Cross-Origin-Opener-Policy")).toBe("same-origin");
   });
 
-  it("enforces the CSP without eval and with frame-ancestors none", () => {
-    const res = proxy(new NextRequest("https://stepkite.com/uk"));
+  it("enforces the CSP without eval and with frame-ancestors none", async () => {
+    const res = await proxy(new NextRequest("https://stepkite.com/uk"));
     const csp = res.headers.get("Content-Security-Policy") ?? "";
     expect(res.headers.get("Content-Security-Policy-Report-Only")).toBeNull();
     expect(csp).toContain("frame-ancestors 'none'");
@@ -29,10 +29,9 @@ describe("security headers", () => {
     expect(csp).not.toContain("unsafe-eval");
   });
 
-  it("adds manifest-src and upgrade-insecure-requests outside development", () => {
-    const csp =
-      proxy(new NextRequest("https://stepkite.com/uk")).headers.get("Content-Security-Policy") ??
-      "";
+  it("adds manifest-src and upgrade-insecure-requests outside development", async () => {
+    const res = await proxy(new NextRequest("https://stepkite.com/uk"));
+    const csp = res.headers.get("Content-Security-Policy") ?? "";
     expect(csp).toContain("manifest-src 'self'");
     expect(csp).toContain("upgrade-insecure-requests");
     expect(csp).not.toContain("frame-src");

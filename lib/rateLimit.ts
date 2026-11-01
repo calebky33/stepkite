@@ -4,7 +4,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 export type RateLimitBinding = { limit(options: { key: string }): Promise<{ success: boolean }> };
 
 /** Binding names, matching `ratelimits` in wrangler.jsonc. */
-export type RateLimitName = "RL_JOB_PREVIEW" | "RL_NEWSLETTER";
+export type RateLimitName = "RL_JOB_PREVIEW" | "RL_NEWSLETTER" | "RL_AUTH";
 
 export type RateLimitOptions = { failClosed?: boolean };
 

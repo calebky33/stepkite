@@ -84,7 +84,11 @@ describe("binding names", () => {
     const names = (JSON.parse(raw) as { ratelimits: { name: string }[] }).ratelimits.map(
       (r) => r.name,
     );
-    const union: Record<RateLimitName, true> = { RL_JOB_PREVIEW: true, RL_NEWSLETTER: true };
+    const union: Record<RateLimitName, true> = {
+      RL_JOB_PREVIEW: true,
+      RL_NEWSLETTER: true,
+      RL_AUTH: true,
+    };
     expect(names.sort()).toEqual(Object.keys(union).sort());
   });
 });

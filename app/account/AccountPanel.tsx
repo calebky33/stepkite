@@ -1,8 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { useState } from "react";
+import { BillingSummary } from "@/components/billing/BillingSummary";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 
@@ -49,18 +49,7 @@ export function AccountPanel() {
 
   return (
     <div className="flex flex-col gap-6">
-      <Card className="flex flex-col gap-3">
-        <h2 className="text-base font-semibold">You&apos;re not signed in</h2>
-        <p className="text-base text-muted">
-          Your CVs and saved jobs live on this device. Sign in to sync them once that opens.
-        </p>
-        <Link
-          href="/sign-in"
-          className="inline-flex min-h-11 items-center self-start text-base text-primary underline-offset-4 hover:underline"
-        >
-          Go to sign in
-        </Link>
-      </Card>
+      <BillingSummary />
 
       <Card className="flex flex-col gap-3">
         <h2 className="text-base font-semibold">Delete my data</h2>

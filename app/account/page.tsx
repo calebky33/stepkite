@@ -9,11 +9,7 @@ export const metadata = stubMetadata({
 
 export default function Account() {
   return (
-    <PageShell
-      title="Your account"
-      lead="Sign-in isn't open yet, so there's no account to show."
-      narrow
-    >
+    <PageShell title="Your account" lead="Your plan, your sign in, and your data." narrow>
       <AccountPanel />
     </PageShell>
   );

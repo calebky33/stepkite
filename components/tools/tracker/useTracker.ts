@@ -66,7 +66,18 @@ export function useTracker() {
   const [quarantineDropped, setQuarantineDropped] = useState(0);
   const [unreadableRows, setUnreadableRows] = useState<Record<string, unknown[]>>({});
   const [problem, setProblem] = useState<SaveProblem | null>(null);
-  const [announce, setAnnounce] = useState("");
+  const [announce, setAnnounceRaw] = useState("");
+  const lastAnnounce = useRef("");
+  /** Clears first when the text repeats, so screen readers announce it again. */
+  const setAnnounce = useCallback((next: string) => {
+    if (next !== "" && next === lastAnnounce.current) {
+      setAnnounceRaw("");
+      queueMicrotask(() => setAnnounceRaw(next));
+    } else {
+      setAnnounceRaw(next);
+    }
+    lastAnnounce.current = next;
+  }, []);
   const undo = useUndo();
   const { offer } = undo;
   /** The persisted delete-all snapshot has its own timer, independent of the Undo slot. */
@@ -135,7 +146,7 @@ export function useTracker() {
         left(),
       );
     },
-    [armPlanTimer, offer, stopPlanTimer],
+    [armPlanTimer, offer, stopPlanTimer, setAnnounce],
   );
 
   useEffect(() => {
@@ -210,7 +221,7 @@ export function useTracker() {
       setAnnounce(`Added ${job.title} to ${stageName(job.stageId)}.`);
       void save({ save: { jobs: [job], activities: [activity] } });
     },
-    [save, stageName],
+    [save, stageName, setAnnounce],
   );
 
   const updateJob = useCallback(async (job: Job): Promise<boolean> => {
@@ -261,7 +272,7 @@ export function useTracker() {
         },
       });
     },
-    [data.stages, offer, save, stageName],
+    [data.stages, offer, save, stageName, setAnnounce],
   );
 
   const setArchived = useCallback(
@@ -291,7 +302,7 @@ export function useTracker() {
         },
       });
     },
-    [offer, save],
+    [offer, save, setAnnounce],
   );
 
   const removeJob = useCallback(
@@ -327,7 +338,7 @@ export function useTracker() {
         },
       });
     },
-    [data.activities, data.interviews, offer, save],
+    [data.activities, data.interviews, offer, save, setAnnounce],
   );
 
   const addNoteTo = useCallback(
@@ -368,7 +379,7 @@ export function useTracker() {
         },
       });
     },
-    [offer, save],
+    [offer, save, setAnnounce],
   );
 
   const saveInterview = useCallback(
@@ -383,7 +394,7 @@ export function useTracker() {
       setAnnounce(isNew ? "Interview added." : "Interview saved.");
       void save({ save: { interviews: [interview], activities: activity ? [activity] : [] } });
     },
-    [data.interviews, save],
+    [data.interviews, save, setAnnounce],
   );
 
   const removeInterview = useCallback(
@@ -400,7 +411,7 @@ export function useTracker() {
         },
       });
     },
-    [offer, save],
+    [offer, save, setAnnounce],
   );
 
   const saveContact = useCallback(
@@ -409,7 +420,7 @@ export function useTracker() {
       setAnnounce(`Saved ${contact.name}.`);
       void save({ save: { contacts: [contact] } });
     },
-    [save],
+    [save, setAnnounce],
   );
 
   const removeContact = useCallback(
@@ -434,7 +445,7 @@ export function useTracker() {
         },
       });
     },
-    [data.contacts, data.jobs, offer, save],
+    [data.contacts, data.jobs, offer, save, setAnnounce],
   );
 
   const saveStages = useCallback(
@@ -452,7 +463,7 @@ export function useTracker() {
       setAnnounce(summary);
       void save({ save: { jobs } });
     },
-    [save],
+    [save, setAnnounce],
   );
 
   const restoreBackup = useCallback(
@@ -472,7 +483,7 @@ export function useTracker() {
           : "The backup could not be written in full, and your earlier data could not be put back. Export what you can from this page now, then reload.",
       };
     },
-    [],
+    [setAnnounce],
   );
 
   const deleteAll = useCallback(
@@ -508,7 +519,7 @@ export function useTracker() {
       offerRestore(plan);
       return { ok: true, persisted: plan.persisted === true };
     },
-    [data, unreadable, offerRestore],
+    [data, unreadable, offerRestore, setAnnounce],
   );
 
   const backupText = useCallback(

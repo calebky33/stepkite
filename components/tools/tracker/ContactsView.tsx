@@ -1,7 +1,7 @@
 "use client";
 
 import { Pencil, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { IconButton } from "@/components/ui/IconButton";
@@ -10,6 +10,7 @@ import { attachContact, detachContact } from "@/lib/tracker/contacts";
 import type { Contact, Job } from "@/lib/tracker/schema";
 import { ContactForm } from "./ContactForm";
 import { NativeSelect } from "./fields";
+import { EDIT_ATTR, useFocusReturn } from "./focusReturn";
 import { formatWhen } from "./format";
 import type { Tracker } from "./useTracker";
 
@@ -19,9 +20,15 @@ export function ContactsView({ t, country }: Props) {
   const [form, setForm] = useState<"new" | Contact | null>(null);
   const { contacts, jobs } = t.data;
   const sorted = [...contacts].sort((a, b) => a.name.localeCompare(b.name));
+  const root = useRef<HTMLDivElement>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
+  const returnFocus = useFocusReturn(root, heading);
 
   return (
-    <div className="flex min-w-0 flex-col gap-6">
+    <div ref={root} className="flex min-w-0 flex-col gap-6">
+      <h3 ref={heading} tabIndex={-1} className="sr-only">
+        Contacts
+      </h3>
       {form ? (
         <Card className="flex flex-col gap-4 md:p-6">
           <h3 className="font-display text-xl">
@@ -32,6 +39,7 @@ export function ContactsView({ t, country }: Props) {
             onSave={(c) => {
               t.actions.saveContact(c);
               setForm(null);
+              returnFocus(c.id);
             }}
             onCancel={() => setForm(null)}
           />
@@ -55,6 +63,7 @@ export function ContactsView({ t, country }: Props) {
                 country={country}
                 t={t}
                 onEdit={() => setForm(c)}
+                onDeleted={() => returnFocus(null)}
               />
             </li>
           ))}
@@ -70,9 +79,10 @@ type CardProps = {
   country: CountryCode;
   t: Tracker;
   onEdit: () => void;
+  onDeleted: () => void;
 };
 
-function ContactCard({ contact, jobs, country, t, onEdit }: CardProps) {
+function ContactCard({ contact, jobs, country, t, onEdit, onDeleted }: CardProps) {
   const [pick, setPick] = useState("");
   const linked = jobs.filter((j) => j.contactIds?.includes(contact.id));
   const free = jobs.filter((j) => !j.archivedAt && !j.contactIds?.includes(contact.id));
@@ -87,11 +97,19 @@ function ContactCard({ contact, jobs, country, t, onEdit }: CardProps) {
           </p>
         </div>
         <div className="flex shrink-0">
-          <IconButton label={`Edit ${contact.name}`} icon={<Pencil />} onClick={onEdit} />
+          <IconButton
+            label={`Edit ${contact.name}`}
+            icon={<Pencil />}
+            onClick={onEdit}
+            {...{ [EDIT_ATTR]: contact.id }}
+          />
           <IconButton
             label={`Delete ${contact.name}`}
             icon={<Trash2 />}
-            onClick={() => t.actions.removeContact(contact)}
+            onClick={() => {
+              t.actions.removeContact(contact);
+              onDeleted();
+            }}
           />
         </div>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useFocusReturn } from "./focusReturn";
 import { Button } from "@/components/ui/Button";
 import type { CountryCode } from "@/lib/countries";
 import { upcomingInterviews } from "@/lib/tracker/interviews";
@@ -15,6 +16,9 @@ type Props = { t: Tracker; country: CountryCode };
 export function InterviewsView({ t, country }: Props) {
   const now = useNow();
   const [form, setForm] = useState<"new" | Interview | null>(null);
+  const root = useRef<HTMLDivElement>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
+  const returnFocus = useFocusReturn(root, heading);
   const { jobs, interviews } = t.data;
   const live = jobs.filter((j) => !j.archivedAt);
   const upcoming = upcomingInterviews(interviews, now);
@@ -28,7 +32,13 @@ export function InterviewsView({ t, country }: Props) {
 
   const list = (title: string, items: Interview[], empty: string) => (
     <section className="flex min-w-0 flex-col gap-3" aria-label={title}>
-      <h3 className="font-display text-xl">{title}</h3>
+      <h3
+        ref={title === "Upcoming" ? heading : undefined}
+        tabIndex={title === "Upcoming" ? -1 : undefined}
+        className="font-display text-xl outline-none"
+      >
+        {title}
+      </h3>
       {items.length === 0 ? (
         <p className="text-muted">{empty}</p>
       ) : (
@@ -40,7 +50,10 @@ export function InterviewsView({ t, country }: Props) {
                 country={country}
                 jobLabel={label(i)}
                 onEdit={() => setForm(i)}
-                onDelete={() => t.actions.removeInterview(i)}
+                onDelete={() => {
+                  t.actions.removeInterview(i);
+                  returnFocus(null);
+                }}
               />
             </li>
           ))}
@@ -50,7 +63,7 @@ export function InterviewsView({ t, country }: Props) {
   );
 
   return (
-    <div className="flex min-w-0 flex-col gap-8">
+    <div ref={root} className="flex min-w-0 flex-col gap-8">
       {form ? (
         <div className="flex flex-col gap-4 rounded-card border border-border bg-surface p-4 md:p-6">
           <h3 className="font-display text-xl">
@@ -62,6 +75,7 @@ export function InterviewsView({ t, country }: Props) {
             onSave={(iv) => {
               t.actions.saveInterview(iv);
               setForm(null);
+              returnFocus(iv.id);
             }}
             onCancel={() => setForm(null)}
           />

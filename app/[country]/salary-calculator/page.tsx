@@ -8,8 +8,16 @@ import { SALARY_CONTENT } from "@/lib/content/salaryCalculator";
 import { countryParams, requireCountry, type CountryParams } from "@/lib/routes";
 import { INDEXABLE_PATHS, SITE_URL, stubMetadata } from "@/lib/seo";
 import { getRates } from "@/lib/tax";
+import { MAX_GROSS, MIN_GROSS } from "@/lib/tax/types";
 
-type Props = { params: Promise<CountryParams> };
+type Props = { params: Promise<CountryParams>; searchParams: Promise<{ gross?: string }> };
+
+/** Reads ?gross= from the URL. Only whole numbers in range are used. */
+function parseGross(value: string | undefined): number | undefined {
+  if (!value || !/^\d{1,8}$/.test(value)) return undefined;
+  const n = Number(value);
+  return n >= MIN_GROSS && n <= MAX_GROSS ? n : undefined;
+}
 
 export const dynamicParams = false;
 
@@ -51,8 +59,9 @@ function jsonLdString(data: object): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");
 }
 
-export default async function SalaryCalculatorPage({ params }: Props) {
+export default async function SalaryCalculatorPage({ params, searchParams }: Props) {
   const country = await requireCountry(params);
+  const initialGross = parseGross((await searchParams).gross);
   const info = COUNTRY_INFO[country];
   const content = SALARY_CONTENT[country];
 
@@ -104,7 +113,7 @@ export default async function SalaryCalculatorPage({ params }: Props) {
     <>
       <h1 className="font-display text-4xl">{content.h1}</h1>
       <p className="max-w-prose text-muted">{content.intro}</p>
-      <PayCalculator country={country} />
+      <PayCalculator country={country} initialGross={initialGross} />
       <p className="max-w-prose text-sm text-muted">
         Applying for jobs?{" "}
         <Link href={`/${country}/cv`}>Build your {COUNTRY_INFO[country].cvName}</Link>.

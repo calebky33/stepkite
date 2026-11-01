@@ -53,6 +53,31 @@ describe("PayCalculator", () => {
     expect(screen.queryByText("Example")).toBeNull();
   });
 
+  it("reads gross and period from the query on mount", async () => {
+    window.history.replaceState(null, "", "/uk/salary-calculator?gross=2500&period=monthly");
+    try {
+      render(<PayCalculator country="uk" />);
+      await waitFor(() =>
+        expect(
+          (screen.getByRole("textbox", { name: "Salary before tax" }) as HTMLInputElement).value,
+        ).toBe("2,500"),
+      );
+      expect(screen.queryByText("Example")).toBeNull();
+    } finally {
+      window.history.replaceState(null, "", "/");
+    }
+  });
+
+  it("ignores a bad gross in the query", () => {
+    window.history.replaceState(null, "", "/uk/salary-calculator?gross=-5&period=annual");
+    try {
+      render(<PayCalculator country="uk" initialGross={30000} />);
+      expect(screen.getAllByText("Example").length).toBeGreaterThan(0);
+    } finally {
+      window.history.replaceState(null, "", "/");
+    }
+  });
+
   it("shows the old regime inputs for India only after choosing it", () => {
     render(<PayCalculator country="in" />);
     expect(screen.queryByText("Section 80C investments")).toBeNull();

@@ -1,6 +1,7 @@
 "use client";
 
 import { Input } from "@/components/ui/Input";
+import type { CountryCode } from "@/lib/countries";
 import { NativeSelect, TextArea } from "./fields";
 import type { JobErrors, JobValues, Period } from "./jobForm";
 
@@ -12,6 +13,8 @@ type Props = {
   hideUrl?: boolean;
   /** The notes field sits elsewhere, as in "Paste job text". */
   hideNotes?: boolean;
+  /** When set, a salary figure links to the pay calculator for this country. */
+  country?: CountryCode;
 };
 
 const PERIODS: readonly { value: Period; label: string }[] = [
@@ -25,7 +28,11 @@ const CURRENCIES = ["GBP", "USD", "INR"];
 /** Title, company and link. Every job needs these. */
 export function MainFields({ values, errors, onChange, hideUrl }: Props) {
   return (
-    <div className={hideUrl ? "grid gap-4 md:grid-cols-2 md:gap-6" : "grid gap-4 md:grid-cols-3 md:gap-6"}>
+    <div
+      className={
+        hideUrl ? "grid gap-4 md:grid-cols-2 md:gap-6" : "grid gap-4 md:grid-cols-3 md:gap-6"
+      }
+    >
       <Input
         label="Job title"
         value={values.title}
@@ -54,7 +61,12 @@ export function MainFields({ values, errors, onChange, hideUrl }: Props) {
 }
 
 /** Everything else about a job. All of it is optional. */
-export function DetailFields({ values, errors, onChange, hideNotes }: Props) {
+export function DetailFields({ values, errors, onChange, hideNotes, country }: Props) {
+  const figure = Number(values.salaryMin.replace(/,/g, "").trim());
+  const takeHomeHref =
+    country && values.salaryMin.trim() !== "" && Number.isFinite(figure) && figure > 0
+      ? `/${country}/salary-calculator?gross=${encodeURIComponent(String(figure))}&period=${values.period}`
+      : null;
   const currencies = CURRENCIES.includes(values.currency)
     ? CURRENCIES
     : [...CURRENCIES, values.currency];
@@ -103,6 +115,14 @@ export function DetailFields({ values, errors, onChange, hideNotes }: Props) {
           options={PERIODS}
           onChange={(e) => onChange({ period: e.target.value as Period })}
         />
+        {takeHomeHref ? (
+          <a
+            href={takeHomeHref}
+            className="inline-flex min-h-11 items-center text-sm underline underline-offset-4 md:col-span-4"
+          >
+            What you take home
+          </a>
+        ) : null}
       </fieldset>
       <div className="grid gap-4 md:grid-cols-2">
         <Input

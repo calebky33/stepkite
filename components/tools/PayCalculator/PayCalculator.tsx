@@ -67,13 +67,29 @@ function compute(
 
 type PayCalculatorProps = { country: CountryCode; initialGross?: number };
 
+/** Reads ?gross=&period= from the URL once, server-side safe (returns null when there is no
+ * window). A link from the job tracker uses this to prefill the calculator. */
+function readLinkedSalary(): { gross: number; period: Period } | null {
+  if (typeof window === "undefined") return null;
+  const query = new URLSearchParams(window.location.search);
+  const raw = query.get("gross");
+  const word = query.get("period");
+  if (raw === null || !/^\d+(\.\d{1,2})?$/.test(raw)) return null;
+  const amount = Number(raw);
+  if (!(amount > 0 && amount < 10_000_000)) return null;
+  if (word !== null && word !== "annual" && word !== "monthly" && word !== "weekly") return null;
+  const period: Period = word === "monthly" ? "month" : word === "weekly" ? "week" : "year";
+  return { gross: amount, period };
+}
+
 export function PayCalculator({ country, initialGross }: PayCalculatorProps) {
   const info = COUNTRY_INFO[country];
+  const linked = useState(() => readLinkedSalary())[0];
   const [gross, setGross] = useState<number | null>(
-    initialGross ?? info.salaryLevels[2] ?? info.salaryLevels[0] ?? null,
+    linked?.gross ?? initialGross ?? info.salaryLevels[2] ?? info.salaryLevels[0] ?? null,
   );
-  const [edited, setEdited] = useState(false);
-  const [period, setPeriod] = useState<Period>("year");
+  const [edited, setEdited] = useState(linked !== null);
+  const [period, setPeriod] = useState<Period>(linked?.period ?? "year");
   const [values, setValues] = useState<FieldValues>(DEFAULT_VALUES[country]);
   const [settled, setSettled] = useState<Settled>({ gross, values });
   const engine = useEngine(country);

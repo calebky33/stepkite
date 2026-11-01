@@ -71,7 +71,7 @@ export function JobEditForm({ job, country, onSave }: Props) {
     <form onSubmit={(e) => void submit(e)} noValidate className="flex min-w-0 flex-col gap-4">
       <h3 className="font-display text-xl">Details</h3>
       <MainFields values={values} errors={errors} onChange={change} />
-      <DetailFields values={values} errors={errors} onChange={change} />
+      <DetailFields values={values} errors={errors} onChange={change} country={country} />
       <div className="flex flex-wrap items-center gap-3">
         <Button type="submit">Save changes</Button>
         <p role="status" aria-live="polite" className="text-sm text-muted">

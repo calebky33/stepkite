@@ -4,6 +4,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { IconButton } from "@/components/ui/IconButton";
 import type { CountryCode } from "@/lib/countries";
 import type { Interview } from "@/lib/tracker/schema";
+import { EDIT_ATTR } from "./focusReturn";
 import { formatWhen } from "./format";
 import { KIND_NAMES } from "./InterviewForm";
 
@@ -38,7 +39,12 @@ export function InterviewRow({ interview, country, jobLabel, onEdit, onDelete }:
         ) : null}
       </div>
       <div className="flex shrink-0">
-        <IconButton label={`Edit interview on ${when}`} icon={<Pencil />} onClick={onEdit} />
+        <IconButton
+          label={`Edit interview on ${when}`}
+          icon={<Pencil />}
+          onClick={onEdit}
+          {...{ [EDIT_ATTR]: interview.id }}
+        />
         <IconButton label={`Delete interview on ${when}`} icon={<Trash2 />} onClick={onDelete} />
       </div>
     </div>

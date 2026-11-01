@@ -28,6 +28,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: "Stepkite", template: "%s | Stepkite" },
   description: "Pay calculators and CV tools that follow your country's rules.",
+  // Pages that set their own openGraph replace this; pass title, subtitle and country to /api/og.
+  openGraph: { siteName: "Stepkite", images: [{ url: "/api/og", width: 1200, height: 630 }] },
+  twitter: { card: "summary_large_image", images: ["/api/og"] },
 };
 
 export const viewport: Viewport = {

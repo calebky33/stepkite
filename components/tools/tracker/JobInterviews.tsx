@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useFocusReturn } from "./focusReturn";
 import { Button } from "@/components/ui/Button";
 import type { CountryCode } from "@/lib/countries";
 import type { Interview, Job } from "@/lib/tracker/schema";
@@ -22,9 +23,21 @@ export function JobInterviews({ job, interviews, country, onSave, onDelete }: Pr
   const sorted = [...interviews].sort((a, b) => a.at.localeCompare(b.at));
   // An open interview form holds unsaved input, so Escape cancels it instead of closing the panel.
   usePanelDirty(form !== null, () => setForm(null));
+  const root = useRef<HTMLElement>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
+  const returnFocus = useFocusReturn(root, heading);
   return (
-    <section aria-labelledby="job-interviews-heading" className="flex min-w-0 flex-col gap-3">
-      <h3 id="job-interviews-heading" className="font-display text-xl">
+    <section
+      ref={root}
+      aria-labelledby="job-interviews-heading"
+      className="flex min-w-0 flex-col gap-3"
+    >
+      <h3
+        ref={heading}
+        tabIndex={-1}
+        id="job-interviews-heading"
+        className="font-display text-xl outline-none"
+      >
         Interviews
       </h3>
       {sorted.length === 0 && !form ? (
@@ -37,7 +50,10 @@ export function JobInterviews({ job, interviews, country, onSave, onDelete }: Pr
                 interview={i}
                 country={country}
                 onEdit={() => setForm(i)}
-                onDelete={() => onDelete(i)}
+                onDelete={() => {
+                  onDelete(i);
+                  returnFocus(null);
+                }}
               />
             </li>
           ))}
@@ -51,6 +67,7 @@ export function JobInterviews({ job, interviews, country, onSave, onDelete }: Pr
           onSave={(iv) => {
             onSave(iv);
             setForm(null);
+            returnFocus(iv.id);
           }}
           onCancel={() => setForm(null)}
         />

@@ -8,12 +8,11 @@ import CountryHubPage, { generateStaticParams } from "./page";
 
 const appDir = join(process.cwd(), "app", "[country]");
 
-/** Maps /uk/salary/30000 to the page file that serves it. */
+/** Maps /uk/salary-calculator/30000 to the page file that serves it. */
 function pageFileFor(path: string): string {
   const [, , ...rest] = path.split("/");
   const segments = rest.map((segment, index) => {
-    if (rest[index - 1] === "salary") return "[amount]";
-    if (rest[index - 1] === "guides") return "[slug]";
+    if (rest[index - 1] === "salary-calculator") return "[gross]";
     return segment;
   });
   return join(appDir, ...segments, "page.tsx");
@@ -33,7 +32,8 @@ describe("country hub", () => {
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     const hrefs = screen.getAllByRole("link").map((a) => a.getAttribute("href"));
     for (const path of countryRoutes(country)) expect(hrefs).toContain(path);
-    expect(hrefs.every((h) => h?.startsWith(`/${country}/`))).toBe(true);
+    expect(hrefs).toContain("/guides");
+    expect(hrefs.every((h) => h?.startsWith(`/${country}/`) || h === "/guides")).toBe(true);
   });
 
   it("shows the regime compare for India only", async () => {

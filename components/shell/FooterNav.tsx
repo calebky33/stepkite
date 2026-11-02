@@ -45,7 +45,7 @@ export function FooterNav({ children }: { children?: ReactNode }) {
     { href: `/${country}`, label: "All tools" },
   ];
   const explore: FooterLink[] = [
-    { href: `/${country}/guides`, label: "Career guides" },
+    { href: `/guides`, label: "Career guides" },
     { href: "/pricing", label: "Pricing" },
     { href: "#product-updates", label: "Product updates" },
   ];

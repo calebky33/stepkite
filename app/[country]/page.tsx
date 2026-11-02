@@ -36,7 +36,7 @@ function groupsFor(country: CountryCode): HubGroup[] {
     {
       heading: "Common salaries",
       links: info.salaryLevels.map((amount) => ({
-        href: `${base}/salary/${amount}`,
+        href: `${base}/salary-calculator/${amount}`,
         label: `${info.takeHomeTerm.charAt(0).toUpperCase()}${info.takeHomeTerm.slice(1)} on ${formatMoney(amount, country)}`,
       })),
     },
@@ -50,7 +50,7 @@ function groupsFor(country: CountryCode): HubGroup[] {
           label: `Match your ${info.cvName} to a job ad`,
           note: "Not available yet",
         },
-        { href: `${base}/guides`, label: "Guides" },
+        { href: `/guides`, label: "Guides" },
       ],
     },
   ];

@@ -47,7 +47,7 @@ export const COUNTRY_INFO: Record<CountryCode, CountryInfo> = {
     cvName: "CV",
     takeHomeTerm: "in-hand salary",
     paper: "A4",
-    salaryLevels: [500000, 800000, 1200000, 1800000, 2500000],
+    salaryLevels: [500000, 1000000, 1500000, 2000000, 2500000],
   },
 };
 

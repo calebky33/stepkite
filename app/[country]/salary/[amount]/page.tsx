@@ -1,9 +1,6 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { PayCalculator } from "@/components/tools/PayCalculator/PayCalculator";
-import { ToolLinks } from "@/components/tools/ToolLinks";
-import { COUNTRIES, COUNTRY_INFO, formatMoney, isCountry } from "@/lib/countries";
-import { SITE_URL, stubMetadata } from "@/lib/seo";
+import { permanentRedirect } from "next/navigation";
+import { COUNTRIES, COUNTRY_INFO, isCountry } from "@/lib/countries";
+import { SEO_SALARY_LEVELS } from "@/lib/salaryLevels";
 
 type Params = { country: string; amount: string };
 type Props = { params: Promise<Params> };
@@ -16,38 +13,18 @@ export function generateStaticParams(): Params[] {
   );
 }
 
-async function resolve(params: Promise<Params>) {
+/**
+ * Legacy curated level pages. Replaced by /{country}/salary-calculator/{gross} and the generic
+ * calculator with ?gross=. This page 308s to whichever target matches, so old bookmarks and
+ * backlinks keep working.
+ */
+export default async function LegacySalaryPage({ params }: Props) {
   const { country, amount } = await params;
-  if (!isCountry(country) || !/^\d+$/.test(amount)) notFound();
+  if (!isCountry(country) || !/^\d+$/.test(amount)) permanentRedirect("/");
   const gross = Number(amount);
-  if (!COUNTRY_INFO[country].salaryLevels.includes(gross)) notFound();
-  return { country, gross };
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { country, gross } = await resolve(params);
-  const money = formatMoney(gross, country);
-  return stubMetadata({
-    title: `${money} salary in ${COUNTRY_INFO[country].name}: ${COUNTRY_INFO[country].takeHomeTerm}`,
-    description: `Check what a ${money} salary leaves you after tax in ${COUNTRY_INFO[country].name}.`,
-    alternates: { canonical: `${SITE_URL}/${country}/salary/${gross}` },
-  });
-}
-
-export default async function SalaryAmountPage({ params }: Props) {
-  const { country, gross } = await resolve(params);
-  const info = COUNTRY_INFO[country];
-  const money = formatMoney(gross, country);
-  return (
-    <>
-      <h1 className="font-display text-4xl">
-        What a {money} salary leaves you in {info.name}
-      </h1>
-      <p className="max-w-prose text-muted">
-        See what {money} comes to after tax below. Change the figure to try your own.
-      </p>
-      <PayCalculator country={country} initialGross={gross} />
-      <ToolLinks country={country} />
-    </>
-  );
+  const base = `/${country}/salary-calculator`;
+  const target = (SEO_SALARY_LEVELS[country] as readonly number[]).includes(gross)
+    ? `${base}/${gross}`
+    : `${base}?gross=${gross}`;
+  permanentRedirect(target);
 }

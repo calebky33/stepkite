@@ -22,11 +22,10 @@ export function countryRoutes(country: CountryCode): string[] {
   const base = `/${country}`;
   const routes = [
     `${base}/salary-calculator`,
-    ...COUNTRY_INFO[country].salaryLevels.map((amount) => `${base}/salary/${amount}`),
+    ...COUNTRY_INFO[country].salaryLevels.map((amount) => `${base}/salary-calculator/${amount}`),
     `${base}/cv`,
     `${base}/tracker`,
     `${base}/match`,
-    `${base}/guides`,
     `${base}/compare/offers`,
   ];
   if (country === "in") routes.push(`${base}/compare/regime`);

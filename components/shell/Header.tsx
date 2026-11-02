@@ -54,6 +54,7 @@ function isActive(pathname: string, country: CountryCode, key: ItemKey): boolean
   if (key === "pay") {
     return (
       pathname === `${base}/salary-calculator` ||
+      pathname.startsWith(`${base}/salary-calculator/`) ||
       pathname.startsWith(`${base}/salary/`) ||
       pathname.startsWith(`${base}/compare/`)
     );
@@ -63,7 +64,6 @@ function isActive(pathname: string, country: CountryCode, key: ItemKey): boolean
     return (
       pathname === base ||
       pathname.startsWith(`${base}/tracker`) ||
-      pathname.startsWith(`${base}/guides`) ||
       pathname.startsWith(`${base}/match`)
     );
   }

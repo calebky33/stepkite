@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/components/ui/cn";
+import { useBillingMe } from "@/lib/billing/useBillingMe";
 import { useConsent } from "./consentStore";
 
 type AdSlotProps = {
@@ -15,10 +16,13 @@ const HEIGHT: Record<AdSlotProps["placement"], string> = {
 
 /**
  * A reserved box so the page never jumps. No ad network is connected yet, so it stays empty.
- * When one is added it loads only if the visitor accepted ads.
+ * When one is added it loads only if the visitor accepted ads. Hidden for viewers whose
+ * entitlement grants Pro access (lifetime, trialing, or any active paid plan).
  */
 export function AdSlot({ placement }: AdSlotProps) {
   const consent = useConsent();
+  const billing = useBillingMe();
+  if (billing.isPro) return null;
   return (
     <div className="flex w-full flex-col gap-1" data-placement={placement}>
       <p className="text-sm text-muted">Advertisement</p>

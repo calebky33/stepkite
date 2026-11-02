@@ -9,6 +9,7 @@ import { IconButton } from "@/components/ui/IconButton";
 import { Input } from "@/components/ui/Input";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { useBillingMe } from "@/lib/billing/useBillingMe";
 import { COUNTRY_INFO, type CountryCode } from "@/lib/countries";
 import { checkAts } from "@/lib/cv/ats";
 import type { Cv } from "@/lib/cv/schema";
@@ -76,6 +77,7 @@ export function CvEditorScreen({
   onSaveOrExport?: () => void;
 }) {
   const doc = COUNTRY_INFO[country].cvName;
+  const billing = useBillingMe();
   const { cv, saveState, edit, undo, redo, canUndo, canRedo, saveNow, replaceWith, startNew } =
     useCvDocument(country, cvId, sandbox);
   const [view, setView] = useState<View>("edit");
@@ -377,6 +379,7 @@ export function CvEditorScreen({
             country={country}
             printRef={printRef}
             onLayout={onLayout}
+            watermark={!billing.isPro}
           />
         </div>
       </div>

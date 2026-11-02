@@ -41,6 +41,7 @@ export function PagedPreview({
   printRef,
   onLayout,
   printing = false,
+  watermark = false,
 }: {
   cv: Cv;
   country: CountryCode;
@@ -50,6 +51,8 @@ export function PagedPreview({
   onLayout?: (info: { pages: number; empty: boolean }) => void;
   /** The print copy exists only while a print is under way. */
   printing?: boolean;
+  /** When true, the printed pages carry a small "Made with Stepkite" footer. Pro removes it. */
+  watermark?: boolean;
 }) {
   const isEmpty = useMemo(() => buildBlocks(userCv).length === 0, [userCv]);
   const cv = useMemo(() => (isEmpty ? exampleCv(userCv) : userCv), [isEmpty, userCv]);
@@ -180,7 +183,7 @@ export function PagedPreview({
             {pages.map((page, index) => (
               <div
                 key={index}
-                className="cv-print-page bg-white"
+                className="cv-print-page relative bg-white"
                 style={{
                   width: `${paper.width}mm`,
                   height: `${paper.height - 0.3}mm`,
@@ -189,6 +192,21 @@ export function PagedPreview({
                 }}
               >
                 <Template cv={cv} blocks={page.blocks} locale={info.locale} />
+                {watermark ? (
+                  <p
+                    data-testid="pdf-watermark"
+                    style={{
+                      position: "absolute",
+                      insetInline: 0,
+                      bottom: `${style.marginMm / 3}mm`,
+                      textAlign: "center",
+                      fontSize: "9pt",
+                      color: "#6b7280",
+                    }}
+                  >
+                    Made with Stepkite. stepkite.com
+                  </p>
+                ) : null}
               </div>
             ))}
           </div>

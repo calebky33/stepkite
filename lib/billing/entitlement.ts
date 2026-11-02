@@ -32,11 +32,12 @@ export async function readEntitlement(userId: string): Promise<Entitlement> {
   return FREE;
 }
 
-/** True while the user has Pro access (trial or any paid plan still inside its period). */
+/** True while the user has Pro access (trial or any paid plan still inside its period).
+ * A lifetime user whose status went to 'revoked' (chargeback, refund, abuse) loses access. */
 export function hasProAccess(e: Entitlement): boolean {
+  if (e.status === "revoked") return false;
   if (e.planCode === "lifetime") return true;
-  if (e.status === "trialing" || e.status === "active") return true;
-  return false;
+  return e.status === "trialing" || e.status === "active";
 }
 
 /** Max exports the trial allows per day. See docs/RULES.md rule 13. */

@@ -53,18 +53,11 @@ export function AuthForm({ mode, next }: { mode: Mode; next: string }) {
       </h2>
       <div className="flex flex-col gap-2">
         <Link
-          href="/api/auth/google"
+          href={`/api/auth/google?next=${encodeURIComponent(next)}`}
           prefetch={false}
           className="inline-flex min-h-11 items-center justify-center rounded-input border border-border-strong bg-surface px-4 text-base hover:bg-surface-2"
         >
           Continue with Google
-        </Link>
-        <Link
-          href="/api/auth/linkedin"
-          prefetch={false}
-          className="inline-flex min-h-11 items-center justify-center rounded-input border border-border-strong bg-surface px-4 text-base hover:bg-surface-2"
-        >
-          Continue with LinkedIn
         </Link>
       </div>
       <div className="flex items-center gap-3 text-xs text-muted" role="separator">

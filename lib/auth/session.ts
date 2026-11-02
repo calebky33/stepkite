@@ -1,21 +1,23 @@
-/**
- * Server-side session helper. Once Supabase is wired, getSession reads the auth cookie and
- * returns the user. Right now there is no auth, so it returns null. Callers must handle null
- * by treating the visitor as anonymous.
- *
- * See docs/MONETIZATION.md for the sign-up flow this replaces.
- */
+import { createSupabaseServer } from "@/lib/supabase/server";
+
 export type SessionUser = {
   id: string;
   email: string;
   createdAt: string;
 };
 
-export async function getSession(request: Request): Promise<SessionUser | null> {
-  // Stub: no session until Supabase is wired. The request is read now (for the cookie header)
-  // only so the signature matches the final version. See lib/supabase/server.ts (to be added).
-  request.headers.get("cookie");
-  return null;
+export async function getSession(_request: Request): Promise<SessionUser | null> {
+  // `_request` is kept so the 7 call sites don't churn; the cookie bridge reads from next/headers.
+  void _request;
+  const supabase = await createSupabaseServer();
+  if (!supabase) return null;
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data.user) return null;
+  return {
+    id: data.user.id,
+    email: data.user.email ?? "",
+    createdAt: data.user.created_at,
+  };
 }
 
 /** Requires a signed-in user. Returns a 401 Response otherwise, which routes should return. */

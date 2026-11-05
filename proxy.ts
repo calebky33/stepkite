@@ -45,6 +45,9 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 
   const url = new URL(request.url);
   const user = await getSession(request);
+  // Carry the signed-in boolean to page renders so the root layout reads it
+  // from headers() instead of calling getSession a second time.
+  requestHeaders.set("x-stepkite-signed-in", user !== null ? "1" : "0");
   if (shouldRedirect(url.pathname, user !== null)) {
     const next = `${url.pathname}${url.search}`;
     const target = new URL(`/sign-up?next=${encodeURIComponent(next)}`, url.origin);

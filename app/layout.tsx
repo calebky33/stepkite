@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Calistoga, Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { connection } from "next/server";
+import { headers } from "next/headers";
 import { ConsentBanner } from "@/components/shell/ConsentBanner";
 import { Footer } from "@/components/shell/Footer";
 import { Header } from "@/components/shell/Header";
-import { getSession } from "@/lib/auth/session";
 import { SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
@@ -47,14 +47,9 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   // Every page renders per request so the proxy can attach a CSP nonce to Next's own scripts.
   await connection();
-  // One extra auth read per request so the Header renders the signed-in state on first paint.
-  // Worth it to skip a flash of anonymous nav. A failure here must not take the whole site down.
-  let signedIn = false;
-  try {
-    signedIn = (await getSession()) !== null;
-  } catch {
-    signedIn = false;
-  }
+  // The proxy already called getSession and tagged the request. Reuse that result
+  // instead of a second Supabase round trip per page render.
+  const signedIn = (await headers()).get("x-stepkite-signed-in") === "1";
   return (
     <html lang="en" className={`${inter.variable} ${calistoga.variable} ${jakarta.variable}`}>
       <body className="flex min-h-dvh flex-col">

@@ -13,6 +13,9 @@
 # testing
 /coverage
 
+# generated content (produced by scripts/build-guides.mjs)
+/lib/guides.generated.ts
+
 # next.js
 /.next/
 /out/

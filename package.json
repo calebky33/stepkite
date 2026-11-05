@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "pnpm check:copy && next build",
+    "dev": "node scripts/build-guides.mjs && next dev",
+    "build": "node scripts/build-guides.mjs && pnpm check:copy && next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",

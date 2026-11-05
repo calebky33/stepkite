@@ -11,7 +11,10 @@ export function stubMetadata(meta: Metadata): Metadata {
   return { ...meta, robots: STUB_ROBOTS };
 }
 
-export const SITE_URL = "https://stepkite.com";
+// Default to the live workers.dev deploy. Override with NEXT_PUBLIC_SITE_URL once the
+// custom domain is DNS-live, so canonicals + sitemap stop pointing at a dead host.
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://stepkite.calebky33.workers.dev";
 
 /** Only pages with finished content. Add a route here in the same change that makes it real and removes its noindex. */
 export const INDEXABLE_PATHS: readonly string[] = [

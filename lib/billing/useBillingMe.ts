@@ -9,9 +9,9 @@ type BillingMeResponse = {
 };
 
 export type BillingMeState =
-  | { status: "loading"; isPro: false }
-  | { status: "ready"; isPro: boolean }
-  | { status: "error"; isPro: false };
+  | { status: "loading"; isPro: false; signedIn: false }
+  | { status: "ready"; isPro: boolean; signedIn: boolean }
+  | { status: "error"; isPro: false; signedIn: false };
 
 /**
  * Reads /api/billing/me once on mount so UI can gate ads and watermarks on the viewer's plan.
@@ -19,7 +19,11 @@ export type BillingMeState =
  * The error branch is also treated as free so a flaky network never leaks Pro-only UI.
  */
 export function useBillingMe(): BillingMeState {
-  const [state, setState] = useState<BillingMeState>({ status: "loading", isPro: false });
+  const [state, setState] = useState<BillingMeState>({
+    status: "loading",
+    isPro: false,
+    signedIn: false,
+  });
 
   useEffect(() => {
     const controller = new AbortController();
@@ -28,11 +32,11 @@ export function useBillingMe(): BillingMeState {
         if (!res.ok) throw new Error(`billing/me ${res.status}`);
         const body = (await res.json()) as BillingMeResponse;
         const isPro = body.entitlement ? hasProAccess(body.entitlement) : false;
-        setState({ status: "ready", isPro });
+        setState({ status: "ready", isPro, signedIn: body.signedIn });
       })
       .catch((err: unknown) => {
         if (err instanceof DOMException && err.name === "AbortError") return;
-        setState({ status: "error", isPro: false });
+        setState({ status: "error", isPro: false, signedIn: false });
       });
     return () => controller.abort();
   }, []);

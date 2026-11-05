@@ -6,8 +6,9 @@ export type SessionUser = {
   createdAt: string;
 };
 
-export async function getSession(_request: Request): Promise<SessionUser | null> {
-  // `_request` is kept so the 7 call sites don't churn; the cookie bridge reads from next/headers.
+export async function getSession(_request?: Request): Promise<SessionUser | null> {
+  // The argument is unused: the cookie bridge reads from next/headers. It stays optional so
+  // route handlers can still write `getSession(request)` as a self-documenting pattern.
   void _request;
   const supabase = await createSupabaseServer();
   if (!supabase) return null;
@@ -21,7 +22,7 @@ export async function getSession(_request: Request): Promise<SessionUser | null>
 }
 
 /** Requires a signed-in user. Returns a 401 Response otherwise, which routes should return. */
-export async function requireSession(request: Request): Promise<SessionUser | Response> {
+export async function requireSession(request?: Request): Promise<SessionUser | Response> {
   const user = await getSession(request);
   if (!user) {
     return Response.json({ error: "sign_in_required" }, { status: 401 });

@@ -19,10 +19,18 @@ const GATED_PATH_PATTERNS: readonly RegExp[] = [
   /^\/billing(?:\/|$)/,
 ];
 
+const AUTH_PATH_PATTERNS: readonly RegExp[] = [/^\/sign-in(?:\/|$)/, /^\/sign-up(?:\/|$)/];
+
 /** Pure, testable gate decision. True when the visitor must be redirected to sign up. */
 export function shouldRedirect(pathname: string, hasSession: boolean): boolean {
   if (hasSession) return false;
   return GATED_PATH_PATTERNS.some((pattern) => pattern.test(pathname));
+}
+
+/** Signed-in visitors on /sign-in or /sign-up belong on the account page, not the login form. */
+export function shouldRedirectWhenSignedIn(pathname: string, hasSession: boolean): boolean {
+  if (!hasSession) return false;
+  return AUTH_PATH_PATTERNS.some((pattern) => pattern.test(pathname));
 }
 
 export async function proxy(request: NextRequest): Promise<NextResponse> {
@@ -40,6 +48,22 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   if (shouldRedirect(url.pathname, user !== null)) {
     const next = `${url.pathname}${url.search}`;
     const target = new URL(`/sign-up?next=${encodeURIComponent(next)}`, url.origin);
+    const redirect = NextResponse.redirect(target);
+    redirect.headers.set(name, csp);
+    return redirect;
+  }
+  if (shouldRedirectWhenSignedIn(url.pathname, user !== null)) {
+    // Build the target in two steps so we can reject anything that resolves off-origin.
+    // Backslashes are normalised to slashes by WHATWG, so "/\\evil.com" would otherwise escape.
+    const nextParam = url.searchParams.get("next");
+    const hasBackslash = nextParam?.includes("\\") ?? false;
+    const target = (() => {
+      if (!nextParam || !nextParam.startsWith("/") || nextParam.startsWith("//") || hasBackslash) {
+        return new URL("/", url.origin);
+      }
+      const candidate = new URL(nextParam, url.origin);
+      return candidate.origin === url.origin ? candidate : new URL("/", url.origin);
+    })();
     const redirect = NextResponse.redirect(target);
     redirect.headers.set(name, csp);
     return redirect;

@@ -16,7 +16,7 @@ afterEach(() => {
 
 describe("Header", () => {
   it("shows the logo, the main links and the country links", () => {
-    render(<Header />);
+    render(<Header signedIn={false} />);
     expect(screen.getByRole("img", { name: "Stepkite" })).toBeTruthy();
     expect(screen.getByRole("navigation", { name: "Main" })).toBeTruthy();
     expect(screen.getAllByRole("button", { name: /^Country, / }).length).toBeGreaterThan(0);
@@ -28,7 +28,7 @@ describe("Header", () => {
 
   it("marks the current section", () => {
     pathname = "/uk/cv";
-    render(<Header />);
+    render(<Header signedIn={false} />);
     expect(screen.getByRole("link", { name: "CV builder" }).getAttribute("aria-current")).toBe(
       "page",
     );
@@ -39,7 +39,7 @@ describe("Header", () => {
 
   it("announces a section match as current without claiming it is the page", () => {
     pathname = "/uk/tracker";
-    render(<Header />);
+    render(<Header signedIn={false} />);
     expect(screen.getByRole("button", { name: "Tools" })).toBeTruthy();
     expect(
       screen.getByRole("link", { name: "CV builder" }).getAttribute("aria-current"),
@@ -48,7 +48,7 @@ describe("Header", () => {
 
   it("opens the Tools menu, lists real routes and closes on Escape", () => {
     pathname = "/in";
-    render(<Header />);
+    render(<Header signedIn={false} />);
     const button = screen.getByRole("button", { name: "Tools" });
     expect(button.getAttribute("aria-expanded")).toBe("false");
     expect(screen.queryByRole("link", { name: "Job tracker" })).toBeNull();
@@ -69,7 +69,7 @@ describe("Header", () => {
   });
 
   it("offers the Tools menu inside the mobile menu", () => {
-    render(<Header />);
+    render(<Header signedIn={false} />);
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     const buttons = screen.getAllByRole("button", { name: "Tools" });
     fireEvent.click(buttons[buttons.length - 1]!);
@@ -78,7 +78,7 @@ describe("Header", () => {
 
   it("keeps the links in the current country", () => {
     pathname = "/in/cv";
-    render(<Header />);
+    render(<Header signedIn={false} />);
     expect(screen.getByRole("link", { name: "Pay calculator" }).getAttribute("href")).toBe(
       "/in/salary-calculator",
     );
@@ -86,7 +86,7 @@ describe("Header", () => {
   });
 
   it("opens and closes the mobile menu with the keyboard", () => {
-    render(<Header />);
+    render(<Header signedIn={false} />);
     const button = screen.getByRole("button", { name: "Open menu" });
     expect(button.getAttribute("aria-expanded")).toBe("false");
     fireEvent.click(button);
@@ -98,13 +98,25 @@ describe("Header", () => {
   });
 
   it("closes the mobile menu when the route changes", () => {
-    const { rerender } = render(<Header />);
+    const { rerender } = render(<Header signedIn={false} />);
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     expect(screen.getByRole("navigation", { name: "Mobile" })).toBeTruthy();
     pathname = "/uk/cv";
-    rerender(<Header />);
+    rerender(<Header signedIn={false} />);
     expect(screen.queryByRole("navigation", { name: "Mobile" })).toBeNull();
     expect(document.getElementById("site-menu")?.hasAttribute("hidden")).toBe(true);
+  });
+
+  it("shows a sign in link for anonymous visitors", () => {
+    render(<Header signedIn={false} />);
+    expect(screen.getAllByRole("link", { name: "Sign in" }).length).toBeGreaterThan(0);
+    expect(screen.queryByRole("link", { name: "Your account" })).toBeNull();
+  });
+
+  it("shows a Your account link when the visitor is signed in", () => {
+    render(<Header signedIn={true} />);
+    expect(screen.getAllByRole("link", { name: "Your account" }).length).toBeGreaterThan(0);
+    expect(screen.queryByRole("link", { name: "Sign in" })).toBeNull();
   });
 
   it("closes the mobile menu when the viewport grows past the breakpoint", () => {
@@ -116,7 +128,7 @@ describe("Header", () => {
       },
       removeEventListener: () => {},
     }));
-    render(<Header />);
+    render(<Header signedIn={false} />);
     fireEvent.click(screen.getByRole("button", { name: "Open menu" }));
     expect(screen.getByRole("navigation", { name: "Mobile" })).toBeTruthy();
     act(() => listener?.({ matches: true } as MediaQueryListEvent));

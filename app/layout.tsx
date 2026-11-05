@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { ConsentBanner } from "@/components/shell/ConsentBanner";
 import { Footer } from "@/components/shell/Footer";
 import { Header } from "@/components/shell/Header";
+import { getSession } from "@/lib/auth/session";
 import { SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
@@ -46,10 +47,18 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   // Every page renders per request so the proxy can attach a CSP nonce to Next's own scripts.
   await connection();
+  // One extra auth read per request so the Header renders the signed-in state on first paint.
+  // Worth it to skip a flash of anonymous nav. A failure here must not take the whole site down.
+  let signedIn = false;
+  try {
+    signedIn = (await getSession()) !== null;
+  } catch {
+    signedIn = false;
+  }
   return (
     <html lang="en" className={`${inter.variable} ${calistoga.variable} ${jakarta.variable}`}>
       <body className="flex min-h-dvh flex-col">
-        <Header />
+        <Header signedIn={signedIn} />
         <main id="main" tabIndex={-1} className="flex-1 outline-none">
           {children}
         </main>

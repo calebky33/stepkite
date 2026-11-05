@@ -32,6 +32,7 @@ describe("useBillingMe", () => {
     render(<Probe onState={(state) => seen.push(state)} />);
     await waitFor(() => expect(seen.at(-1)?.status).toBe("ready"));
     expect(seen.at(-1)?.isPro).toBe(false);
+    expect(seen.at(-1)?.signedIn).toBe(false);
   });
 
   it("reports Pro for an active entitlement", async () => {
@@ -60,6 +61,7 @@ describe("useBillingMe", () => {
     render(<Probe onState={(state) => seen.push(state)} />);
     await waitFor(() => expect(seen.at(-1)?.status).toBe("ready"));
     expect(seen.at(-1)?.isPro).toBe(true);
+    expect(seen.at(-1)?.signedIn).toBe(true);
   });
 
   it("falls back to not Pro when the API errors", async () => {
@@ -71,6 +73,7 @@ describe("useBillingMe", () => {
     render(<Probe onState={(state) => seen.push(state)} />);
     await waitFor(() => expect(seen.at(-1)?.status).toBe("error"));
     expect(seen.at(-1)?.isPro).toBe(false);
+    expect(seen.at(-1)?.signedIn).toBe(false);
   });
 
   it("ignores an AbortError on unmount", async () => {

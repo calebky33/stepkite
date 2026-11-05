@@ -76,7 +76,7 @@ function currentFor(pathname: string, href: string, active: boolean): "page" | "
   return pathname === href ? "page" : "true";
 }
 
-export function Header() {
+export function Header({ signedIn }: { signedIn: boolean }) {
   const pathname = usePathname() ?? "/";
   const country = countryFrom(pathname, useSavedCountry());
   const info = COUNTRY_INFO[country];
@@ -179,6 +179,29 @@ export function Header() {
         <div className="flex items-center gap-2">
           <div className="hidden items-center gap-2 lg:flex">
             <CountrySwitcher />
+            {signedIn ? (
+              <Link
+                href="/account"
+                aria-current={
+                  pathname === "/account" || pathname.startsWith("/account/") ? "page" : undefined
+                }
+                className={cn(
+                  LINK_CLASS,
+                  pathname === "/account" || pathname.startsWith("/account/")
+                    ? "bg-accent-soft font-semibold text-text"
+                    : "text-muted hover:bg-surface-2 hover:text-text",
+                )}
+              >
+                Your account
+              </Link>
+            ) : (
+              <Link
+                href="/sign-in"
+                className={cn(LINK_CLASS, "text-muted hover:bg-surface-2 hover:text-text")}
+              >
+                Sign in
+              </Link>
+            )}
             <Link href={`/${country}/cv`} className={buttonStyles("primary")}>
               Build a {info.cvName}
             </Link>
@@ -252,6 +275,41 @@ export function Header() {
           >
             Build a {info.cvName}
           </Link>
+          {signedIn ? (
+            <Link
+              href="/account"
+              onClick={() => setOpenedPath(null)}
+              aria-current={
+                pathname === "/account" || pathname.startsWith("/account/") ? "page" : undefined
+              }
+              className={cn(
+                LINK_CLASS,
+                "w-full",
+                pathname === "/account" || pathname.startsWith("/account/")
+                  ? "bg-accent-soft font-semibold text-text"
+                  : "text-muted hover:bg-surface-2 hover:text-text",
+              )}
+            >
+              Your account
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/sign-in"
+                onClick={() => setOpenedPath(null)}
+                className={cn(LINK_CLASS, "w-full text-muted hover:bg-surface-2 hover:text-text")}
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/sign-up"
+                onClick={() => setOpenedPath(null)}
+                className={cn(LINK_CLASS, "w-full text-muted hover:bg-surface-2 hover:text-text")}
+              >
+                Create account
+              </Link>
+            </>
+          )}
         </nav>
       </div>
     </header>

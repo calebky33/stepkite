@@ -11,11 +11,34 @@ const DeleteDialog = dynamic(() => import("./DeleteDialog"), { ssr: false });
 
 type Outcome = { kind: "none" } | { kind: "deleted" } | { kind: "message"; text: string };
 
+type SignOutStatus = "idle" | "busy" | "error";
+
 export function AccountPanel() {
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const [dialogError, setDialogError] = useState<string | undefined>();
   const [outcome, setOutcome] = useState<Outcome>({ kind: "none" });
+  const [signOutStatus, setSignOutStatus] = useState<SignOutStatus>("idle");
+
+  const signOut = async () => {
+    setSignOutStatus("busy");
+    try {
+      const response = await fetch("/api/auth/signout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (response.ok) {
+        // Full navigation so the server re-reads getSession with the cleared Supabase cookies
+        // and the Header renders the anonymous nav. router.push caches the layout in some cases.
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- see above
+        window.location.assign("/");
+        return;
+      }
+      setSignOutStatus("error");
+    } catch {
+      setSignOutStatus("error");
+    }
+  };
 
   const confirmDelete = async () => {
     setBusy(true);
@@ -50,6 +73,24 @@ export function AccountPanel() {
   return (
     <div className="flex flex-col gap-6">
       <BillingSummary />
+
+      <Card id="sign-out" className="flex flex-col gap-3">
+        <h2 className="text-base font-semibold">Sign out</h2>
+        <p className="text-base text-muted">
+          Sign out on this device. Your saved work stays on your account.
+        </p>
+        <Button
+          variant="secondary"
+          className="self-start"
+          onClick={signOut}
+          disabled={signOutStatus === "busy"}
+        >
+          Sign out
+        </Button>
+        <div role="status" className="text-base">
+          {signOutStatus === "error" ? "That didn't go through. Try again in a minute." : null}
+        </div>
+      </Card>
 
       <Card className="flex flex-col gap-3">
         <h2 className="text-base font-semibold">Delete my data</h2>

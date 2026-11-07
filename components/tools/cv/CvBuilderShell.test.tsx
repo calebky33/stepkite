@@ -12,6 +12,14 @@ vi.mock("@/lib/storage/db", () => ({
   clearEverything: vi.fn().mockResolvedValue({ ok: true, value: null }),
 }));
 
+// The shell reads ?import=1 to open the Upload screen when the account page sends you here.
+// jsdom has no App Router context, so the hooks need stubs.
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: vi.fn(), push: vi.fn(), prefetch: vi.fn() }),
+  usePathname: () => "/uk/cv",
+  useSearchParams: () => new URLSearchParams(),
+}));
+
 /** Writes to the CV collection only. Earlier copies are written to their own collection. */
 const cvWrites = () => db.write.mock.calls.filter((call) => call[0] === "cvs");
 

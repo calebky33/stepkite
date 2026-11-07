@@ -4,6 +4,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/storage/db", () => import("@/lib/storage/memoryDb"));
 
+// The shell now reads ?import=1 through next/navigation; jsdom has no App Router context.
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: vi.fn(), push: vi.fn(), prefetch: vi.fn() }),
+  usePathname: () => "/uk/cv",
+  useSearchParams: () => new URLSearchParams(),
+}));
+
 import { buildBackup } from "@/lib/cv/backup";
 import { emptyCv, storedCvSchema, type Cv } from "@/lib/cv/schema";
 import { listCvs, saveCv } from "@/lib/storage/cvStore";

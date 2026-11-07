@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { CountryCode } from "@/lib/countries";
 import { newCvId } from "@/lib/storage/cvStore";
@@ -17,6 +18,19 @@ export function CvBuilderShell({ country }: { country: CountryCode }) {
   const [screen, setScreen] = useState<Screen>({ name: "editor", cvId: FIRST_CV_ID });
   // Set when someone backs out of the import step, so focus can go back to the button they used.
   const returnFocus = useRef(false);
+  // The account page's Upload link lands here with ?import=1. Honour it once, then
+  // strip the param so a back or refresh does not re-open the import screen.
+  const router = useRouter();
+  const pathname = usePathname();
+  const params = useSearchParams();
+  const importParam = params?.get("import");
+  const consumedImport = useRef(false);
+  useEffect(() => {
+    if (consumedImport.current || importParam !== "1") return;
+    consumedImport.current = true;
+    setScreen((current) => ({ name: "import", back: current }));
+    if (pathname) router.replace(pathname, { scroll: false });
+  }, [importParam, pathname, router]);
   useEffect(() => {
     if (screen.name === "import" || !returnFocus.current) return;
     returnFocus.current = false;

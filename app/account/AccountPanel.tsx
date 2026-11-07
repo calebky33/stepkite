@@ -5,6 +5,7 @@ import { useState } from "react";
 import { BillingSummary } from "@/components/billing/BillingSummary";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { QuickActions } from "./QuickActions";
 
 // Radix Dialog loads only when someone asks to delete.
 const DeleteDialog = dynamic(() => import("./DeleteDialog"), { ssr: false });
@@ -72,6 +73,7 @@ export function AccountPanel() {
 
   return (
     <div className="flex flex-col gap-6">
+      <QuickActions />
       <BillingSummary />
 
       <Card id="sign-out" className="flex flex-col gap-3">

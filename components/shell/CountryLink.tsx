@@ -21,10 +21,10 @@ export function SavedCountryName() {
   return <>{COUNTRY_SHORT_NAME[useSavedCountry()]}</>;
 }
 
-const EXAMPLE_SALARY: Record<CountryCode, number> = { uk: 45000, us: 60000, in: 1200000 };
+const EXAMPLE_SALARY: Partial<Record<CountryCode, number>> = { uk: 45000, us: 60000, in: 1200000 };
 
 /** An example salary written in the remembered country's currency. */
 export function SavedExampleSalary() {
   const country = useSavedCountry();
-  return <>{formatMoney(EXAMPLE_SALARY[country], country)}</>;
+  return <>{formatMoney(EXAMPLE_SALARY[country] ?? 45000, country)}</>;
 }

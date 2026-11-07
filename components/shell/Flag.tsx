@@ -34,7 +34,14 @@ export function Flag({ code }: { code: CountryCode }) {
           <rect y="10.66" width="24" height="5.34" fill="#138808" />
           <circle cx="12" cy="8" r="1.9" fill="none" stroke="#000080" strokeWidth="0.6" />
         </>
-      ) : null}
+      ) : (
+        <>
+          <rect width="24" height="16" fill="#e5e7eb" />
+          <text x="12" y="12" textAnchor="middle" fontSize="7" fontWeight="700" fill="#4b5563">
+            {code.toUpperCase()}
+          </text>
+        </>
+      )}
     </svg>
   );
 }

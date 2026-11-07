@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/Table";
 import { useCountTween } from "@/components/ui/useCountTween";
 import { COUNTRY_INFO, cvLabel, formatMoney, type CountryCode } from "@/lib/countries";
-import { getRates } from "@/lib/tax";
+import { requireRates } from "@/lib/tax";
 import type { PayResult } from "@/lib/tax/types";
 import { Donut, type DonutSlice } from "./Donut";
 import { mouseHover } from "./pointerHover";
@@ -56,7 +56,10 @@ type PlaceholderRow = { key: string; label: string };
 
 function placeholderRows(country: CountryCode): PlaceholderRow[] {
   const info = COUNTRY_INFO[country];
-  const social = { uk: "National Insurance", us: "Payroll tax", in: "Provident fund" }[country];
+  const social =
+    ({ uk: "National Insurance", us: "Payroll tax", in: "Provident fund" } as Partial<
+      Record<CountryCode, string>
+    >)[country] ?? "Social security";
   const pension = country === "us" ? "401(k)" : "Pension";
   return [
     { key: "gross", label: "Pay before tax" },
@@ -173,9 +176,9 @@ export function ResultCard({ country, state, annualGross, entered, example }: Re
           {state.kind === "ready" ? (
             <ReadyNotes
               state={state}
-              ratesLoaded={getRates(country).loaded}
+              ratesLoaded={requireRates(country).loaded}
               // US state figures are not all read in full, so one date would overstate the checks.
-              verifiedOn={country === "us" ? undefined : getRates(country).verifiedOn}
+              verifiedOn={country === "us" ? undefined : requireRates(country).verifiedOn}
             />
           ) : null}
         </>
@@ -202,7 +205,7 @@ function MissingNotice({
   entered: string | null;
   example: boolean;
 }) {
-  const url = getRates(country).officialSources[0];
+  const url = requireRates(country).officialSources[0];
   const host = hostOf(url);
   return (
     <>

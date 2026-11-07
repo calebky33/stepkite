@@ -1,7 +1,11 @@
 import type { CountryCode } from "@/lib/countries";
 import type { Cv } from "./schema";
 
-const CITY: Record<CountryCode, string> = { uk: "Leeds", us: "Austin", in: "Pune" };
+const CITY: Partial<Record<CountryCode, string>> = { uk: "Leeds", us: "Austin", in: "Pune" };
+
+function cityFor(country: CountryCode): string {
+  return CITY[country] ?? "Example City";
+}
 
 /**
  * A made-up person shown in the preview until the user types. The page is labelled "Example"
@@ -14,7 +18,7 @@ export function exampleCv(base: Cv): Cv {
       fullName: "Sam Example",
       email: "sam.example@example.com",
       phone: "",
-      city: CITY[base.country],
+      city: cityFor(base.country),
       links: [],
     },
     summary:
@@ -24,7 +28,7 @@ export function exampleCv(base: Cv): Cv {
         id: "example-job-1",
         role: "Operations coordinator",
         employer: "Northfield Supplies",
-        location: CITY[base.country],
+        location: cityFor(base.country),
         start: "2021-03",
         end: null,
         bullets: [
@@ -37,7 +41,7 @@ export function exampleCv(base: Cv): Cv {
         id: "example-job-2",
         role: "Warehouse assistant",
         employer: "Harbour Goods",
-        location: CITY[base.country],
+        location: cityFor(base.country),
         start: "2018-06",
         end: "2021-02",
         bullets: ["Picked and packed orders.", "Trained two new starters on the scanning system."],

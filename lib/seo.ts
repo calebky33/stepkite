@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SEO_SALARY_LEVELS } from "@/lib/salaryLevels";
+import { salaryLevelsFor } from "@/lib/salaryLevels";
 
 /**
  * Pages with no real content yet. They get noindex and stay out of sitemap.ts
@@ -27,5 +27,5 @@ export const INDEXABLE_PATHS: readonly string[] = [
   "/guides/writing-a-cv-that-passes-ats-checks",
   "/uk/salary-calculator",
   // Salary level pages. US and India stay out until their rates are reviewed by hand.
-  ...SEO_SALARY_LEVELS.uk.map((g) => `/uk/salary-calculator/${g}`),
+  ...salaryLevelsFor("uk").map((g) => `/uk/salary-calculator/${g}`),
 ];

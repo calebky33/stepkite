@@ -11,10 +11,10 @@ import {
   isCountry,
   type CountryCode,
 } from "@/lib/countries";
-import { SEO_SALARY_LEVELS } from "@/lib/salaryLevels";
+import { salaryLevelsFor } from "@/lib/salaryLevels";
 import { computeSalary } from "@/lib/salaryPages";
 import { INDEXABLE_PATHS, SITE_URL, stubMetadata } from "@/lib/seo";
-import { getRates } from "@/lib/tax";
+import { getRates, requireRates } from "@/lib/tax";
 
 type Params = { country: string; gross: string };
 type Props = { params: Promise<Params> };
@@ -23,7 +23,7 @@ export const dynamicParams = false;
 
 export function generateStaticParams(): Params[] {
   return COUNTRIES.flatMap((country) =>
-    SEO_SALARY_LEVELS[country].map((gross) => ({ country, gross: String(gross) })),
+    salaryLevelsFor(country).map((gross) => ({ country, gross: String(gross) })),
   );
 }
 
@@ -41,7 +41,7 @@ async function resolve(params: Promise<Params>) {
   const { country, gross: raw } = await params;
   if (!isCountry(country) || !/^\d+$/.test(raw)) notFound();
   const gross = Number(raw);
-  if (!SEO_SALARY_LEVELS[country].includes(gross)) notFound();
+  if (!salaryLevelsFor(country).includes(gross)) notFound();
   const result = await computeSalary(country, gross);
   if (!result) notFound();
   return { country, gross, result };
@@ -67,14 +67,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ],
     },
   };
-  const indexable = getRates(country).loaded && INDEXABLE_PATHS.includes(path);
+  const indexable = (getRates(country)?.loaded ?? false) && INDEXABLE_PATHS.includes(path);
   return indexable ? meta : stubMetadata(meta);
 }
 
 export default async function SalaryLevelPage({ params }: Props) {
   const { country, gross, result } = await resolve(params);
   const info = COUNTRY_INFO[country];
-  const rates = getRates(country);
+  const rates = requireRates(country);
   const money = (n: number) => formatMoney(n, country);
   const title = titleFor(country, gross);
   const base = `${SITE_URL}/${country}/salary-calculator`;

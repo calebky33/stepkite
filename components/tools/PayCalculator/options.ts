@@ -11,7 +11,7 @@ export type BuiltOptions = {
   errors: Record<string, string>;
 };
 
-export const DEFAULT_VALUES: Record<CountryCode, FieldValues> = {
+export const DEFAULT_VALUES: Partial<Record<CountryCode, FieldValues>> = {
   uk: {
     region: "england",
     pensionPercent: "",
@@ -38,13 +38,13 @@ export const DEFAULT_VALUES: Record<CountryCode, FieldValues> = {
   },
 };
 
-const PERCENT_KEYS: Record<CountryCode, readonly string[]> = {
+const PERCENT_KEYS: Partial<Record<CountryCode, readonly string[]>> = {
   uk: ["pensionPercent"],
   us: ["retirementPercent"],
   in: [],
 };
 
-const AMOUNT_KEYS: Record<CountryCode, readonly string[]> = {
+const AMOUNT_KEYS: Partial<Record<CountryCode, readonly string[]>> = {
   uk: ["otherDeductions"],
   us: ["otherDeductions"],
   in: ["section80c", "section80d", "hraReceived", "rentPaid", "otherDeductions"],
@@ -73,12 +73,12 @@ export function buildOptions(country: CountryCode, values: FieldValues): BuiltOp
     if (country === "in" && !oldOnly && (OLD_REGIME_KEYS as readonly string[]).includes(key)) {
       continue;
     }
-    if (PERCENT_KEYS[country].includes(key)) {
+    if ((PERCENT_KEYS[country] ?? []).includes(key)) {
       const n = parse(raw);
       if (n === null) continue;
       if (Number.isNaN(n) || n < 0 || n > 100) errors[key] = PERCENT_ERROR;
       else options[key] = n;
-    } else if (AMOUNT_KEYS[country].includes(key)) {
+    } else if ((AMOUNT_KEYS[country] ?? []).includes(key)) {
       const n = parse(raw);
       if (n === null) continue;
       if (Number.isNaN(n) || n < 0 || n > MAX_GROSS) errors[key] = AMOUNT_ERROR;

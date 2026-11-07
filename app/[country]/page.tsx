@@ -27,33 +27,35 @@ type HubGroup = { heading: string; links: HubLink[] };
 function groupsFor(country: CountryCode): HubGroup[] {
   const info = COUNTRY_INFO[country];
   const base = `/${country}`;
-  const pay: HubLink[] = [{ href: `${base}/compare/offers`, label: "Compare two job offers" }];
-  if (country === "in") {
-    pay.push({ href: `${base}/compare/regime`, label: "Old or new tax regime" });
-  }
-  return [
-    { heading: "Pay", links: pay },
-    {
+  const groups: HubGroup[] = [];
+  if (info.tier === 1) {
+    const pay: HubLink[] = [{ href: `${base}/compare/offers`, label: "Compare two job offers" }];
+    if (country === "in") {
+      pay.push({ href: `${base}/compare/regime`, label: "Old or new tax regime" });
+    }
+    groups.push({ heading: "Pay", links: pay });
+    groups.push({
       heading: "Common salaries",
       links: info.salaryLevels.map((amount) => ({
         href: `${base}/salary-calculator/${amount}`,
         label: `${info.takeHomeTerm.charAt(0).toUpperCase()}${info.takeHomeTerm.slice(1)} on ${formatMoney(amount, country)}`,
       })),
-    },
-    {
-      heading: "Job search",
-      links: [
-        { href: `${base}/cv`, label: `Build your ${info.cvName}` },
-        { href: `${base}/tracker`, label: "Track your applications" },
-        {
-          href: `${base}/match`,
-          label: `Match your ${info.cvName} to a job ad`,
-          note: "Not available yet",
-        },
-        { href: `/guides`, label: "Guides" },
-      ],
-    },
-  ];
+    });
+  }
+  groups.push({
+    heading: "Job search",
+    links: [
+      { href: `${base}/cv`, label: `Build your ${info.cvName}` },
+      { href: `${base}/tracker`, label: "Track your applications" },
+      {
+        href: `${base}/match`,
+        label: `Match your ${info.cvName} to a job ad`,
+        note: "Not available yet",
+      },
+      { href: `/guides`, label: "Guides" },
+    ],
+  });
+  return groups;
 }
 
 export default async function CountryHubPage({ params }: Props) {
@@ -65,8 +67,9 @@ export default async function CountryHubPage({ params }: Props) {
         Tools for {info.name}
       </h1>
       <p className="max-w-prose text-lg text-muted">
-        Work out your {info.takeHomeTerm}, build a {info.cvName} that fits {info.name}, and keep
-        track of the jobs you apply for. Your {info.cvName} and your jobs stay on this device.
+        {info.tier === 1
+          ? `Work out your ${info.takeHomeTerm}, build a ${info.cvName} that fits ${info.name}, and keep track of the jobs you apply for. Your ${info.cvName} and your jobs stay on this device.`
+          : `Build a ${info.cvName} that fits ${info.name} and keep track of the jobs you apply for. Your ${info.cvName} and your jobs stay on this device.`}
       </p>
       <Link
         href={`/${country}/salary-calculator`}

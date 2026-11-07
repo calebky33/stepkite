@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { COUNTRIES, COUNTRY_INFO, isCountry, type CountryCode } from "@/lib/countries";
+import { COUNTRIES, getCountry, isCountry, type CountryCode } from "@/lib/countries";
 
 export type CountryParams = { country: string };
 
@@ -20,14 +20,15 @@ export async function requireCountry(params: Promise<CountryParams>): Promise<Co
  */
 export function countryRoutes(country: CountryCode): string[] {
   const base = `/${country}`;
-  const routes = [
-    `${base}/salary-calculator`,
-    ...COUNTRY_INFO[country].salaryLevels.map((amount) => `${base}/salary-calculator/${amount}`),
-    `${base}/cv`,
-    `${base}/tracker`,
-    `${base}/match`,
-    `${base}/compare/offers`,
-  ];
-  if (country === "in") routes.push(`${base}/compare/regime`);
+  const info = getCountry(country);
+  const routes = [`${base}/salary-calculator`];
+  if (info?.tier === 1) {
+    routes.push(...info.salaryLevels.map((amount) => `${base}/salary-calculator/${amount}`));
+  }
+  routes.push(`${base}/cv`, `${base}/tracker`, `${base}/match`);
+  if (info?.tier === 1) {
+    routes.push(`${base}/compare/offers`);
+    if (country === "in") routes.push(`${base}/compare/regime`);
+  }
   return routes;
 }

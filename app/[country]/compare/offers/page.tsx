@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { OfferCompare } from "@/components/tools/compare/OfferCompare";
-import { COUNTRY_INFO } from "@/lib/countries";
+import { TaxUnavailable } from "@/components/tools/TaxUnavailable";
+import { COUNTRY_INFO, hasTaxEngine } from "@/lib/countries";
 import { countryParams, requireCountry, type CountryParams } from "@/lib/routes";
 import { SITE_URL, stubMetadata } from "@/lib/seo";
 
@@ -24,6 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function OfferComparePage({ params }: Props) {
   const country = await requireCountry(params);
+  if (!hasTaxEngine(country)) return <TaxUnavailable country={country} />;
   return (
     <>
       <h1 className="font-display text-4xl">Compare two job offers</h1>

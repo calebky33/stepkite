@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { CurrencyInput } from "@/components/ui/CurrencyInput";
 import { COUNTRY_INFO, formatMoney } from "@/lib/countries";
 import { useEngine } from "@/components/tools/PayCalculator/useEngine";
-import { getRates } from "@/lib/tax";
+import { requireRates } from "@/lib/tax";
 import { MAX_GROSS, MIN_GROSS, type EngineOutcome, type PayEngine } from "@/lib/tax/types";
 
 const REGIMES = [
@@ -21,7 +21,7 @@ function outcomeFor(
   if (!engine || gross === null || gross < MIN_GROSS || gross > MAX_GROSS) return null;
   return engine({
     country: "in",
-    taxYear: getRates("in").taxYear,
+    taxYear: requireRates("in").taxYear,
     gross,
     period: "year",
     options: { regime },

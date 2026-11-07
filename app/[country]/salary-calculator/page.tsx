@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AdSlot } from "@/components/shell/AdSlot";
 import { PayCalculator } from "@/components/tools/PayCalculator/PayCalculator";
+import { TaxUnavailable } from "@/components/tools/TaxUnavailable";
 import { ToolLinks } from "@/components/tools/ToolLinks";
-import { COUNTRY_INFO } from "@/lib/countries";
+import { COUNTRY_INFO, hasTaxEngine } from "@/lib/countries";
 import { SALARY_CONTENT } from "@/lib/content/salaryCalculator";
 import { countryParams, requireCountry, type CountryParams } from "@/lib/routes";
 import { INDEXABLE_PATHS, SITE_URL, stubMetadata } from "@/lib/seo";
@@ -51,7 +52,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // Stay out of search results until the rates have been checked against the official source.
   // Index only when the rates are loaded and the path is on the reviewed list in lib/seo.ts.
   const indexable =
-    getRates(country).loaded && INDEXABLE_PATHS.includes(`/${country}/salary-calculator`);
+    (getRates(country)?.loaded ?? false) &&
+    INDEXABLE_PATHS.includes(`/${country}/salary-calculator`);
   return indexable ? meta : stubMetadata(meta);
 }
 
@@ -64,6 +66,16 @@ export default async function SalaryCalculatorPage({ params, searchParams }: Pro
   const initialGross = parseGross((await searchParams).gross);
   const info = COUNTRY_INFO[country];
   const content = SALARY_CONTENT[country];
+
+  if (!hasTaxEngine(country)) {
+    return (
+      <>
+        <TaxUnavailable country={country} />
+        <AdSlot placement="calculator" />
+        <ToolLinks country={country} />
+      </>
+    );
+  }
 
   if (!content) {
     return (

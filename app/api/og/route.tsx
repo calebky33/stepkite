@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 import { z } from "zod";
-import { COUNTRIES, COUNTRY_SHORT_NAME, formatMoney } from "@/lib/countries";
+import { COUNTRY_SHORT_NAME, formatMoney, isCountry } from "@/lib/countries";
 import { MAX_GROSS, MIN_GROSS } from "@/lib/tax/types";
 
 const DEFAULT_TITLE = "Stepkite";
@@ -12,7 +12,7 @@ const text = z.string().trim().min(1).max(100);
 const ogQuerySchema = z.object({
   title: text.optional(),
   subtitle: text.optional(),
-  country: z.enum(COUNTRIES).optional(),
+  country: z.string().refine((c) => isCountry(c)).optional(),
   gross: z.coerce.number().min(MIN_GROSS).max(MAX_GROSS).optional(),
 });
 

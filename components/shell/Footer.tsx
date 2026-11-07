@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
 import { COUNTRIES, COUNTRY_INFO, type CountryCode } from "@/lib/countries";
 import { Flag } from "./Flag";
+import { FooterCountries } from "./FooterCountries";
 import { FooterGroup } from "./FooterGroup";
 import { FooterNav } from "./FooterNav";
 import { NewsletterSignup } from "./NewsletterSignup";
@@ -49,16 +50,7 @@ export function Footer({ homeCountry = null }: { homeCountry?: CountryCode | nul
             </FooterGroup>
           ) : (
             <FooterGroup title="Supported countries" label="Countries">
-              <ul className="lg:columns-2 lg:gap-4">
-                {COUNTRIES.map((code) => (
-                  <li key={code} className="break-inside-avoid">
-                    <Link href={`/${code}`} className={`${LINK_CLASS} gap-2`}>
-                      <Flag code={code} />
-                      {COUNTRY_INFO[code].shortName}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              <FooterCountries linkClass={LINK_CLASS} />
             </FooterGroup>
           )}
         </FooterNav>

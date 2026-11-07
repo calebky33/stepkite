@@ -4,7 +4,7 @@ import { PLANS, cadenceLabel, formatPrice, type Plan } from "@/lib/billing/plans
 
 /**
  * The four plan cards. Numbers come from lib/billing/plans.ts, which will swap for the Supabase
- * `plans` row when it lands. No Stripe calls are made from here: the Checkout link is server
+ * `plans` row when it lands. No Paystack calls are made from here: the Checkout link is server
  * side (docs/MONETIZATION.md, Routes we add).
  */
 export function PricingCards() {

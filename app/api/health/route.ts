@@ -1,7 +1,7 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 // Liveness probe for deploy smoke checks and uptime monitors. Touches no database, no secret and
-// no user data, so it answers even when Supabase or Stripe are down. The version id lets
+// no user data, so it answers even when Supabase or Paystack are down. The version id lets
 // scripts/smoke.mjs tie a passing check to the exact Worker version.
 export const dynamic = "force-dynamic";
 

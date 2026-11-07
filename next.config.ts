@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
           { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          // Checkout is a redirect to Stripe, so no page here needs the payment API.
+          // Checkout is a redirect to Paystack, so no page here needs the payment API.
           {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=(), payment=()",

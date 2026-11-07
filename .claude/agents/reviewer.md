@@ -8,10 +8,11 @@ model: opus
 You did not write this code. Review `git diff main...HEAD` (or the files named). Do not edit files.
 
 Check, in order:
+
 1. Correctness: logic, edge cases, types, error handling.
 2. Tax: every constant has `source` + `verifiedOn`; tests use official worked examples.
 3. Privacy: CV data never sent to a server unless signed-in sync; no personal data in logs, analytics, or URLs.
-4. Security: input validated server-side (zod), auth check on every synced record, rate limits on AI/account routes, no secrets client-side, Stripe webhooks signature-verified.
+4. Security: input validated server-side (zod), auth check on every synced record, rate limits on AI/account routes, no secrets client-side, Paystack webhooks signature-verified.
 5. Accessibility: labels, roles, focus order, contrast, reduced motion.
 6. Performance: no client component that could be server, no large deps on calculator pages, no layout shift.
 7. Product rules in CLAUDE.md (no ads in CV builder, no fabricated claims, AI only rewords real experience), and that the required agents and skills table in CLAUDE.md was followed for this diff.

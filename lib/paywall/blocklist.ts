@@ -1,7 +1,7 @@
 /**
  * Disposable email domains. Used by sign-up and the trial route to brake abuse: a disposable
  * address lets one person claim many free trials. The list is server side only and never
- * presented to the user. See docs/MONETIZATION.md (Stripe Radar: enable).
+ * presented to the user. See docs/MONETIZATION.md (abuse controls).
  *
  * This is not a complete catalogue (there are thousands of these services). It covers the most
  * common ones. We can add more without a code change by moving the list to a Supabase table

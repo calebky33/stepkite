@@ -7,7 +7,7 @@
  */
 
 export type PlanCode = "free" | "monthly" | "yearly" | "lifetime";
-export type Currency = "USD" | "GBP" | "INR";
+export type BillingCurrency = "USD";
 export type Interval = "day" | "month" | "year";
 
 export interface Plan {
@@ -15,7 +15,7 @@ export interface Plan {
   name: string;
   /** Amount in the smallest unit of the currency (cents for USD). Zero on the Free plan. */
   amountCents: number;
-  currency: Currency;
+  currency: BillingCurrency;
   /** The billing cadence. Null on Free (nothing is billed) and on Lifetime (one payment). */
   interval: Interval | null;
   features: readonly string[];
@@ -82,9 +82,8 @@ export function getPlan(code: PlanCode): Plan {
 export function formatPrice(plan: Plan): string {
   if (plan.amountCents === 0) return "Free";
   const amount = plan.amountCents / 100;
-  const locale = plan.currency === "GBP" ? "en-GB" : plan.currency === "INR" ? "en-IN" : "en-US";
   const whole = Number.isInteger(amount);
-  return new Intl.NumberFormat(locale, {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: plan.currency,
     minimumFractionDigits: whole ? 0 : 2,

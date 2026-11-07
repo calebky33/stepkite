@@ -1,7 +1,7 @@
 /**
  * Content-Security-Policy for pages. Hosts come from the code:
  * - connect-src https://*.supabase.co: the browser Supabase client (lib/supabase/browser.ts).
- * - Fonts are self-hosted by next/font, images are local, and checkout is a redirect to Stripe
+ * - Fonts are self-hosted by next/font, images are local, and checkout is a redirect to Paystack
  *   (navigation is not limited by CSP), so no other host is allowed.
  * - style-src 'unsafe-inline': React style attributes need it. Scripts never get it.
  */

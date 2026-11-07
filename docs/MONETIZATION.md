@@ -2,6 +2,8 @@
 
 How Stepkite earns. Pairs with docs/RULES.md pricing section. Nothing here contradicts RULES.md; it describes the shape.
 
+Provider: **Paystack**. USD only at launch because Paystack does not support GBP or INR. A second provider may be added later for GBP and INR without changing the pattern here.
+
 ## Flow
 
 ```
@@ -22,8 +24,10 @@ authenticated:
    └─ /{country}/tracker, /{country}/match: free uses local only; Pro adds sync + metrics + AI
 
 paywall on day 8 (trial end) or on Pro-only click:
-   └─ Stripe Checkout: Monthly $9.99 / Yearly $39 / Lifetime $149
-       └─ webhook writes entitlement in Supabase
+   └─ Paystack hosted checkout: Monthly $9.99 / Yearly $39 / Lifetime $149
+       └─ our server calls /transaction/initialize, returns authorization_url
+       └─ customer pays on Paystack, is redirected back to callback_url
+       └─ webhook writes entitlement in Supabase on charge.success
        └─ unlock takes effect on next request
 ```
 
@@ -39,10 +43,9 @@ users               (one row per auth user)
 
 plans               (one source of truth for prices)
   code text pk      ("free"|"trial"|"monthly"|"yearly"|"lifetime")
-  stripe_product_id text
-  stripe_price_id text
+  paystack_plan_code text null   (PLN_... for recurring; null for lifetime one-off)
   amount_cents int
-  currency text        ("USD"|"GBP"|"INR")
+  currency text        ("USD" only at launch)
   interval text null   ("day"|"month"|"year"|null for lifetime)
   interval_count int null
   active bool
@@ -57,22 +60,22 @@ entitlements        (one row per user, server-side truth)
   trial_exports_today int default 0      (reset at midnight UTC; cap of 2 during trial)
   current_period_end timestamptz null
   cancel_at timestamptz null             (when paid access revokes)
-  stripe_customer_id text
-  stripe_subscription_id text null
+  paystack_customer_code text
+  paystack_subscription_code text null
   updated_at timestamptz default now()
 
 trial_fingerprints  (one trial per browser + IP; abuse brake)
   fingerprint_hash text pk        (SHA-256 of browser fingerprint)
-  ip_hash text                    (SHA-256 of CF-Connecting-IP)
+  ip_hash text                    (HMAC-SHA256 of CF-Connecting-IP with a server-side pepper)
   email_domain text
   started_at timestamptz
   user_id uuid references users(id)
 
-payments            (audit, one row per Stripe event we accepted)
+payments            (audit, one row per Paystack event we accepted)
   id uuid pk default gen_random_uuid()
   user_id uuid references users(id)
-  event_id text unique    (Stripe event.id, idempotency)
-  type text               (invoice.paid, charge.succeeded, etc.)
+  event_id text unique    (Paystack event id, idempotency)
+  type text               (charge.success, invoice.paid, etc.)
   amount_cents int
   currency text
   occurred_at timestamptz
@@ -81,16 +84,21 @@ payments            (audit, one row per Stripe event we accepted)
 
 Row-level security: a user reads only their own row in `users` and `entitlements`; writes only through server routes. `plans` is readable by all. `payments` is readable only by the owner through a service role.
 
-## Stripe products (owner creates in dashboard, prices land in `plans` table)
+## Paystack products (owner creates in dashboard, codes land in `plans` table)
 
-- `prod_trial` → `price_trial` $1.00 USD once, with 7-day free then convert
-- `prod_monthly` → `price_monthly` $9.99 USD / month
-- `prod_yearly` → `price_yearly` $39.00 USD / year
-- `prod_lifetime` → `price_lifetime` $149.00 USD one-time
+Create two subscription **plans** and one one-off **product** on Paystack, all in USD:
 
-Localized prices land before each market opens (GBP in UK, INR in India). Stripe Tax is on for every price.
+- Monthly plan → interval `monthly`, amount `999` (kobo = cents) → copy `plan_code` into `plans.paystack_plan_code` for `code='monthly'`.
+- Yearly plan → interval `annually`, amount `3900` → copy into `plans.paystack_plan_code` for `code='yearly'`.
+- Lifetime: no Paystack plan needed. Keep `paystack_plan_code` null; the checkout route initialises a one-time transaction for $149 (`14900` cents).
 
-Stripe Radar: enable. Block disposable email domains (list stays server-side in `lib/paywall/blocklist.ts`).
+USD on Paystack requires the merchant account to be in Nigeria or Kenya and to pass Paystack's USD activation step (see OWNER-SETUP.md section 2.1).
+
+Paystack has no equivalent to Stripe Radar or Stripe Tax. We instead:
+
+- block disposable email domains in `lib/paywall/blocklist.ts` before `/api/trial/start`,
+- rate-limit `/api/auth/*` and `/api/paywall/*` (WAF, see DEPLOY.md),
+- include VAT or GST in the displayed price in the UK, EU and India and flag that on the pricing page.
 
 ## Routes we add
 
@@ -98,9 +106,9 @@ Stripe Radar: enable. Block disposable email domains (list stays server-side in 
 - `POST /api/auth/signin`
 - `GET  /api/auth/callback` OAuth return (Google, LinkedIn)
 - `POST /api/trial/start` starts the 7-day no-card trial; body `{fingerprint}`; checks `trial_fingerprints` for reuse, blocks disposable email domains, writes `trial_ends_at = now + 7 days`
-- `POST /api/paywall/checkout` creates a Stripe Checkout session; body `{plan: "monthly"|"yearly"|"lifetime"}`
-- `POST /api/paywall/portal` creates a Stripe Billing Portal session for the signed-in user
-- `POST /api/stripe/webhook` the only writer to `entitlements` and `payments`
+- `POST /api/paywall/checkout` calls `/transaction/initialize` on Paystack; body `{plan: "monthly"|"yearly"|"lifetime"}`; returns `{authorization_url}` for the browser to redirect to
+- `POST /api/paywall/cancel` disables the signed-in user's Paystack subscription (replaces the Stripe Billing Portal pattern). Access runs to `current_period_end`.
+- `POST /api/paystack/webhook` the only writer to `entitlements` and `payments`
 - `GET  /api/export/pdf` entitlement-gated; free = watermarked, trialing or active = unwatermarked; trial increments `trial_exports_today` and refuses after 2
 - `GET  /api/export/docx` Pro-only (status in `trialing`, `active`, or plan_code `lifetime`)
 - `POST /api/sandbox/migrate` moves an anonymous localStorage draft onto a freshly signed-up account
@@ -111,8 +119,8 @@ Client never says "I paid" or "I am on trial". Server reads Supabase. Supabase i
 
 - `/sign-in`, `/sign-up` replace stubs. Google, LinkedIn, email+password. `?next=<path>` returns the user to the gated page.
 - `/{country}/cv` soft-start sandbox mode for anonymous visitors (draft in localStorage, non-dismissible sign-up banner at 60 s or on save or export). Authenticated users see their own CVs synced via Supabase.
-- `/pricing` four cards (Free, Monthly, Yearly, Lifetime). Signed-in Pro users see their current plan, next charge amount, next charge date, and a one-click Cancel button at the top of the page. Signed-in Free users see "Start free trial" at the top.
-- `/account` same current-plan panel, plus Email, Password, Linked accounts, Delete my account.
+- `/pricing` four cards (Free, Monthly, Yearly, Lifetime). Signed-in Pro users see their current plan, next charge amount, next charge date, and a one-click Cancel button at the top of the page. Signed-in Free users see "Start free trial" at the top. One line on the page: "Prices are in USD. VAT or GST, where it applies, is included."
+- `/account` same current-plan panel, plus Email, Password, Linked accounts, Cancel plan, Delete my account.
 
 Open pages (no gate, sidebar ads allowed):
 
@@ -130,34 +138,36 @@ Gated pages (sign-up required):
 
 ## Webhook contract
 
-Idempotent. The route stores `event.id` in `payments`; a second delivery of the same id is accepted and dropped.
+Idempotent. The route stores Paystack's event id in `payments`; a second delivery of the same id is accepted and dropped. Signature verification uses `Paystack-Signature` (current scheme: HMAC-SHA512 of `<t>.<kid>.<body>` with the `whsec_...` signing secret, 300 second tolerance on `t`) with a fallback to the legacy `x-paystack-signature` header (HMAC-SHA512 of the raw body with the secret key) so a slow signing-secret rollout cannot drop live events.
 
-| Stripe event                  | Entitlement change                                                          |
-| ----------------------------- | --------------------------------------------------------------------------- |
-| customer.created              | insert `users` row if missing, store `stripe_customer_id` in `entitlements` |
-| checkout.session.completed    | mark entitlement status based on the plan                                   |
-| customer.subscription.updated | update `status`, `current_period_end`, `cancel_at`                          |
-| customer.subscription.deleted | status = `"canceled"`, cancel_at = now                                      |
-| invoice.paid                  | append to `payments`, extend `current_period_end`                           |
-| invoice.payment_failed        | status = `"past_due"`                                                       |
-| charge.refunded               | status = `"revoked"` when full refund                                       |
+| Paystack event                 | Entitlement change                                                                              |
+| ------------------------------ | ----------------------------------------------------------------------------------------------- |
+| customeridentification.success | insert `users` row if missing, store `paystack_customer_code` in `entitlements`                 |
+| charge.success                 | first paid charge for the plan: mark entitlement active, extend `current_period_end`            |
+| subscription.create            | store `paystack_subscription_code` and `current_period_end` from Paystack's `next_payment_date` |
+| subscription.not_renew         | set `cancel_at = current_period_end` (user cancelled; access runs out the period)               |
+| subscription.disable           | status = `"canceled"`, cancel_at = now                                                          |
+| invoice.create                 | nothing until the paid variant lands                                                            |
+| invoice.update                 | if paid, append to `payments` and extend `current_period_end`                                   |
+| invoice.payment_failed         | status = `"past_due"`                                                                           |
+| charge.refunded                | status = `"revoked"` when the refund is full                                                    |
 
 Reminders ride on top:
 
-- Trial-conversion reminder email at `current_period_end - 48h`.
+- Trial-conversion reminder email at `trial_ends_at - 48h`.
 - Annual renewal reminder at `current_period_end - 48h`.
 - Monthly: both an email (opt-out, on by default) and an in-app banner from `current_period_end - 48h` to `current_period_end`.
 
 ## Trust rules in code
 
-- Checkout session includes `subscription_data.description = "Today $1.00. Then $9.99 / month starting <date>. Cancel anytime."` and the trial end date is confirmed in the success page.
-- `/api/paywall/portal` link is one click from the account page.
-- Receipts: Stripe sends them. We also store the audit row in `payments`.
-- Refunds: `/api/paywall/refund` opens a mailto when a user requests one within the money-back window; the owner approves and refunds in Stripe.
+- The authorization URL from Paystack is the single success path; we never POST card data ourselves.
+- `/api/paywall/cancel` is one click from the account page.
+- Receipts: Paystack sends them. We also store the audit row in `payments`.
+- Refunds: `/api/paywall/refund` opens a mailto when a user requests one within the money-back window; the owner approves and refunds in the Paystack dashboard.
 
 ## Not in this build (defer to a future session)
 
-- Localized prices (GBP, INR) land before each market opens.
+- A second provider (Stripe or similar) to accept GBP in the UK and INR in India.
 - Server-rendered PDF via puppeteer-core on a Worker (free is browser-side; paid lands server-side when the Worker + puppeteer path is proven).
 - Team or multi-seat.
 - Referral or affiliate program.
@@ -165,9 +175,6 @@ Reminders ride on top:
 ## Owner steps before the first build session
 
 1. Create a Supabase project; copy `anon` key and service role key to secrets.
-2. Create Stripe products and prices listed above; copy ids into the `plans` table.
+2. Create a Paystack account (NG or KE merchant), activate USD, create the two plans and the lifetime product listed above, and copy the plan codes into the `plans` table.
 3. Add Google and LinkedIn OAuth apps to Supabase Auth settings.
-4. Set webhook endpoint `/api/stripe/webhook` and copy signing secret.
-5. Set GitHub Actions secrets: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `STRIPE_PUBLIC_KEY`. Set Worker secrets: `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`.
-
-The build session cannot start until step 1 and step 2 are complete.
+4. Set webhook endpoint `/api/paystack/webhook` in the Paystack dashboard and copy the signing secret (`whsec_...`) into the Worker.

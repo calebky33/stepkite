@@ -3,11 +3,18 @@ import { readBodyCapped } from "@/lib/http/body";
 import { rateLimit } from "@/lib/rateLimit";
 
 /**
- * Opens the Stripe Billing Portal for the signed in user.
+ * Cancels the signed in user's Paystack subscription. One click: no email, no chat
+ * (docs/RULES.md rule 17). Access runs to `current_period_end`, then revokes via the
+ * subscription.disable webhook.
  *
- * Right now returns 503 after every guard, because Stripe is not wired. The real route reads
- * stripe_customer_id from the entitlements row and returns the one time portal URL. See
- * docs/MONETIZATION.md (POST /api/paywall/portal) and docs/RULES.md on refunds and cancels.
+ * Paystack does not host a customer portal like Stripe's, so this endpoint replaces the old
+ * /api/paywall/portal. The account page uses it for the Cancel button, then shows the stored
+ * `cancel_at` from the entitlements row.
+ *
+ * Right now returns 503 after every guard, because Paystack and Supabase are not wired. The real
+ * route reads the user's paystack_subscription_code from entitlements, fetches a one time
+ * email_token from GET /subscription/:code, then POSTs /subscription/disable. See
+ * docs/MONETIZATION.md (POST /api/paywall/cancel) and docs/RULES.md rules 17 and 18.
  */
 
 const MAX_REQUEST_BYTES = 4096;

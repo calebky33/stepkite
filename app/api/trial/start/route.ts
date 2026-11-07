@@ -6,7 +6,7 @@ import { rateLimit } from "@/lib/rateLimit";
 /**
  * Starts the 7 day no card Pro trial.
  *
- * Right now returns 503 after every guard, because Supabase and Stripe are not wired. The real
+ * Right now returns 503 after every guard, because Supabase and Paystack are not wired. The real
  * route (docs/MONETIZATION.md: POST /api/trial/start) writes trial_started_at and trial_ends_at
  * on the entitlement row, inserts into trial_fingerprints, and refuses when the fingerprint,
  * IP hash, or email domain was already used.

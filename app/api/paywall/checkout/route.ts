@@ -4,12 +4,12 @@ import { readBodyCapped } from "@/lib/http/body";
 import { rateLimit } from "@/lib/rateLimit";
 
 /**
- * Opens a Stripe Checkout session for the signed in user.
+ * Starts a Paystack checkout for the signed in user and returns the hosted authorization URL.
  *
- * Right now returns 503 after every guard, because Stripe is not wired. The real route reads
- * STRIPE_SECRET_KEY and the per plan price id from env, creates the session with the plan's
- * price, Stripe Tax on, success and cancel URLs, and returns the hosted URL for the client to
- * redirect to. See docs/MONETIZATION.md (POST /api/paywall/checkout).
+ * Right now returns 503 after every guard, because Paystack and Supabase are not wired. The real
+ * route reads the plan's amount and paystack_plan_code from the Supabase `plans` row, calls
+ * POST /transaction/initialize on Paystack with a fresh reference, and returns the authorization
+ * URL for the browser to redirect to. See docs/MONETIZATION.md (POST /api/paywall/checkout).
  */
 
 const bodySchema = z.object({ plan: z.enum(["monthly", "yearly", "lifetime"]) }).strict();

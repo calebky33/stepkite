@@ -16,15 +16,16 @@ Source of ideas: public market research on how CV builders are put together. Eve
 
 Each template ships a token manifest. The editor only offers values inside it.
 
-| Token | Allowed values |
-|---|---|
-| accent | 6 to 8 approved colours, each at least 4.5:1 contrast on the page background |
-| fontPair | 4 to 6 curated pairs, ATS safe, subset loaded |
-| fontScale | 0.9 to 1.1 in steps of 0.05 |
-| spacing | compact, normal, roomy (fixed rem sets) |
-| margins | 12 to 24 mm |
+| Token     | Allowed values                                                               |
+| --------- | ---------------------------------------------------------------------------- |
+| accent    | 6 to 8 approved colours, each at least 4.5:1 contrast on the page background |
+| fontPair  | 4 to 6 curated pairs, ATS safe, subset loaded                                |
+| fontScale | 0.9 to 1.1 in steps of 0.05                                                  |
+| spacing   | compact, normal, roomy (fixed rem sets)                                      |
+| margins   | 12 to 24 mm                                                                  |
 
 Rules that keep layouts intact:
+
 - Tokens become CSS variables. Values are clamped in `lib/cv/tokens.ts` on every load and save. Free-form colours, sizes and font names never reach CSS.
 - Sections sit in fixed grid areas with `overflow-wrap: anywhere` and `break-inside: avoid` on each entry.
 - Pagination: render offscreen, measure, split at entry boundaries, never inside a bullet.
@@ -59,10 +60,11 @@ Landing page order: promo banner (only while a real promo runs), header, hero wi
 ## 6. Import (existing CV to fields)
 
 Pipeline: file (PDF, DOCX, TXT, 5 MB cap) to text, text to schema, review screen.
+
 1. Extract text in the browser where possible (`pdf.js`, `mammoth`). The file never leaves the device unless the user chooses AI-assisted import.
 2. A rules pass finds sections and dates. If confidence is low, the optional server route `api/import` maps the text to the zod schema with structured output.
 3. A review screen shows low-confidence fields first. Nothing is saved until the user confirms.
-Tradeoff: browser parsing is private and free but weaker on odd layouts. AI import costs money and sends text to a server, so it is opt-in and rate limited like `api/match`.
+   Tradeoff: browser parsing is private and free but weaker on odd layouts. AI import costs money and sends text to a server, so it is opt-in and rate limited like `api/match`.
 
 ## 7. AI writing
 
@@ -72,6 +74,7 @@ Tasks: summary, bullet expander, tone and grammar rewrite, tailor to a job ad, c
 client -> api/ai/{task} -> auth + rate limit -> context (CV JSON, locale, job ad)
   -> model call with structured output -> zod validate -> return as a diff
 ```
+
 - Before any request, the UI shows what text will be sent, and the user confirms. CV text is never sent silently (CLAUDE.md rule 3).
 - Every prompt forbids invented employers, dates, figures and qualifications. Unknown numbers become visible placeholders such as `[number]`.
 - Results always arrive as a diff. The user accepts line by line.
@@ -105,7 +108,7 @@ client -> api/ai/{task} -> auth + rate limit -> context (CV JSON, locale, job ad
 
 - The server decides what is live: `GET /api/promo?country=GB` returns `{ code, percentOff, endsAt, serverNow }` (UTC).
 - The client counts down `endsAt` minus `serverNow`, so a wrong device clock changes nothing. It stops at zero and the banner disappears.
-- Stripe is the authority. The coupon carries `redeem_by = endsAt`. After that time checkout refuses the code.
+- Paystack is the authority. The promotion is applied on the server at `/transaction/initialize` and refuses after `endsAt`.
 - No resetting timers, no fake deadlines, no invented "was" prices. A struck-through price must be one we actually charged recently (UK and EU rules). Respect `prefers-reduced-motion`.
 - The banner reserves its height so the page does not jump.
 
@@ -115,6 +118,7 @@ client -> api/ai/{task} -> auth + rate limit -> context (CV JSON, locale, job ad
 Verify button -> provider (email domain check first, vendor later) -> signed webhook
   -> verify signature and idempotency -> record verification -> entitlement (kind student, expires_at)
 ```
+
 - One grant per verified person. Re-verify at expiry. Revoke if the provider reverses.
 - Launch with an allow-list of education email domains (`.ac.uk`, `.edu`, `.ac.in`). Add a verification vendor once volume justifies the fee and the agreement.
 - Reuses the `entitlements` table in ARCHITECTURE.md with `kind = 'student'`.
@@ -129,23 +133,24 @@ cvs(id, user_id, title, data jsonb, schema_version int, template_id, tokens json
 cv_versions(id, cv_id, data jsonb, created_at)           -- one previous version
 share_links(token pk, cv_id, expires_at null, hide_contact bool, revoked_at null)
 sites(id, cv_id, subdomain unique, template_id, snapshot jsonb, published_at)
-promotions(id, code, percent_off, starts_at, ends_at, countries text[], stripe_coupon_id, active)
+promotions(id, code, percent_off, starts_at, ends_at, countries text[], active)
 student_verifications(id, user_id, method, status, verified_at, expires_at)
 ```
+
 Existing: `profiles`, `jobs`, `entitlements`. Public reads of a share link or site go through a server route that checks the token. No public table access.
 
 ## 14. Milestones
 
 Mapped to ROADMAP.md. One Claude Code session per line.
 
-| ROADMAP weeks | Work |
-|---|---|
-| 1 to 2 | Scaffold, tokens, one template rendered from JSON, country routing |
-| 5 to 7 | Schema, IndexedDB, editor, live preview, token clamping, pagination, autosave and snapshots, three country templates, browser PDF, ATS test |
-| 7 | Sync and RLS, Pro Pass, AI tasks with eval set, promo module |
-| 8 | Validation gate with 30 strangers |
-| 9 to 12 | Import review screen, DOCX, share links, sample CV pages, Spanish and Portuguese |
-| Later | Personal site, student vendor, server PDF if needed, native apps, German and French |
+| ROADMAP weeks | Work                                                                                                                                        |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 to 2        | Scaffold, tokens, one template rendered from JSON, country routing                                                                          |
+| 5 to 7        | Schema, IndexedDB, editor, live preview, token clamping, pagination, autosave and snapshots, three country templates, browser PDF, ATS test |
+| 7             | Sync and RLS, Pro Pass, AI tasks with eval set, promo module                                                                                |
+| 8             | Validation gate with 30 strangers                                                                                                           |
+| 9 to 12       | Import review screen, DOCX, share links, sample CV pages, Spanish and Portuguese                                                            |
+| Later         | Personal site, student vendor, server PDF if needed, native apps, German and French                                                         |
 
 ## 15. Needs approval before building
 
@@ -156,26 +161,27 @@ Mapped to ROADMAP.md. One Claude Code session per line.
 
 ## 16. Tests
 
-Unit: token clamping, schema validation, promo window with fake clocks and time zones. Visual: every template with worst-case data at 375 px and 1280 px, light and dark. ATS: text extraction from exported PDFs. Autosave: close the tab mid-edit, two tabs, offline then online. Import: 30 real CVs. Promo: Stripe test mode with an expired `redeem_by`. End to end (Playwright): create, edit, export, share, delete.
+Unit: token clamping, schema validation, promo window with fake clocks and time zones. Visual: every template with worst-case data at 375 px and 1280 px, light and dark. ATS: text extraction from exported PDFs. Autosave: close the tab mid-edit, two tabs, offline then online. Import: 30 real CVs. Promo: Paystack test mode with an expired `ends_at` on the server. End to end (Playwright): create, edit, export, share, delete.
 
 ## 17. Lessons from market research (all folded into the sections above)
 
 Added after a second look at how established builders are put together. Mechanics only. Nothing here reuses anyone's text, images, prices or designs.
 
-| Lesson | What Stepkite does | Section |
-|---|---|---|
-| The live preview runs as its own service on its own origin, embedded in the editor. | Serve `/render` from a separate route with strict CSP and no access to app cookies. User content cannot reach app state. | 1, 9 |
-| One shared preview modal is filled from data on the clicked card. | One `TemplatePreview` component takes a template id. No per-card modal markup. | 3 |
-| "Show all templates" loads more cards from the server in pages. | Gallery pages from JSON (`offset`, `limit`) and renders with React. Static first page for speed and search. | 3 |
-| A countdown reads a date and uses the visitor's device clock. | Promo sends `endsAt` and `serverNow` in UTC. The client never trusts its own clock. Ends exactly when Stripe's `redeem_by` ends. | 11 |
-| Ratings are posted with a CSRF token and mirrored in a cookie. | No ratings in cookies. Any feedback is stored server side with a CSRF-safe route, or not at all. | 13 |
-| Country is decided on the server and drives prices and copy. | Read the country at the edge (Cloudflare header). Never in client JS. | 3 |
-| Sitemaps are mostly sample CVs, cover letters, categories and guides. | Sample CV pages by job title and country, built from data with the same renderer. Add a page only when it has real demand and passes tests. | 3 |
-| A free ATS checker brings in visitors. | A free CV checker that runs in the browser: upload, score, then offer the builder. Results are not sold to anyone. | 6, 9 |
-| Subscriptions with a rolling discount are the norm. | Pro Pass is one payment and the price is the price. Say so plainly on the pricing page. | RULES 1, 2 |
-| Cloud import (a file picker for Dropbox or Drive) sits next to upload. | Add a Drive or Dropbox picker after launch. The file is read in the browser. | 6 |
-| Several payment options (cards, PayPal, wallets). | Stripe first. Add PayPal for the UK and India after the validation gate if checkout drop-off shows the need. | 12 |
-| Error tracking is wired in from day one. | Add Sentry or an equivalent with personal data scrubbed. CV text and emails never leave in an error report. | RULES 22 |
+| Lesson                                                                              | What Stepkite does                                                                                                                                        | Section    |
+| ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| The live preview runs as its own service on its own origin, embedded in the editor. | Serve `/render` from a separate route with strict CSP and no access to app cookies. User content cannot reach app state.                                  | 1, 9       |
+| One shared preview modal is filled from data on the clicked card.                   | One `TemplatePreview` component takes a template id. No per-card modal markup.                                                                            | 3          |
+| "Show all templates" loads more cards from the server in pages.                     | Gallery pages from JSON (`offset`, `limit`) and renders with React. Static first page for speed and search.                                               | 3          |
+| A countdown reads a date and uses the visitor's device clock.                       | Promo sends `endsAt` and `serverNow` in UTC. The client never trusts its own clock. The server stops applying the promo at exactly `endsAt`.              | 11         |
+| Ratings are posted with a CSRF token and mirrored in a cookie.                      | No ratings in cookies. Any feedback is stored server side with a CSRF-safe route, or not at all.                                                          | 13         |
+| Country is decided on the server and drives prices and copy.                        | Read the country at the edge (Cloudflare header). Never in client JS.                                                                                     | 3          |
+| Sitemaps are mostly sample CVs, cover letters, categories and guides.               | Sample CV pages by job title and country, built from data with the same renderer. Add a page only when it has real demand and passes tests.               | 3          |
+| A free ATS checker brings in visitors.                                              | A free CV checker that runs in the browser: upload, score, then offer the builder. Results are not sold to anyone.                                        | 6, 9       |
+| Subscriptions with a rolling discount are the norm.                                 | Pro Pass is one payment and the price is the price. Say so plainly on the pricing page.                                                                   | RULES 1, 2 |
+| Cloud import (a file picker for Dropbox or Drive) sits next to upload.              | Add a Drive or Dropbox picker after launch. The file is read in the browser.                                                                              | 6          |
+| Several payment options (cards, PayPal, wallets).                                   | Paystack first (cards, Apple Pay, Google Pay, bank transfer). Add a second provider for GBP and INR after the validation gate if drop-off shows the need. | 12         |
+| Error tracking is wired in from day one.                                            | Add Sentry or an equivalent with personal data scrubbed. CV text and emails never leave in an error report.                                               | RULES 22   |
 
 ### Still unknown (needs a signed-in session we will not create)
+
 Editor internals, autosave protocol, export engine, AI prompts, parser, site builder. Sections 5 to 10 are our own design, not copied.

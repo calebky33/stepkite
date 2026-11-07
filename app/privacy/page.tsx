@@ -28,7 +28,7 @@ export default function Privacy() {
           paragraphs: [
             "We store your email address, a hashed password or an OAuth identifier (Google or LinkedIn), the plan you are on, and the CVs and jobs you choose to save.",
             "During the seven-day free trial we also store an anonymised browser fingerprint and a hashed IP address. We use these only to stop the same person starting more than one free trial.",
-            "If you pay, Stripe handles your card details. We keep a record that a charge happened, the amount and the date, not your card number.",
+            "If you pay, Paystack handles your card details. We keep a record that a charge happened, the amount and the date, not your card number.",
           ],
         },
         {
@@ -54,7 +54,7 @@ export default function Privacy() {
         {
           heading: "Who we share with",
           paragraphs: [
-            "Our hosting is Cloudflare Workers. Our account and sync database is Supabase. Payments are Stripe. OAuth sign-in uses Google or LinkedIn. We do not sell your data.",
+            "Our hosting is Cloudflare Workers. Our account and sync database is Supabase. Payments are Paystack. OAuth sign-in uses Google or LinkedIn. We do not sell your data.",
             "If an ad network is added, the exact provider will be named here before it goes live.",
           ],
         },

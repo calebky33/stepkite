@@ -3,6 +3,7 @@
 Static-first. Server only for auth, sync, payments, AI.
 
 ## Layout
+
 ```
 app/
   [country]/                 uk | us | in (generateStaticParams)
@@ -12,8 +13,9 @@ app/
     tracker/                 job tracker (client)
     guides/[slug]/           MDX
   api/
-    checkout/route.ts        create Stripe Checkout session
-    stripe/webhook/route.ts  verify signature, grant Pro
+    paywall/checkout/route.ts  initialize a Paystack transaction, return authorization URL
+    paywall/cancel/route.ts    disable the user's Paystack subscription
+    paystack/webhook/route.ts  verify signature, grant Pro
     match/route.ts           AI job-ad matching (auth + rate limit)
     og/route.tsx             share images
   sitemap.ts, robots.ts
@@ -28,21 +30,28 @@ content/<country>/*.mdx
 ```
 
 ## Data
+
 - Free users: everything in IndexedDB. No account.
-- Signed-in sync: Supabase tables `profiles`, `cvs (id, user_id, data jsonb, updated_at)`, `jobs`, `entitlements (user_id, kind, expires_at, stripe_session_id)`. RLS on every table: `user_id = auth.uid()`.
+- Signed-in sync: Supabase tables `profiles`, `cvs (id, user_id, data jsonb, updated_at)`, `jobs`, `entitlements (user_id, plan_code, status, current_period_end, paystack_customer_code, paystack_subscription_code)`. RLS on every table: `user_id = auth.uid()`.
 - Conflict rule for sync: last-write-wins by `updated_at`, keep one previous version.
 
 ## Payments
-- Pro Pass: Stripe Checkout `mode=payment`, price per currency (GBP, USD, INR). Webhook `checkout.session.completed` → insert entitlement with `expires_at = now + 30d`. Idempotent on session id.
-- Annual: `mode=subscription`, explicit opt-in, cancel link in account.
-- Stripe Tax enabled on Checkout. No card data touches our servers.
+
+- Provider: Paystack. USD only at launch (Paystack does not support GBP or INR).
+- Lifetime: POST `/transaction/initialize` (one-time, no plan). On `charge.success`, grant lifetime entitlement. Idempotent on the Paystack event id.
+- Monthly and yearly: POST `/transaction/initialize` with a `plan` code (PLN_...). Paystack bills the cadence automatically. The `subscription.create` event records the subscription code; `charge.success` extends `current_period_end`; `subscription.disable` revokes.
+- Cancel: POST `/subscription/disable` from our own `/api/paywall/cancel` (Paystack has no hosted customer portal).
+- Tax is our responsibility (Paystack does not collect), so prices are tax-inclusive outside the US. No card data touches our servers.
 
 ## AI matching
+
 - Server route only; key in env. zod-validate input; cap job-ad and CV text length; per-user and per-IP rate limit; free = 1/month.
 - Prompt returns structured JSON: requirements, which are evidenced, suggested rewording of EXISTING lines only. UI shows diffs; user accepts each.
 
 ## Hosting
+
 Cloudflare Workers via OpenNext. Verify in week 1: SSG, route handlers, OG images, middleware. Avoid features the adapter does not support (check docs, don't assume).
 
 ## Security checklist
+
 zod on every route input · auth + ownership check on every record · rate limits · secrets in env only · webhook signature verification · CSP headers · no PII in logs · daily DB backups.

@@ -8,7 +8,7 @@ async function load() {
 }
 
 function post(headers: Record<string, string> = {}): Request {
-  return new Request(`${ORIGIN}/api/paywall/portal`, {
+  return new Request(`${ORIGIN}/api/paywall/cancel`, {
     method: "POST",
     headers: { origin: ORIGIN, ...headers },
   });
@@ -19,7 +19,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("paywall portal route", () => {
+describe("paywall cancel route", () => {
   it("refuses a foreign origin with 403", async () => {
     const { POST } = await load();
     const res = await POST(post({ origin: "https://evil.test" }));

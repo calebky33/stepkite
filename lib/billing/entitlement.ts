@@ -2,7 +2,7 @@
  * Server-side entitlement helper. Once Supabase is wired, readEntitlement reads the user's row
  * from the entitlements table. Right now it returns the free plan for everyone.
  *
- * See docs/MONETIZATION.md for the schema. Only the Stripe webhook (and /api/trial/start)
+ * See docs/MONETIZATION.md for the schema. Only the Paystack webhook (and /api/trial/start)
  * ever write entitlements.
  */
 export type PlanCode = "free" | "trial" | "monthly" | "yearly" | "lifetime";

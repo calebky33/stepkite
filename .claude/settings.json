@@ -21,6 +21,26 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Bash|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "C:/Users/USER/.local/bin/graphify.EXE hook-guard search",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "C:/Users/USER/.local/bin/graphify.EXE hook-guard read",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "Stop": [
@@ -75,7 +95,7 @@
       "WebFetch(domain:developers.cloudflare.com)",
       "WebFetch(domain:opennext.js.org)",
       "WebFetch(domain:supabase.com)",
-      "WebFetch(domain:docs.stripe.com)"
+      "WebFetch(domain:paystack.com)"
     ],
     "ask": [
       "Bash(pnpm install:*)",

@@ -27,7 +27,7 @@ export default function CookiesPage() {
           paragraphs: [
             "The sign-in cookie, set by our account provider Supabase, keeps you signed in. It lasts for the length of your session.",
             "The CSRF token cookie protects form posts from being made from other sites.",
-            "If you buy a plan, Stripe sets its own cookies on its checkout page while you pay.",
+            "If you buy a plan, Paystack sets its own cookies on its checkout page while you pay.",
             "These are needed for the job, so they don't wait for your choice.",
           ],
         },

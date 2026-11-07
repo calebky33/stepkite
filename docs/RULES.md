@@ -8,7 +8,7 @@ Rules for building every part of Stepkite so it is simply better than what is on
 2. **Free is genuinely useful.** A visitor who signs up can build, preview, and export a watermarked PDF from one ATS-safe template. The free template is clean and recruiter-ready, just not the strongest in the pack.
 3. **Pay at the moment of value.** The paywall fires on Export PDF, Download, Finish, or any premium template. Not before. Build and preview stay free forever.
 4. **The price you see is the price.** No fake countdowns, no invented "was" prices, no rolling "20% off". A discount shows only during a real promotion with a real end time. Every price surface states the next renewal amount and date.
-5. **One price list, server-side.** Prices live in the database, not in client code. Never trust the client for price, plan or access. Stripe and the database are the authority.
+5. **One price list, server-side.** Prices live in the database, not in client code. Never trust the client for price, plan or access. Paystack and the database are the authority.
 6. **Honest numbers.** No made-up user counts, ratings, success rates or "recruiters love this". Every figure on a page has a source or a date.
 7. **Country first.** Every tool follows local rules: tax year, spelling, CV norms, page size, currency. A UK page never shows US habits.
 8. **One job per screen.** Each page answers one question and shows the answer before the explanation.
@@ -17,19 +17,19 @@ Rules for building every part of Stepkite so it is simply better than what is on
 
 ## Pricing, trial and cancellation (the source of truth)
 
-11. **One source of truth.** Prices and plans sit in a `plans` table with Stripe product and price ids. The pricing page, Checkout and the webhook all read the same row.
+11. **One source of truth.** Prices and plans sit in a `plans` table with the Paystack plan code for each tier. The pricing page, Checkout and the webhook all read the same row.
 12. **Current plan is always visible.** The pricing page and the account page show the signed-in user's current plan, next charge amount, next charge date, and a one-click Cancel button. No digging in menus.
 13. **Trial is 7 days free, no card.** The user clicks "Start free trial", confirms email, and gets full Pro for seven days. On day 8 a plan picker loads; opt-out drops the account to the Free tier. During the trial, exports are capped at two per day as an abuse brake, and ads are hidden.
-14. **One trial per customer.** Enforced per email, per browser fingerprint, and per IP. Disposable email domains are blocked. Stripe Radar is on for all paid charges.
+14. **One trial per customer.** Enforced per email, per browser fingerprint, and per IP. Disposable email domains are blocked. Paystack risk checks run on every charge, and the WAF rate-limits auth and paywall routes.
 15. **Plans.** Free: full builder, unlimited edits, 3 saved CVs, 1 ATS-safe template, watermarked PDF, local-only tracker, light sidebar ads on the builder page. Monthly: $9.99. Yearly: $39 (one charge). Lifetime: $149 one-time. Any limited-time launch tier (for example $79 lifetime) carries a hard cap and a visible end date.
 16. **Soft-start sandbox.** The landing page's "Build my CV" CTA opens the editor in anonymous mode, drafts saved to localStorage only. After 60 seconds of typing, or on any save or export, a non-dismissible banner asks the visitor to sign up. The draft migrates to the new account on sign-up so no work is lost.
 17. **Cancel is one click.** On the account page. No email, no chat. Access runs to the end of the paid period, then revokes. Monthly and yearly are both cancellable at any time with no further charges.
 18. **Reminders before every charge.** 48 hours before the trial converts. 48 hours before each annual renewal. For monthly, both an in-app banner and an email, both opt-out but on by default.
 19. **Receipts for every charge.** No silent charges. 14-day money-back on yearly and lifetime. The $1 trial is non-refundable. Monthly cancels at period end.
 20. **Entitlement is server-side.** Every export is checked server-side. If a PDF is generated in the browser, a paid download must either be rendered server-side or acknowledged in writing as acceptable risk.
-21. **Webhook is the single mutator.** Only the Stripe webhook changes a user's `entitlement` row. No "paid" flag ever comes from the client.
-22. **Stripe Tax on.** Prices are tax-inclusive in UK, EU and India, tax-exclusive in the US. Shown clearly on the pricing page.
-23. **Default currency USD.** Localised prices for UK (GBP) and India (INR) land before each market opens.
+21. **Webhook is the single mutator.** Only the Paystack webhook changes a user's `entitlement` row. No "paid" flag ever comes from the client.
+22. **Tax is our job.** Paystack does not collect tax. UK, EU and India prices are tax-inclusive (the shown number already covers VAT or GST at the applicable rate); US prices are tax-exclusive and the shown number is what is charged. The pricing page says which market a price covers.
+23. **USD everywhere.** Paystack does not support GBP or INR, so every plan is in USD until a second provider lands. The pricing page states this once on the page itself. Localised currency returns when a provider that supports it is added.
 
 ## Make it right: the build
 

@@ -21,6 +21,7 @@ How every Stepkite pay calculator behaves. It applies to all countries and is re
 ## Intent (optional, never blocks the result)
 
 Three choices under the result, each changing only what is offered next:
+
 - **Checking my payslip:** show a line by line comparison box and common reasons figures differ (tax code, pension method).
 - **Weighing a job offer:** show the pay needed to match a current salary, and links to the tracker.
 - **Moving or changing region:** show the same salary in another region side by side.
@@ -67,4 +68,4 @@ Three choices under the result, each changing only what is offered next:
 - **Structured data.** `FAQPage`, `WebApplication` and `BreadcrumbList` JSON-LD on every calculator page, generated from the same content as the visible text.
 - **Exchange rates are data, not code.** Keep rates in a dated file with a named source. Show the date next to any converted figure. Refresh on a schedule and fail visibly when stale.
 - **Remember the last country in `localStorage` only.** Do not store scores, logs or a profile of the visitor. Behavioural lead scoring is out of bounds under CLAUDE.md rule 3.
-- **Paid extras come after the free answer.** If a paid report is offered, it sits below the result, creates a Stripe Checkout session through our server route, and never hides the free numbers.
+- **Paid extras come after the free answer.** If a paid report is offered, it sits below the result, creates a Paystack transaction through our server route, and never hides the free numbers.

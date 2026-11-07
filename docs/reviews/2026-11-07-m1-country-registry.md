@@ -65,6 +65,21 @@ Overall: sound. No tier 2 route reaches tax code: `loadEngine` returns null, `re
 - Vitest (og, lib/cv, PayCalculator): 172 of 172 passed. `tsc --noEmit`: clean (run on the earlier uncommitted state).
 - Build, lint and check:copy at 4af6f8b: pending, to follow.
 
+## Resolution (2026-11-07)
+
+The owner asked Claude to take over Pi's uncommitted fixes and close the review.
+- `879d064`: items 1 to 6 and 9 plus migration hardening. Typecheck, lint and check:copy clean,
+  757 of 757 tests passed, build passed (228 pages).
+- Follow-up commit: item 7 (TaxUnavailable and the tier 2 hub button use the `cvName` wording,
+  and a tracker link is added). Migration validation now runs in its own transaction, with the ISO
+  comment fixed and rollback documented. 278 of 278 tests passed in app/[country] and components/tools.
+- Item 8: no change needed. Export (`PdfDownload` to `rules.paper`) and preview (`info.paper`)
+  take the paper size from the country.
+- Flag badge text contrast: no change needed. The SVG is `aria-hidden` and the country name sits beside it.
+
+Still open: the 375px and 1280px visual check in light and dark mode, the migration has not been
+applied to Supabase, and nothing has been pushed. Before merge, run the `reviewer` agent and then `/ship-check`.
+
 ## Handback
 
 Pi: reference item numbers in your fix commits, or add a reply section here.

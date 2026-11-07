@@ -1,6 +1,8 @@
 import { readEnv } from "@/lib/env";
 import { readBodyCapped } from "@/lib/http/body";
-import { verifyPaystackSignature } from "@/lib/paystack";
+import { handlePaystackEvent } from "@/lib/billing/paystackWebhook";
+import { createPaystack, verifyPaystackSignature } from "@/lib/paystack";
+import { createSupabaseAdmin } from "@/lib/supabase/admin";
 
 /**
  * Paystack webhook. The only server writer to `entitlements` and `payments`. Never session gated:
@@ -26,9 +28,11 @@ import { verifyPaystackSignature } from "@/lib/paystack";
  *     invoice.payment_failed        → status = "past_due"
  *     charge.refunded               → status = "revoked" when the refund is full
  *
- * Nothing is wired yet, so this returns 503 as soon as the signature check passes. A missing
- * signature header returns 400 so misrouted or probing traffic fails fast. A present signature
- * that does not verify also returns 400.
+ * After the signature check, lib/billing/paystackWebhook.ts applies the event. It returns 200 for
+ * applied, duplicate and ignored events and 500 when Paystack should retry. A missing signature
+ * header returns 400 so misrouted or probing traffic fails fast. A present signature that does
+ * not verify also returns 400. It returns 503 only when a secret or Supabase is not configured.
+ * Refund events are not handled; refunds are done by hand in the Paystack dashboard.
  */
 
 const MAX_WEBHOOK_BYTES = 1_048_576; // 1 MiB; Paystack events run small, but allow room.
@@ -63,7 +67,28 @@ export async function POST(request: Request): Promise<Response> {
   });
   if (!ok) return reply({ error: "bad_signature" }, 400);
 
-  // Supabase admin writes land here once wired. See the comment block above for the mapping and
-  // the idempotency rule.
-  return reply({ error: "not_available_yet" }, 503);
+  let payload: unknown;
+  try {
+    payload = JSON.parse(body.text);
+  } catch {
+    return reply({ error: "invalid_request" }, 400);
+  }
+
+  const admin = createSupabaseAdmin();
+  const paystack = createPaystack();
+  if (!admin || !paystack) {
+    console.error(JSON.stringify({ route: "paystack/webhook", event: "not_configured" }));
+    return reply({ error: "not_available_yet" }, 503);
+  }
+
+  try {
+    const outcome = await handlePaystackEvent({ admin, paystack, payload });
+    // A non-2xx makes Paystack retry. Only "retry" and real failures should.
+    if (outcome === "retry") return reply({ error: "retry" }, 500);
+    return reply({ status: outcome }, 200);
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : "unknown";
+    console.error(JSON.stringify({ route: "paystack/webhook", event: "handler_failed", detail }));
+    return reply({ error: "handler_failed" }, 500);
+  }
 }

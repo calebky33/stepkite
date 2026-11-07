@@ -1,6 +1,6 @@
 /**
- * Server-side entitlement helper. Once Supabase is wired, readEntitlement reads the user's row
- * from the entitlements table. Right now it returns the free plan for everyone.
+ * Entitlement types and pure helpers, safe to import from client code. The Supabase read lives in
+ * lib/billing/readEntitlement.ts (server only).
  *
  * See docs/MONETIZATION.md for the schema. Only the Paystack webhook (and /api/trial/start)
  * ever write entitlements.
@@ -16,7 +16,7 @@ export type Entitlement = {
   trialExportsToday: number;
 };
 
-const FREE: Entitlement = {
+export const FREE_ENTITLEMENT: Entitlement = {
   planCode: "free",
   status: "none",
   trialEndsAt: null,
@@ -25,19 +25,19 @@ const FREE: Entitlement = {
   trialExportsToday: 0,
 };
 
-export async function readEntitlement(userId: string): Promise<Entitlement> {
-  // Stub: free for everyone until Supabase is wired. The id is accepted now so the final
-  // version (which reads the entitlements row for this user) keeps the same signature.
-  void userId;
-  return FREE;
-}
+/** A paid plan whose period ended this long ago, with no renewal recorded, no longer counts. This
+ * covers a missed webhook without cutting off a renewal that Paystack is still retrying. */
+const RENEWAL_GRACE_MS = 3 * 24 * 60 * 60 * 1000;
 
 /** True while the user has Pro access (trial or any paid plan still inside its period).
  * A lifetime user whose status went to 'revoked' (chargeback, refund, abuse) loses access. */
-export function hasProAccess(e: Entitlement): boolean {
+export function hasProAccess(e: Entitlement, now: Date = new Date()): boolean {
   if (e.status === "revoked") return false;
   if (e.planCode === "lifetime") return true;
-  return e.status === "trialing" || e.status === "active";
+  if (e.status === "trialing") return true;
+  if (e.status !== "active") return false;
+  if (!e.currentPeriodEnd) return true;
+  return new Date(e.currentPeriodEnd).getTime() + RENEWAL_GRACE_MS > now.getTime();
 }
 
 /** Max exports the trial allows per day. See docs/RULES.md rule 13. */

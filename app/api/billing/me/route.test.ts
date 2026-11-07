@@ -11,7 +11,7 @@ function get(): Request {
 
 afterEach(() => {
   vi.doUnmock("@/lib/auth/session");
-  vi.doUnmock("@/lib/billing/entitlement");
+  vi.doUnmock("@/lib/billing/readEntitlement");
   vi.restoreAllMocks();
 });
 
@@ -38,5 +38,22 @@ describe("billing me route", () => {
     };
     expect(body.signedIn).toBe(true);
     expect(body.entitlement?.planCode).toBe("free");
+  });
+
+  it("returns 503, not the free plan, when the entitlement read fails", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.doMock("@/lib/auth/session", async (orig) => ({
+      ...(await orig<typeof import("@/lib/auth/session")>()),
+      getSession: async () => ({ id: "u1", email: "a@b.co", createdAt: "2025-01-01" }),
+    }));
+    vi.doMock("@/lib/billing/readEntitlement", () => ({
+      readEntitlement: async () => {
+        throw new Error("entitlement read failed (XX000)");
+      },
+    }));
+    const { GET } = await load();
+    const res = await GET(get());
+    expect(res.status).toBe(503);
+    expect(await res.json()).toEqual({ error: "entitlement_unavailable" });
   });
 });

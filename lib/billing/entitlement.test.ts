@@ -3,7 +3,6 @@ import {
   TRIAL_EXPORTS_PER_DAY,
   canExportDuringTrial,
   hasProAccess,
-  readEntitlement,
   type Entitlement,
 } from "./entitlement";
 
@@ -39,9 +38,30 @@ describe("entitlement helpers", () => {
     expect(canExportDuringTrial(FREE)).toBe(false);
   });
 
-  it("readEntitlement returns the free default until Supabase is wired", async () => {
-    const e = await readEntitlement("anyone");
-    expect(e.planCode).toBe("free");
-    expect(e.status).toBe("none");
+  it("hasProAccess lets an active plan run three days past its period end, then stops", () => {
+    const now = new Date("2026-11-10T12:00:00.000Z");
+    const active = { ...FREE, planCode: "monthly" as const, status: "active" as const };
+    expect(hasProAccess({ ...active, currentPeriodEnd: "2026-11-08T12:00:00.000Z" }, now)).toBe(
+      true,
+    );
+    expect(hasProAccess({ ...active, currentPeriodEnd: "2026-11-06T12:00:00.000Z" }, now)).toBe(
+      false,
+    );
+    expect(hasProAccess({ ...active, currentPeriodEnd: null }, now)).toBe(true);
+    expect(
+      hasProAccess(
+        {
+          ...FREE,
+          planCode: "lifetime",
+          status: "active",
+          currentPeriodEnd: "2020-01-01T00:00:00.000Z",
+        },
+        now,
+      ),
+    ).toBe(true);
+  });
+
+  it("hasProAccess is false for past_due", () => {
+    expect(hasProAccess({ ...FREE, planCode: "monthly", status: "past_due" })).toBe(false);
   });
 });

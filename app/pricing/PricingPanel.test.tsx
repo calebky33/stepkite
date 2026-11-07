@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { CurrentPlanPanel } from "@/components/billing/CurrentPlanPanel";
@@ -6,8 +6,12 @@ import { PLANS } from "@/lib/billing/plans";
 import { PricingCards } from "./PricingCards";
 import Pricing from "./page";
 
+const push = vi.fn();
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
+
 afterEach(() => {
   vi.restoreAllMocks();
+  push.mockClear();
 });
 
 describe("PricingCards", () => {
@@ -34,14 +38,56 @@ describe("PricingCards", () => {
     expect(screen.getByText("one time")).toBeTruthy();
   });
 
-  it("sends paid plans to sign-up with the pricing return path", () => {
+  it("gives each paid plan a Choose button and no link", () => {
     render(<PricingCards />);
-    const monthly = screen.getByRole("link", { name: "Choose Monthly" }) as HTMLAnchorElement;
-    expect(monthly.getAttribute("href")).toBe("/sign-up?next=/pricing");
-    const yearly = screen.getByRole("link", { name: "Choose Yearly" }) as HTMLAnchorElement;
-    expect(yearly.getAttribute("href")).toBe("/sign-up?next=/pricing");
-    const lifetime = screen.getByRole("link", { name: "Choose Lifetime" }) as HTMLAnchorElement;
-    expect(lifetime.getAttribute("href")).toBe("/sign-up?next=/pricing");
+    for (const name of ["Choose Monthly", "Choose Yearly", "Choose Lifetime"]) {
+      expect(screen.getByRole("button", { name })).toBeTruthy();
+      expect(screen.queryByRole("link", { name })).toBeNull();
+    }
+  });
+
+  it("sends a signed out visitor to sign in and back to pricing", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      Response.json({ error: "sign_in_required" }, { status: 401 }),
+    );
+    render(<PricingCards />);
+    fireEvent.click(screen.getByRole("button", { name: "Choose Monthly" }));
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/sign-in?next=/pricing"));
+  });
+
+  it("names the chosen plan to the server and nothing else", async () => {
+    const spy = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(Response.json({ error: "already_subscribed" }, { status: 409 }));
+    render(<PricingCards />);
+    fireEvent.click(screen.getByRole("button", { name: "Choose Yearly" }));
+    await waitFor(() => expect(spy).toHaveBeenCalled());
+    const [url, init] = spy.mock.calls[0] ?? [];
+    expect(url).toBe("/api/paywall/checkout");
+    expect(JSON.parse(String((init as RequestInit).body))).toEqual({ plan: "yearly" });
+  });
+
+  it("explains a refusal and lets the visitor try again", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      Response.json({ error: "already_subscribed" }, { status: 409 }),
+    );
+    render(<PricingCards />);
+    const button = screen.getByRole("button", { name: "Choose Monthly" });
+    fireEvent.click(button);
+    expect((await screen.findAllByText(/already have a plan/))[0]).toBeTruthy();
+    await waitFor(() => expect((button as HTMLButtonElement).disabled).toBe(false));
+  });
+
+  it("shows a plain message when the request fails or the link is not Paystack", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("offline"));
+    render(<PricingCards />);
+    const button = screen.getByRole("button", { name: "Choose Monthly" });
+    fireEvent.click(button);
+    expect((await screen.findAllByText(/did not start/))[0]).toBeTruthy();
+    fetchSpy.mockResolvedValue(Response.json({ authorization_url: "https://evil.example/pay" }));
+    fireEvent.click(button);
+    await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(2));
+    expect((await screen.findAllByText(/did not start/))[0]).toBeTruthy();
   });
 
   it("gives the Free card a sign-up note rather than a link", () => {
@@ -50,7 +96,7 @@ describe("PricingCards", () => {
     expect(screen.getByText("Nothing to pay. Sign up to save your work.")).toBeTruthy();
   });
 
-  it("does not reach the network", () => {
+  it("does not reach the network until a plan is chosen", () => {
     const spy = vi.spyOn(globalThis, "fetch");
     render(<PricingCards />);
     expect(spy).not.toHaveBeenCalled();

@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { Card } from "@/components/ui/Card";
+import { CheckoutButton } from "./CheckoutButton";
 import { PLANS, cadenceLabel, formatPrice, type Plan } from "@/lib/billing/plans";
 
 /**
@@ -56,12 +56,7 @@ function PricingCard({ plan }: { plan: Plan }) {
         {plan.code === "free" ? (
           <p className="text-sm text-muted">Nothing to pay. Sign up to save your work.</p>
         ) : (
-          <Link
-            href={`/sign-up?next=/pricing`}
-            className="inline-flex min-h-11 items-center justify-center rounded-input border border-border-strong bg-surface px-4 py-2 text-base font-semibold text-text shadow-card transition-colors hover:bg-surface-2"
-          >
-            Choose {plan.name}
-          </Link>
+          <CheckoutButton plan={plan.code} label={`Choose ${plan.name}`} />
         )}
       </div>
     </Card>

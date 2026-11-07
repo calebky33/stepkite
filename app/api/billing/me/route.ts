@@ -1,5 +1,6 @@
 import { getSession } from "@/lib/auth/session";
-import { readEntitlement, type Entitlement } from "@/lib/billing/entitlement";
+import type { Entitlement } from "@/lib/billing/entitlement";
+import { readEntitlement } from "@/lib/billing/readEntitlement";
 
 /**
  * The signed in visitor's current entitlement. Anonymous callers get `{signedIn: false,
@@ -14,8 +15,20 @@ export type BillingMe = {
 
 export async function GET(request: Request): Promise<Response> {
   const user = await getSession(request);
-  const payload: BillingMe = user
-    ? { signedIn: true, entitlement: await readEntitlement(user.id) }
-    : { signedIn: false, entitlement: null };
-  return Response.json(payload, { headers: { "Cache-Control": "no-store" } });
+  if (!user) {
+    const anonymous: BillingMe = { signedIn: false, entitlement: null };
+    return Response.json(anonymous, { headers: { "Cache-Control": "no-store" } });
+  }
+  try {
+    const payload: BillingMe = { signedIn: true, entitlement: await readEntitlement(user.id) };
+    return Response.json(payload, { headers: { "Cache-Control": "no-store" } });
+  } catch (error) {
+    // Say so rather than showing a paid user the free plan.
+    const detail = error instanceof Error ? error.message : "unknown";
+    console.error(JSON.stringify({ route: "billing/me", event: "read_failed", detail }));
+    return Response.json(
+      { error: "entitlement_unavailable" },
+      { status: 503, headers: { "Cache-Control": "no-store" } },
+    );
+  }
 }

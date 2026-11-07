@@ -31,6 +31,8 @@ jobs:
     environment: production
     steps:
       - uses: actions/checkout@v4
+      # wrangler-action shells out to the package manager of the lockfile, so pnpm must exist.
+      - uses: pnpm/action-setup@v4
       # GitHub expressions have no arithmetic, so compute the remainder in the shell.
       - name: Compute remaining percent
         id: split
@@ -45,6 +47,7 @@ jobs:
             versions deploy
             ${{ inputs.new_version_id }}@${{ inputs.new_percent }}%
             ${{ inputs.current_version_id }}@${{ steps.split.outputs.rest }}%
+            --name stepkite
             --yes
             --message "promote ${{ inputs.new_version_id }} to ${{ inputs.new_percent }}%"
       - name: Note

@@ -1,0 +1,2 @@
+# Signed-in e2e session. Never commit it.
+.auth/

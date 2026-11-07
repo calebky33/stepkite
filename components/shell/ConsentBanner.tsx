@@ -15,7 +15,9 @@ import { saveConsent, subscribeToConsent, useConsent } from "./consentStore";
 function guessRegion(pathname: string | null): string | null {
   const first = pathname?.split("/")[1];
   if (first === "uk") return "GB";
-  if (first && isCountry(first) && CONSENT_REQUIRED_REGIONS.has(first.toUpperCase())) return "GB";
+  if (first && isCountry(first) && CONSENT_REQUIRED_REGIONS.has(first.toUpperCase())) {
+    return first.toUpperCase();
+  }
   let zone = "";
   try {
     zone = Intl.DateTimeFormat().resolvedOptions().timeZone ?? "";

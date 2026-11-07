@@ -16,9 +16,12 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const country = await requireCountry(params);
   const name = COUNTRY_INFO[country].name;
+  const tax = isTaxCountry(country);
   return stubMetadata({
-    title: `Compare two job offers in ${name}`,
-    description: `Put two ${name} salaries side by side after tax.`,
+    title: tax ? `Compare two job offers in ${name}` : `Offer comparison for ${name}`,
+    description: tax
+      ? `Put two ${name} salaries side by side after tax.`
+      : `Comparing offers after tax is not available for ${name} yet.`,
     alternates: { canonical: `${SITE_URL}/${country}/compare/offers` },
   });
 }

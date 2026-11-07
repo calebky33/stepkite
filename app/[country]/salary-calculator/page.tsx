@@ -30,6 +30,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const country = await requireCountry(params);
   const canonical = `${SITE_URL}/${country}/salary-calculator`;
   const content = SALARY_CONTENT[country];
+  if (!isTaxCountry(country)) {
+    const name = COUNTRY_INFO[country].name;
+    return stubMetadata({
+      title: `Salary tools for ${name}`,
+      description: `Take-home pay for ${name} is not available yet. Build a ${COUNTRY_INFO[country].cvName} and track your applications instead.`,
+      alternates: { canonical },
+    });
+  }
   if (!content) {
     const term = COUNTRY_INFO[country].takeHomeTerm;
     return stubMetadata({

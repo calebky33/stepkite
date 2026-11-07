@@ -35,8 +35,15 @@ export function Flag({ code }: { code: CountryCode }) {
         </>
       ) : (
         <>
-          <rect width="24" height="16" fill="var(--surface-2)" />
-          <text x="12" y="12" textAnchor="middle" fontSize="7" fontWeight="700" fill="var(--border-strong)">
+          <rect width="24" height="16" style={{ fill: "var(--surface-2)" }} />
+          <text
+            x="12"
+            y="12"
+            textAnchor="middle"
+            fontSize="7"
+            fontWeight="700"
+            style={{ fill: "var(--text-muted)" }}
+          >
             {code.toUpperCase()}
           </text>
         </>

@@ -8,25 +8,25 @@ export function TaxUnavailable({ country }: { country: CountryCode }) {
   return (
     <section aria-labelledby="tax-unavailable-heading" className="max-w-prose space-y-3">
       <h1 id="tax-unavailable-heading" className="font-display text-4xl">
-        Salary tools are not available yet
+        No salary tools for {info.name} yet
       </h1>
       <p className="text-lg text-muted">
-        We only show take-home pay where we have checked the tax rules against the official source,
-        and we have not done that for {info.name} yet.
+        We only show take-home pay once we&apos;ve checked the tax rules against the official
+        source. We haven&apos;t done that for {info.name} yet.
       </p>
       <p className="text-muted">
-        In the meantime you can still build a {info.cvName} and keep track of your applications.
+        You can still build a {info.cvName} and track your applications here.
       </p>
       <div className="flex flex-wrap items-center gap-3">
         <Link
           href={`/${country}/cv`}
-          className="inline-flex min-h-11 items-center rounded-input bg-primary px-4 py-2 text-base font-semibold text-primary-fg transition-colors hover:opacity-90"
+          className="inline-flex min-h-11 items-center rounded-input bg-primary px-4 py-2 text-base font-semibold text-primary-fg transition-[transform,scale,translate,opacity] duration-150 ease-[var(--ease-out)] hover:opacity-90 active:scale-[0.97]"
         >
           Build your {info.cvName}
         </Link>
         <Link
           href={`/${country}/tracker`}
-          className="inline-flex min-h-11 items-center rounded-input border border-border px-4 py-2 text-base font-semibold transition-colors hover:bg-surface-2"
+          className="inline-flex min-h-11 items-center rounded-input border border-border px-4 py-2 text-base font-semibold text-text transition-[transform,scale,translate,background-color] duration-150 ease-[var(--ease-out)] hover:bg-surface-2 active:scale-[0.97]"
         >
           Track your applications
         </Link>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { COUNTRY_INFO, formatMoney, type CountryCode } from "@/lib/countries";
+import { COUNTRY_INFO, formatMoney, isTaxCountry, type CountryCode } from "@/lib/countries";
 import { countryParams, requireCountry, type CountryParams } from "@/lib/routes";
 import { SITE_URL, stubMetadata } from "@/lib/seo";
 
@@ -71,7 +71,7 @@ export default async function CountryHubPage({ params }: Props) {
           ? `Work out your ${info.takeHomeTerm}, build a ${info.cvName} that fits ${info.name}, and keep track of the jobs you apply for. Your ${info.cvName} and your jobs stay on this device.`
           : `Build a ${info.cvName} that fits ${info.name} and keep track of the jobs you apply for. Your ${info.cvName} and your jobs stay on this device.`}
       </p>
-      {info.tier === 1 ? (
+      {isTaxCountry(country) ? (
         <Link
           href={`/${country}/salary-calculator`}
           className="inline-flex min-h-11 items-center self-start rounded-input bg-primary px-4 py-2 text-base font-semibold text-primary-fg transition-[transform,scale,translate,opacity] duration-150 ease-[var(--ease-out)] hover:opacity-90 active:scale-[0.97]"

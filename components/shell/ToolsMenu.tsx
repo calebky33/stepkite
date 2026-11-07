@@ -101,7 +101,7 @@ export function ToolsMenu({
         hidden={!open}
         className={cn(
           layout === "popover"
-            ? "absolute left-0 top-full z-40 mt-1 w-64 min-w-56 rounded-card border border-border bg-surface p-1 shadow-pop"
+            ? "absolute left-0 top-full z-40 mt-1 max-h-[min(70vh,28rem)] w-64 min-w-56 overflow-y-auto overscroll-contain rounded-card border border-border bg-surface p-1 shadow-pop"
             : "mt-1 flex flex-col gap-1 pl-3",
         )}
       >

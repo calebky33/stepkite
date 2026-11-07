@@ -76,6 +76,24 @@ describe("useBillingMe", () => {
     expect(seen.at(-1)?.signedIn).toBe(false);
   });
 
+  it("treats a malformed body as an error, never as Pro", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve(
+          new Response(
+            JSON.stringify({ signedIn: true, entitlement: { planCode: "lifetime" } }),
+            { status: 200 },
+          ),
+        ),
+      ),
+    );
+    const seen: ReturnType<typeof useBillingMe>[] = [];
+    render(<Probe onState={(state) => seen.push(state)} />);
+    await waitFor(() => expect(seen.at(-1)?.status).toBe("error"));
+    expect(seen.at(-1)?.isPro).toBe(false);
+  });
+
   it("ignores an AbortError on unmount", async () => {
     const abortError = new DOMException("aborted", "AbortError");
     vi.stubGlobal(

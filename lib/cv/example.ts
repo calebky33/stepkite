@@ -1,10 +1,12 @@
-import type { CountryCode } from "@/lib/countries";
+import { COUNTRY_INFO, type CountryCode } from "@/lib/countries";
 import type { Cv } from "./schema";
 
 const CITY: Partial<Record<CountryCode, string>> = { uk: "Leeds", us: "Austin", in: "Pune" };
 
+/** A real city for the three launch markets. Elsewhere the country name reads better than a
+ *  placeholder and needs no per-market data. */
 function cityFor(country: CountryCode): string {
-  return CITY[country] ?? "Example City";
+  return CITY[country] ?? COUNTRY_INFO[country].name;
 }
 
 /**

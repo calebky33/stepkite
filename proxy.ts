@@ -57,6 +57,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     const target = new URL(`/sign-up?next=${encodeURIComponent(next)}`, url.origin);
     const redirect = NextResponse.redirect(target);
     redirect.headers.set(name, csp);
+    syncUserCookie(request, redirect, user !== null);
     return redirect;
   }
   if (shouldRedirectWhenSignedIn(url.pathname, user !== null)) {
@@ -73,6 +74,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
     })();
     const redirect = NextResponse.redirect(target);
     redirect.headers.set(name, csp);
+    syncUserCookie(request, redirect, user !== null);
     return redirect;
   }
 

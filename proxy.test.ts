@@ -38,6 +38,18 @@ describe("proxy sk_user hint cookie", () => {
     expect(response.headers.get("set-cookie") ?? "").toMatch(/sk_user=;/);
   });
 
+  it("clears a stale cookie even when the visitor is redirected to sign up", async () => {
+    const response = await runProxy({ user: null, cookie: "sk_user=1", path: "/account" });
+    expect(response.status).toBe(307);
+    expect(response.headers.get("set-cookie") ?? "").toMatch(/sk_user=;/);
+  });
+
+  it("sets the cookie on the redirect away from the sign in form", async () => {
+    const response = await runProxy({ user: { name: "Caleb" }, path: "/sign-in" });
+    expect(response.status).toBe(307);
+    expect(response.cookies.get("sk_user")?.value).toBe("1");
+  });
+
   it("sets nothing for an anonymous visitor with no cookie", async () => {
     const response = await runProxy({ user: null });
     expect(response.headers.get("set-cookie")).toBeNull();

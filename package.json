@@ -7,7 +7,7 @@
     "build": "node scripts/build-guides.mjs && pnpm check:copy && next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "next typegen && tsc --noEmit",
+    "typecheck": "node scripts/build-guides.mjs && next typegen && tsc --noEmit",
     "test": "vitest run",
     "check:copy": "node scripts/check-copy.mjs",
     "e2e": "playwright test",

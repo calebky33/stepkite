@@ -59,10 +59,21 @@ test("sign-up asks for a country and passes it to Google sign-in", async ({ page
   );
 });
 
-test("every market has a real flag in the footer", async ({ page }) => {
+test("the footer shows a short country list that expands to every market", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/");
-  const flags = page.locator("footer img[src^='/flags/']");
+  // All 23 links are in the HTML for crawlers; only 6 are visible until the list is expanded.
+  await expect(page.locator("footer a[href^='/'] img[src^='/flags/']")).toHaveCount(23);
+  const flags = page.locator("footer img[src^='/flags/']:visible");
+  await expect(flags).toHaveCount(6);
+  const toggle = page.getByRole("button", { name: "Show all 23 countries" });
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await toggle.click();
   await expect(flags).toHaveCount(23);
+  await expect(page.getByRole("button", { name: "Show fewer countries" })).toHaveAttribute(
+    "aria-expanded",
+    "true",
+  );
   const res = await page.request.get("/flags/sa.svg");
   expect(res.ok()).toBe(true);
 });

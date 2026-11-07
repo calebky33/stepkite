@@ -29,7 +29,7 @@ Rules for building every part of Stepkite so it is simply better than what is on
 20. **Entitlement is server-side.** Every export is checked server-side. If a PDF is generated in the browser, a paid download must either be rendered server-side or acknowledged in writing as acceptable risk.
 21. **Webhook is the single mutator.** Only the Paystack webhook changes a user's `entitlement` row. No "paid" flag ever comes from the client.
 22. **Tax is our job.** Paystack does not collect tax. UK, EU and India prices are tax-inclusive (the shown number already covers VAT or GST at the applicable rate); US prices are tax-exclusive and the shown number is what is charged. The pricing page says which market a price covers.
-23. **USD everywhere.** Paystack does not support GBP or INR, so every plan is in USD until a second provider lands. The pricing page states this once on the page itself. Localised currency returns when a provider that supports it is added.
+23. **Display USD, charge KES.** Every price on every page shows USD. The Paystack account is on a Kenyan merchant, so the actual charge is in KES: the amount is in `plans.paystack_amount_kobo` and Paystack's hosted checkout shows the KES figure to the customer. The Stepkite UI never surfaces KES. The USD/KES mapping lives in `lib/billing/plans.ts`; update `paystackAmountKobo` (and its `verifiedOn` comment) whenever the rate drifts enough to shift the displayed USD.
 
 ## Make it right: the build
 

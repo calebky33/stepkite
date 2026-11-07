@@ -21,9 +21,12 @@ export async function requireCountry(params: Promise<CountryParams>): Promise<Co
 export function countryRoutes(country: CountryCode): string[] {
   const base = `/${country}`;
   const info = getCountry(country);
-  const routes = [`${base}/salary-calculator`];
+  const routes: string[] = [];
   if (info?.tier === 1) {
-    routes.push(...info.salaryLevels.map((amount) => `${base}/salary-calculator/${amount}`));
+    routes.push(
+      `${base}/salary-calculator`,
+      ...info.salaryLevels.map((amount) => `${base}/salary-calculator/${amount}`),
+    );
   }
   routes.push(`${base}/cv`, `${base}/tracker`, `${base}/match`);
   if (info?.tier === 1) {

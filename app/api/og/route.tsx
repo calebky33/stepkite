@@ -29,7 +29,9 @@ export function GET(request: Request): Response {
   const parsed = ogQuerySchema.safeParse(raw);
   if (!parsed.success) return new Response("Invalid request", { status: 400 });
 
-  const { country, gross } = parsed.data;
+  const parsedCountry = parsed.data.country;
+  const country = parsedCountry && isCountry(parsedCountry) ? parsedCountry : undefined;
+  const gross = parsed.data.gross;
   const title =
     parsed.data.title ??
     (country && gross !== undefined ? formatMoney(gross, country) : DEFAULT_TITLE);

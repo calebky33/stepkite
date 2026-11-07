@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/Table";
 import { useCountTween } from "@/components/ui/useCountTween";
-import { COUNTRY_INFO, cvLabel, formatMoney, type CountryCode } from "@/lib/countries";
+import { COUNTRY_INFO, cvLabel, formatMoney, type TaxCountry } from "@/lib/countries";
 import { requireRates } from "@/lib/tax";
 import type { PayResult } from "@/lib/tax/types";
 import { Donut, type DonutSlice } from "./Donut";
@@ -34,7 +34,7 @@ export type ResultState =
   | { kind: "ready"; result: PayResult; taxYear: string };
 
 type ResultCardProps = {
-  country: CountryCode;
+  country: TaxCountry;
   state: ResultState;
   /** Yearly gross for the share card. Null hides it. */
   annualGross: number | null;
@@ -54,12 +54,9 @@ const PENDING = "Pending";
 
 type PlaceholderRow = { key: string; label: string };
 
-function placeholderRows(country: CountryCode): PlaceholderRow[] {
+function placeholderRows(country: TaxCountry): PlaceholderRow[] {
   const info = COUNTRY_INFO[country];
-  const social =
-    ({ uk: "National Insurance", us: "Payroll tax", in: "Provident fund" } as Partial<
-      Record<CountryCode, string>
-    >)[country] ?? "Social security";
+  const social = { uk: "National Insurance", us: "Payroll tax", in: "Provident fund" }[country];
   const pension = country === "us" ? "401(k)" : "Pension";
   return [
     { key: "gross", label: "Pay before tax" },
@@ -201,7 +198,7 @@ function MissingNotice({
   entered,
   example,
 }: {
-  country: CountryCode;
+  country: TaxCountry;
   entered: string | null;
   example: boolean;
 }) {
@@ -240,7 +237,7 @@ function MissingNotice({
   );
 }
 
-function PendingTable({ country, view }: { country: CountryCode; view: ResultView }) {
+function PendingTable({ country, view }: { country: TaxCountry; view: ResultView }) {
   const rows = placeholderRows(country);
   const last = rows[rows.length - 1];
   const body = rows.slice(0, -1);
@@ -295,7 +292,7 @@ function ReadyHeadline({
   animate,
   onCounted,
 }: {
-  country: CountryCode;
+  country: TaxCountry;
   view: ResultView;
   result: PayResult;
   animate: boolean;
@@ -342,7 +339,7 @@ function ReadyTable({
   active,
   onActive,
 }: {
-  country: CountryCode;
+  country: TaxCountry;
   view: ResultView;
   result: PayResult;
   active: string | null;
@@ -467,7 +464,7 @@ function ResultSkeleton() {
   );
 }
 
-type NetBarProps = { country: CountryCode; state: ResultState };
+type NetBarProps = { country: TaxCountry; state: ResultState };
 
 /** Sticky bar for small screens. Shows monthly take-home, or Pending until an engine is ready. */
 export function NetBar({ country, state }: NetBarProps) {

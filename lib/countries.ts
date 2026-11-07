@@ -10,9 +10,40 @@
  * so `locale` drives number and date formatting (via Intl), not translation.
  */
 
-export type CountryCode = string; // lowercase ISO 3166-1 alpha-2
 export type Currency = string; // ISO 4217 code
 export type CountryTier = 1 | 2;
+
+/** Lowercase ISO 3166-1 alpha-2 codes for every registered market. Compile-time checked. */
+export type CountryCode =
+  | "uk"
+  | "us"
+  | "in"
+  | "ca"
+  | "au"
+  | "nz"
+  | "ie"
+  | "qa"
+  | "ae"
+  | "sa"
+  | "kw"
+  | "bh"
+  | "om"
+  | "sg"
+  | "za"
+  | "ke"
+  | "ng"
+  | "gh"
+  | "ph"
+  | "my"
+  | "nl"
+  | "de"
+  | "se";
+
+/** Markets with a verified tax engine. Everything tax related is typed with this. */
+export type TaxCountry = "uk" | "us" | "in";
+
+export const isTaxCountry = (value: string): value is TaxCountry =>
+  value === "uk" || value === "us" || value === "in";
 
 export interface CountryInfo {
   code: CountryCode;
@@ -316,12 +347,20 @@ const COUNTRY_LIST: readonly CountryInfo[] = [
 
 export const COUNTRIES: readonly CountryCode[] = COUNTRY_LIST.map((c) => c.code);
 
-export const COUNTRY_INFO: Record<string, CountryInfo> = Object.fromEntries(
-  COUNTRY_LIST.map((c) => [c.code, c]),
+export const COUNTRY_INFO: Record<CountryCode, CountryInfo> = COUNTRY_LIST.reduce(
+  (acc, c) => {
+    acc[c.code] = c;
+    return acc;
+  },
+  {} as Record<CountryCode, CountryInfo>,
 );
 
-export const COUNTRY_SHORT_NAME: Record<string, string> = Object.fromEntries(
-  COUNTRY_LIST.map((c) => [c.code, c.shortName]),
+export const COUNTRY_SHORT_NAME: Record<CountryCode, string> = COUNTRY_LIST.reduce(
+  (acc, c) => {
+    acc[c.code] = c.shortName;
+    return acc;
+  },
+  {} as Record<CountryCode, string>,
 );
 
 export function isCountry(value: string): value is CountryCode {
@@ -329,7 +368,7 @@ export function isCountry(value: string): value is CountryCode {
 }
 
 export function getCountry(value: string): CountryInfo | undefined {
-  return COUNTRY_INFO[value];
+  return isCountry(value) ? COUNTRY_INFO[value] : undefined;
 }
 
 /** True when this market has a verified tax engine and may show salary figures. */

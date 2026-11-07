@@ -21,7 +21,7 @@ function defaultCvRules(country: CountryCode): CvRules {
     allowMaritalStatus: false,
     documentName: info?.cvName ?? "CV",
     paper: info?.paper ?? "A4",
-    spelling: "en-GB",
+    spelling: info?.locale ?? "en-GB",
     sources: [],
   };
 }

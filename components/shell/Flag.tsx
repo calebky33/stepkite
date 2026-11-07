@@ -35,8 +35,8 @@ export function Flag({ code }: { code: CountryCode }) {
         </>
       ) : (
         <>
-          <rect width="24" height="16" fill="#e5e7eb" />
-          <text x="12" y="12" textAnchor="middle" fontSize="7" fontWeight="700" fill="#4b5563">
+          <rect width="24" height="16" fill="var(--surface-2)" />
+          <text x="12" y="12" textAnchor="middle" fontSize="7" fontWeight="700" fill="var(--border-strong)">
             {code.toUpperCase()}
           </text>
         </>

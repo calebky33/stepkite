@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { CurrencyInput } from "@/components/ui/CurrencyInput";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Slider } from "@/components/ui/Slider";
-import { COUNTRY_INFO, formatMoney, type CountryCode } from "@/lib/countries";
+import { COUNTRY_INFO, formatMoney, type TaxCountry } from "@/lib/countries";
 import { requireRates } from "@/lib/tax";
 import { MAX_GROSS, MIN_GROSS, type PayEngine } from "@/lib/tax/types";
 import { InFields } from "./InFields";
@@ -21,19 +21,19 @@ import { UsFields } from "./UsFields";
 const PERIOD_WORD: Record<Period, string> = { year: "a year", month: "a month", week: "a week" };
 
 /** Slider reach per country, in yearly terms. Input limits for the slider only, not tax figures. */
-const SLIDER_YEARLY: Partial<Record<CountryCode, { max: number; step: number }>> = {
+const SLIDER_YEARLY: Record<TaxCountry, { max: number; step: number }> = {
   uk: { max: 150_000, step: 500 },
   us: { max: 300_000, step: 1_000 },
   in: { max: 5_000_000, step: 10_000 },
 };
 
-const COPY: Partial<Record<CountryCode, { label: string; hint: string }>> = {
+const COPY: Record<TaxCountry, { label: string; hint: string }> = {
   uk: { label: "Salary before tax", hint: "Your gross pay, before tax and National Insurance." },
   us: { label: "Salary before taxes", hint: "Your gross pay, before taxes and deductions." },
   in: { label: "Salary before tax", hint: "Your gross pay or CTC, before tax and deductions." },
 };
 
-const FIELDS: Partial<Record<CountryCode, ComponentType<FieldsProps>>> = {
+const FIELDS: Record<TaxCountry, ComponentType<FieldsProps>> = {
   uk: UkFields,
   us: UsFields,
   in: InFields,
@@ -47,7 +47,7 @@ type Settled = { gross: number | null; values: FieldValues };
 
 function compute(
   engine: PayEngine,
-  country: CountryCode,
+  country: TaxCountry,
   gross: number,
   period: Period,
   values: FieldValues,
@@ -70,7 +70,7 @@ function compute(
   }
 }
 
-type PayCalculatorProps = { country: CountryCode; initialGross?: number };
+type PayCalculatorProps = { country: TaxCountry; initialGross?: number };
 
 /** Reads ?gross=&period= from the URL once, server-side safe (returns null when there is no
  * window). A link from the job tracker uses this to prefill the calculator. */
@@ -95,7 +95,7 @@ export function PayCalculator({ country, initialGross }: PayCalculatorProps) {
   );
   const [edited, setEdited] = useState(linked !== null);
   const [period, setPeriod] = useState<Period>(linked?.period ?? "year");
-  const [values, setValues] = useState<FieldValues>(DEFAULT_VALUES[country] ?? {});
+  const [values, setValues] = useState<FieldValues>(DEFAULT_VALUES[country]);
   const [settled, setSettled] = useState<Settled>({ gross, values });
   const engine = useEngine(country);
 
@@ -136,11 +136,10 @@ export function PayCalculator({ country, initialGross }: PayCalculatorProps) {
     setPeriod(next);
   };
   const Fields = FIELDS[country];
-  if (!Fields) return null;
   const onField = (key: string, value: string) =>
     setValues((current) => ({ ...current, [key]: value }));
 
-  const slider = SLIDER_YEARLY[country] ?? { max: 150_000, step: 500 };
+  const slider = SLIDER_YEARLY[country];
   const perYear = PERIODS_PER_YEAR[period];
   const sliderStep = Math.max(1, Math.round(slider.step / perYear));
   const sliderMax = Math.round(slider.max / perYear);
@@ -156,8 +155,8 @@ export function PayCalculator({ country, initialGross }: PayCalculatorProps) {
               {edited ? null : <p className="text-sm text-muted">Change it to your own salary.</p>}
             </div>
             <CurrencyInput
-              label={COPY[country]?.label ?? "Salary before tax"}
-              hint={COPY[country]?.hint ?? ""}
+              label={COPY[country].label}
+              hint={COPY[country].hint}
               error={error}
               locale={info.locale}
               currency={info.currency}

@@ -1,4 +1,4 @@
-import type { CountryCode } from "@/lib/countries";
+import type { TaxCountry } from "@/lib/countries";
 import { MAX_GROSS } from "@/lib/tax/types";
 
 /** Everything the country fields hold, as plain text. Parsed once by buildOptions. */
@@ -11,7 +11,7 @@ export type BuiltOptions = {
   errors: Record<string, string>;
 };
 
-export const DEFAULT_VALUES: Partial<Record<CountryCode, FieldValues>> = {
+export const DEFAULT_VALUES: Record<TaxCountry, FieldValues> = {
   uk: {
     region: "england",
     pensionPercent: "",
@@ -38,13 +38,13 @@ export const DEFAULT_VALUES: Partial<Record<CountryCode, FieldValues>> = {
   },
 };
 
-const PERCENT_KEYS: Partial<Record<CountryCode, readonly string[]>> = {
+const PERCENT_KEYS: Record<TaxCountry, readonly string[]> = {
   uk: ["pensionPercent"],
   us: ["retirementPercent"],
   in: [],
 };
 
-const AMOUNT_KEYS: Partial<Record<CountryCode, readonly string[]>> = {
+const AMOUNT_KEYS: Record<TaxCountry, readonly string[]> = {
   uk: ["otherDeductions"],
   us: ["otherDeductions"],
   in: ["section80c", "section80d", "hraReceived", "rentPaid", "otherDeductions"],
@@ -63,7 +63,7 @@ function parse(raw: string | undefined): number | null {
 }
 
 /** Turns field text into PayInput.region and PayInput.options. Empty number fields are left out. */
-export function buildOptions(country: CountryCode, values: FieldValues): BuiltOptions {
+export function buildOptions(country: TaxCountry, values: FieldValues): BuiltOptions {
   const options: BuiltOptions["options"] = {};
   const errors: Record<string, string> = {};
   const oldOnly = country === "in" && values.regime === "old";
@@ -73,12 +73,12 @@ export function buildOptions(country: CountryCode, values: FieldValues): BuiltOp
     if (country === "in" && !oldOnly && (OLD_REGIME_KEYS as readonly string[]).includes(key)) {
       continue;
     }
-    if ((PERCENT_KEYS[country] ?? []).includes(key)) {
+    if (PERCENT_KEYS[country].includes(key)) {
       const n = parse(raw);
       if (n === null) continue;
       if (Number.isNaN(n) || n < 0 || n > 100) errors[key] = PERCENT_ERROR;
       else options[key] = n;
-    } else if ((AMOUNT_KEYS[country] ?? []).includes(key)) {
+    } else if (AMOUNT_KEYS[country].includes(key)) {
       const n = parse(raw);
       if (n === null) continue;
       if (Number.isNaN(n) || n < 0 || n > MAX_GROSS) errors[key] = AMOUNT_ERROR;

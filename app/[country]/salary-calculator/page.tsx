@@ -4,7 +4,7 @@ import { AdSlot } from "@/components/shell/AdSlot";
 import { PayCalculator } from "@/components/tools/PayCalculator/PayCalculator";
 import { TaxUnavailable } from "@/components/tools/TaxUnavailable";
 import { ToolLinks } from "@/components/tools/ToolLinks";
-import { COUNTRY_INFO, hasTaxEngine } from "@/lib/countries";
+import { COUNTRY_INFO, isTaxCountry } from "@/lib/countries";
 import { SALARY_CONTENT } from "@/lib/content/salaryCalculator";
 import { countryParams, requireCountry, type CountryParams } from "@/lib/routes";
 import { INDEXABLE_PATHS, SITE_URL, stubMetadata } from "@/lib/seo";
@@ -67,11 +67,10 @@ export default async function SalaryCalculatorPage({ params, searchParams }: Pro
   const info = COUNTRY_INFO[country];
   const content = SALARY_CONTENT[country];
 
-  if (!hasTaxEngine(country)) {
+  if (!isTaxCountry(country)) {
     return (
       <>
         <TaxUnavailable country={country} />
-        <AdSlot placement="calculator" />
         <ToolLinks country={country} />
       </>
     );

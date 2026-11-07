@@ -9,6 +9,7 @@ import {
   COUNTRY_SHORT_NAME,
   formatMoney,
   isCountry,
+  isTaxCountry,
   type CountryCode,
 } from "@/lib/countries";
 import { salaryLevelsFor } from "@/lib/salaryLevels";
@@ -74,6 +75,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function SalaryLevelPage({ params }: Props) {
   const { country, gross, result } = await resolve(params);
   const info = COUNTRY_INFO[country];
+  if (!isTaxCountry(country)) notFound();
   const rates = requireRates(country);
   const money = (n: number) => formatMoney(n, country);
   const title = titleFor(country, gross);

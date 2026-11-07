@@ -6,25 +6,21 @@ import { SITE_URL } from "@/lib/seo";
 export const metadata = {
   alternates: { canonical: `${SITE_URL}/contact` },
   title: "Contact Stepkite",
-  description: "How to reach Stepkite. Report a problem on GitHub or email us.",
+  description: "How to reach Stepkite by email.",
 };
 
 const link = "text-primary underline-offset-4 hover:underline";
 
 export default function Contact() {
   return (
-    <PageShell title="Contact" lead="We don't have a support inbox yet." narrow>
+    <PageShell title="Contact" lead="Reach us by email." narrow>
       <div className="flex flex-col gap-4 text-base">
         <p>
-          Open an issue on GitHub at{" "}
-          <a href="https://github.com/calebky33/stepkite/issues" className={link}>
-            github.com/calebky33/stepkite/issues
-          </a>{" "}
-          or email{" "}
+          Email{" "}
           <a href="mailto:contact@stepkite.app" className={link}>
             contact@stepkite.app
-          </a>
-          . The email address will go live soon.
+          </a>{" "}
+          with what went wrong or what you need.
         </p>
         <p>
           If you want your data removed, you don&apos;t need to write to us. The account page has a

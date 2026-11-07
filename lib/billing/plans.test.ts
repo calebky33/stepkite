@@ -26,7 +26,7 @@ describe("PLANS", () => {
 });
 
 describe("plan prices", () => {
-  it("matches the USD display amount in cents written in docs/MONETIZATION.md", () => {
+  it("matches the amount in cents written in docs/MONETIZATION.md", () => {
     const amounts: Record<PlanCode, number> = {
       free: 0,
       monthly: 999,
@@ -34,16 +34,6 @@ describe("plan prices", () => {
       lifetime: 14900,
     };
     for (const plan of PLANS) expect(plan.amountCents).toBe(amounts[plan.code]);
-  });
-
-  it("carries a KES (kobo) charge amount for Paystack on every paid plan", () => {
-    const kobo: Record<PlanCode, number> = {
-      free: 0,
-      monthly: 130000,
-      yearly: 510000,
-      lifetime: 1950000,
-    };
-    for (const plan of PLANS) expect(plan.paystackAmountKobo).toBe(kobo[plan.code]);
   });
 
   it("formats as the dollar amount shown on the pricing page", () => {

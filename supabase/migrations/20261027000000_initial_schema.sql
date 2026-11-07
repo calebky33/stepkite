@@ -130,10 +130,8 @@ create trigger jobs_sync_lww
   before insert or update on public.jobs
   for each row execute function public.sync_lww();
 
--- plans: one row per Paystack product/plan; readable by everyone. Stepkite displays prices in
--- USD (currency column) but Paystack is on a Kenya merchant account and actually charges in
--- KES (paystack_amount_kobo column). The display currency check is a hard single value, not a
--- set, until a second provider lands.
+-- plans: one row per Paystack product/plan; readable by everyone. USD only at launch (Paystack
+-- does not support GBP or INR), so the currency check is a hard single value, not a set.
 create table public.plans (
   code text primary key check (code in ('free', 'trial', 'monthly', 'yearly', 'lifetime')),
   -- Paystack recurring plans only. One-time plans (lifetime) leave paystack_plan_code null and
@@ -141,9 +139,6 @@ create table public.plans (
   paystack_plan_code text,
   amount_cents int not null default 0,
   currency text not null default 'USD' check (currency = 'USD'),
-  -- The KES amount Paystack actually charges, in kobo (1 KES = 100 kobo). Zero on free.
-  -- See lib/billing/plans.ts for the USD→KES calibration and its date.
-  paystack_amount_kobo int not null default 0 check (paystack_amount_kobo >= 0),
   interval text check (interval in ('day', 'month', 'year')),
   interval_count int,
   active boolean not null default true,

@@ -9,7 +9,7 @@ Launch markets: UK, US, India. Business plan summary: docs/PRODUCT.md. Brand and
 - Hosting: Cloudflare Workers via OpenNext adapter. Static-first: calculators & guides are SSG.
 - CV builder + tracker run client-side, stored in IndexedDB. PDF export in the browser.
 - Supabase (Postgres) ONLY for signed-in sync, accounts, payments records.
-- Paystack (hosted checkout and subscriptions) on a Kenya merchant account. Every price in the Stepkite UI is shown in USD; Paystack actually settles in KES, and Paystack's own hosted checkout is where the customer sees the KES amount. The Stepkite UI never surfaces KES. Paystack is not a merchant of record and does not collect tax, so tax registration and price inclusion are ours.
+- Paystack (hosted checkout and subscriptions). USD only at launch: Paystack does not support GBP or INR, so prices do not localise. Paystack is not a merchant of record and does not collect tax, so tax registration and price inclusion are ours.
 - Tests: Vitest (unit), Playwright (e2e). Lint: ESLint + Prettier.
 
 ## Commands

@@ -37,9 +37,9 @@ content/<country>/*.mdx
 
 ## Payments
 
-- Provider: Paystack on a Kenya merchant account. Display currency on the Stepkite UI is USD; the actual settlement currency is KES (stored per-plan in `paystack_amount_kobo`). Paystack's hosted checkout shows the KES figure to the customer; the Stepkite UI never surfaces KES.
-- Lifetime: POST `/transaction/initialize` (one-time, no plan) with `currency: "KES"` and the plan's `paystack_amount_kobo`. On `charge.success`, grant lifetime entitlement. Idempotent on a stable key derived from the Paystack event.
-- Monthly and yearly: POST `/transaction/initialize` with a `plan` code (PLN_...). Paystack bills the cadence automatically in KES. The `subscription.create` event records the subscription code; `charge.success` extends `current_period_end`; `subscription.disable` revokes.
+- Provider: Paystack. USD only at launch (Paystack does not support GBP or INR).
+- Lifetime: POST `/transaction/initialize` (one-time, no plan). On `charge.success`, grant lifetime entitlement. Idempotent on the Paystack event id.
+- Monthly and yearly: POST `/transaction/initialize` with a `plan` code (PLN_...). Paystack bills the cadence automatically. The `subscription.create` event records the subscription code; `charge.success` extends `current_period_end`; `subscription.disable` revokes.
 - Cancel: POST `/subscription/disable` from our own `/api/paywall/cancel` (Paystack has no hosted customer portal).
 - Tax is our responsibility (Paystack does not collect), so prices are tax-inclusive outside the US. No card data touches our servers.
 

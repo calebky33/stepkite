@@ -2,7 +2,7 @@
 
 How Stepkite earns. Pairs with docs/RULES.md pricing section. Nothing here contradicts RULES.md; it describes the shape.
 
-Provider: **Paystack** on a Kenya merchant account. Every price on the Stepkite UI is shown in USD; Paystack settles in KES, and Paystack's own hosted checkout shows the KES amount to the customer. The Stepkite UI never surfaces KES. The USD→KES mapping lives per-plan in `lib/billing/plans.ts` (`paystackAmountKobo`) and in the Supabase `plans.paystack_amount_kobo` column.
+Provider: **Paystack**. USD only at launch because Paystack does not support GBP or INR. A second provider may be added later for GBP and INR without changing the pattern here.
 
 ## Flow
 
@@ -44,9 +44,8 @@ users               (one row per auth user)
 plans               (one source of truth for prices)
   code text pk      ("free"|"trial"|"monthly"|"yearly"|"lifetime")
   paystack_plan_code text null   (PLN_... for recurring; null for lifetime one-off)
-  amount_cents int                 (USD display amount, shown to the customer)
-  currency text                    ("USD" only at launch)
-  paystack_amount_kobo int         (KES amount Paystack actually charges, in kobo)
+  amount_cents int
+  currency text        ("USD" only at launch)
   interval text null   ("day"|"month"|"year"|null for lifetime)
   interval_count int null
   active bool
@@ -85,15 +84,15 @@ payments            (audit, one row per Paystack event we accepted)
 
 Row-level security: a user reads only their own row in `users` and `entitlements`; writes only through server routes. `plans` is readable by all. `payments` is readable only by the owner through a service role.
 
-## Paystack plans (owner creates in dashboard, codes land in `plans` table)
+## Paystack products (owner creates in dashboard, codes land in `plans` table)
 
-Create two subscription **plans** on Paystack. The account is a Kenya merchant, so plan amounts are in KES kobo (1 KES = 100 kobo):
+Create two subscription **plans** and one one-off **product** on Paystack, all in USD:
 
-- Monthly plan → interval `monthly`, amount `130000` (KES 1,300 for ≈ $9.99 display) → copy `plan_code` into `plans.paystack_plan_code` for `code='monthly'`.
-- Yearly plan → interval `annually`, amount `510000` (KES 5,100 for ≈ $39 display) → copy into `plans.paystack_plan_code` for `code='yearly'`.
-- Lifetime: no Paystack plan needed. Keep `paystack_plan_code` null; the checkout route initialises a one-time transaction for KES 19,500 (`1950000` kobo, ≈ $149 display).
+- Monthly plan → interval `monthly`, amount `999` (kobo = cents) → copy `plan_code` into `plans.paystack_plan_code` for `code='monthly'`.
+- Yearly plan → interval `annually`, amount `3900` → copy into `plans.paystack_plan_code` for `code='yearly'`.
+- Lifetime: no Paystack plan needed. Keep `paystack_plan_code` null; the checkout route initialises a one-time transaction for $149 (`14900` cents).
 
-The USD amounts above are the display numbers the Stepkite UI shows; the KES amounts are what Paystack charges. Recalibrate `paystack_amount_kobo` whenever the USD/KES rate drifts materially; last calibrated 2026-11-07 at ≈ USD 1 = KES 130.
+USD on Paystack requires the merchant account to be in Nigeria or Kenya and to pass Paystack's USD activation step (see OWNER-SETUP.md section 2.1).
 
 Paystack has no equivalent to Stripe Radar or Stripe Tax. We instead:
 

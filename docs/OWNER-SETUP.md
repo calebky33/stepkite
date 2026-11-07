@@ -27,25 +27,25 @@ Takes about one hour the first time.
 
 ## 2. Paystack (20 min)
 
-The Paystack account is a Kenya merchant, so plan currency is KES. The Stepkite UI shows USD prices to customers; Paystack settles in KES. The KES amounts below map to the USD display amounts in `lib/billing/plans.ts` (≈ USD 1 = KES 130, calibrated 2026-11-07).
+Paystack supports NGN, GHS, ZAR, KES and USD. GBP and INR are not available, so Stepkite prices are USD only at launch. USD on Paystack needs a Nigeria or Kenya merchant account with USD activation.
 
-2.1 Create a Paystack account at <https://dashboard.paystack.com/signup> if one is not already set up. The Stepkite account is "Apex" (id 2016766).
+2.1 Create a Paystack account at <https://dashboard.paystack.com/signup>. Fill in the business profile and bank details. Settings → Preferences → request USD activation (business documents required). Wait for approval before the first charge.
 
-2.2 In Payments → Plans (Live mode), create two subscription plans (amounts in KES kobo, 1 KES = 100 kobo):
+2.2 In Payments → Plans, create two subscription plans (amounts in cents, USD):
 
-- `Stepkite Monthly` → interval `monthly`, amount `130000` (KES 1,300).
-- `Stepkite Yearly` → interval `annually`, amount `510000` (KES 5,100).
+- `Stepkite Monthly` → interval `monthly`, amount `999`.
+- `Stepkite Yearly` → interval `annually`, amount `3900`.
 
-Lifetime does not need a plan: the checkout route initialises a one-time transaction for `1950000` kobo (KES 19,500) directly.
+Lifetime does not need a plan: the checkout route initialises a one-time transaction for `14900` cents directly.
 
 2.3 Copy each plan's `PLN_...` code. In the Supabase SQL editor, insert the plans:
 
 ```sql
-insert into plans (code, paystack_plan_code, amount_cents, currency, paystack_amount_kobo, interval, interval_count, active)
+insert into plans (code, paystack_plan_code, amount_cents, currency, interval, interval_count, active)
 values
-  ('monthly',  'PLN_...',   999, 'USD',  130000, 'month', 1, true),
-  ('yearly',   'PLN_...',  3900, 'USD',  510000, 'year',  1, true),
-  ('lifetime', null,      14900, 'USD', 1950000, null,    null, true);
+  ('monthly',  'PLN_...',  999, 'USD', 'month', 1, true),
+  ('yearly',   'PLN_...', 3900, 'USD', 'year',  1, true),
+  ('lifetime', null,     14900, 'USD', null,    null, true);
 ```
 
 2.4 Settings → API Keys & Webhooks:

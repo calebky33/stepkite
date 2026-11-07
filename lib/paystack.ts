@@ -26,13 +26,8 @@ export interface PaystackClient {
 
 export interface InitializeInput {
   email: string;
-  /**
-   * Amount in the minor unit of `currency` (kobo for KES, cents for USD). Must be a
-   * non-negative integer. For Kenyan merchants the field is KES kobo.
-   */
+  /** Amount in cents (USD minor unit). Must be a non-negative integer. */
   amount: number;
-  /** ISO 4217 currency code. Kenyan merchants use "KES"; other currencies need account support. */
-  currency: "KES" | "USD" | "NGN" | "GHS" | "ZAR";
   reference: string;
   callbackUrl: string;
   /** Paystack plan code for subscriptions (PLN_...). Omit for one-time charges. */
@@ -155,7 +150,7 @@ export function createPaystack(options?: {
           body: JSON.stringify({
             email: input.email,
             amount: input.amount,
-            currency: input.currency,
+            currency: "USD",
             reference: input.reference,
             callback_url: input.callbackUrl,
             plan: input.plan,

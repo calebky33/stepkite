@@ -10,22 +10,12 @@ export type PlanCode = "free" | "monthly" | "yearly" | "lifetime";
 export type BillingCurrency = "USD";
 export type Interval = "day" | "month" | "year";
 
-/**
- * Stepkite charges through Paystack on a Kenyan merchant account, so every charge is actually
- * settled in KES. Prices are shown to customers in USD (the global default) and Paystack's
- * hosted checkout displays and charges the KES equivalent stored in `paystackAmountKobo`.
- * Update `paystackAmountKobo` when the USD/KES rate drifts materially; last calibrated
- * 2026-11-07 at an approximate rate of USD 1 = KES 130.
- */
 export interface Plan {
   code: PlanCode;
   name: string;
-  /** Display amount in USD cents. Zero on the Free plan. */
+  /** Amount in the smallest unit of the currency (cents for USD). Zero on the Free plan. */
   amountCents: number;
-  /** Display currency. Always USD at the moment; see docs/RULES.md rule 23. */
   currency: BillingCurrency;
-  /** Amount in KES kobo (the currency Paystack actually charges). Zero on the Free plan. */
-  paystackAmountKobo: number;
   /** The billing cadence. Null on Free (nothing is billed) and on Lifetime (one payment). */
   interval: Interval | null;
   features: readonly string[];
@@ -37,7 +27,6 @@ export const PLANS: readonly Plan[] = [
     name: "Free",
     amountCents: 0,
     currency: "USD",
-    paystackAmountKobo: 0,
     interval: null,
     features: [
       "Full builder, unlimited edits",
@@ -53,7 +42,6 @@ export const PLANS: readonly Plan[] = [
     name: "Monthly",
     amountCents: 999,
     currency: "USD",
-    paystackAmountKobo: 130000,
     interval: "month",
     features: [
       "Everything in Free",
@@ -69,7 +57,6 @@ export const PLANS: readonly Plan[] = [
     name: "Yearly",
     amountCents: 3900,
     currency: "USD",
-    paystackAmountKobo: 510000,
     interval: "year",
     features: ["Everything in Monthly", "One charge for the year", "Fourteen day money back"],
   },
@@ -78,7 +65,6 @@ export const PLANS: readonly Plan[] = [
     name: "Lifetime",
     amountCents: 14900,
     currency: "USD",
-    paystackAmountKobo: 1950000,
     interval: null,
     features: ["Everything in Monthly", "Pay once, keep forever", "Fourteen day money back"],
   },

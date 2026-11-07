@@ -17,7 +17,9 @@ export function SandboxBanner({ country }: Props) {
       role="region"
       aria-label="Sign up to save your draft"
       aria-live="polite"
-      className="sticky top-[var(--header-h)] z-30 flex flex-col gap-3 rounded-card border border-border bg-accent-soft p-4 shadow-card sm:flex-row sm:items-center sm:justify-between"
+      // Sticky only from md up. On a phone the Edit and Preview bar already sticks at the same
+      // spot, and two stuck bars would leave little room to type.
+      className="flex flex-col gap-3 rounded-card border border-border bg-accent-soft p-4 shadow-card sm:flex-row sm:items-center sm:justify-between md:sticky md:top-[var(--header-h)] md:z-30"
     >
       <p className="text-base font-semibold text-text">
         Sign up to save and export your CV. Your draft moves to your account.

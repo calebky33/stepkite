@@ -354,6 +354,8 @@ export function CvEditorScreen({
       <div className="sticky top-[var(--header-h)] z-20 -mx-1 border-b border-border bg-bg px-1 py-2 md:hidden">
         <SegmentedControl
           label="View"
+          // Screen readers still hear "View". Hiding it on screen keeps this sticky bar short.
+          hideLabel
           options={[
             { value: "edit", label: "Edit" },
             { value: "preview", label: "Preview" },

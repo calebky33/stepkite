@@ -69,12 +69,14 @@ export function ConsentBanner() {
     <section
       ref={publishHeight}
       aria-label="Cookie choice"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface px-4 pt-4 shadow-bar pb-[max(1rem,env(safe-area-inset-bottom))] md:px-6"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface px-4 pt-3 shadow-bar pb-[max(0.75rem,env(safe-area-inset-bottom))] md:px-6 md:pt-4 md:pb-[max(1rem,env(safe-area-inset-bottom))]"
     >
-      <div className="mx-auto flex max-w-[1120px] flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <p className="max-w-prose text-base">
-          Can we use optional cookies for page statistics and ads? Saying no is fine and every tool
-          still works. We never record the salary you type.{" "}
+      <div className="mx-auto flex max-w-[1120px] flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
+        <p className="max-w-prose text-sm md:text-base">
+          Can we use optional cookies for page statistics and ads?{" "}
+          <span className="hidden md:inline">
+            Saying no is fine and every tool still works. We never record the salary you type.{" "}
+          </span>
           <Link href="/cookies" className="text-primary underline-offset-4 hover:underline">
             Read about cookies
           </Link>

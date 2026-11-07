@@ -31,6 +31,12 @@ jobs:
     environment: production
     steps:
       - uses: actions/checkout@v4
+      # GitHub expressions have no arithmetic, so compute the remainder in the shell.
+      - name: Compute remaining percent
+        id: split
+        env:
+          NEW_PERCENT: ${{ inputs.new_percent }}
+        run: echo "rest=$((100 - NEW_PERCENT))" >> "$GITHUB_OUTPUT"
       - uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -38,7 +44,7 @@ jobs:
           command: >-
             versions deploy
             ${{ inputs.new_version_id }}@${{ inputs.new_percent }}%
-            ${{ inputs.current_version_id }}@${{ 100 - fromJSON(inputs.new_percent) }}%
+            ${{ inputs.current_version_id }}@${{ steps.split.outputs.rest }}%
             --yes
             --message "promote ${{ inputs.new_version_id }} to ${{ inputs.new_percent }}%"
       - name: Note

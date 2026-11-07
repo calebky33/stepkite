@@ -5,6 +5,9 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import type { CountryCode } from "@/lib/countries";
+import { useSavedCountry } from "@/lib/countryPreference";
+import { CountryPicker } from "./CountryPicker";
 
 type Mode = "sign-in" | "sign-up";
 
@@ -18,6 +21,13 @@ export function AuthForm({ mode, next }: { mode: Mode; next: string }) {
   const [status, setStatus] = useState<"idle" | "busy" | "unavailable" | "error">("idle");
   const [fieldError, setFieldError] = useState<string | undefined>();
   const isSignUp = mode === "sign-up";
+  // Starts on the remembered or location-guessed market; the user can change it before signing up.
+  const suggested = useSavedCountry();
+  const [picked, setPicked] = useState<CountryCode | null>(null);
+  const country = picked ?? suggested;
+  const googleHref = `/api/auth/google?next=${encodeURIComponent(next)}${
+    isSignUp ? `&country=${country}` : ""
+  }`;
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -36,7 +46,11 @@ export function AuthForm({ mode, next }: { mode: Mode; next: string }) {
       const res = await fetch(`/api/auth/${isSignUp ? "signup" : "signin"}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: trimmed, password, next }),
+        body: JSON.stringify(
+          isSignUp
+            ? { email: trimmed, password, next, country }
+            : { email: trimmed, password, next },
+        ),
       });
       if (res.status === 503) setStatus("unavailable");
       else if (!res.ok) setStatus("error");
@@ -51,9 +65,16 @@ export function AuthForm({ mode, next }: { mode: Mode; next: string }) {
       <h2 className="text-xl font-semibold">
         {isSignUp ? "Create your account" : "Sign in to your account"}
       </h2>
+      {isSignUp ? (
+        <CountryPicker
+          value={country}
+          onChange={setPicked}
+          hint="You will see pay and CV tools for this country. You can change it later in your account."
+        />
+      ) : null}
       <div className="flex flex-col gap-2">
         <Link
-          href={`/api/auth/google?next=${encodeURIComponent(next)}`}
+          href={googleHref}
           prefetch={false}
           className="inline-flex min-h-11 items-center justify-center rounded-input border border-border-strong bg-surface px-4 text-base hover:bg-surface-2"
         >

@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { ConsentBanner } from "@/components/shell/ConsentBanner";
 import { Footer } from "@/components/shell/Footer";
 import { Header } from "@/components/shell/Header";
+import { isCountry } from "@/lib/countries";
 import { SITE_URL } from "@/lib/seo";
 import "./globals.css";
 
@@ -62,14 +63,17 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const requestHeaders = await headers();
   const signedIn = requestHeaders.get("x-stepkite-signed-in") === "1";
   const userName = readUserName(requestHeaders.get("x-stepkite-user-name"));
+  // Set by the proxy only for a signed-in user with a home market. Checked again here.
+  const rawHome = requestHeaders.get("x-stepkite-user-country");
+  const homeCountry = signedIn && rawHome && isCountry(rawHome) ? rawHome : null;
   return (
     <html lang="en" className={`${inter.variable} ${calistoga.variable} ${jakarta.variable}`}>
       <body className="flex min-h-dvh flex-col">
-        <Header signedIn={signedIn} userName={userName} />
+        <Header signedIn={signedIn} userName={userName} homeCountry={homeCountry} />
         <main id="main" tabIndex={-1} className="flex-1 outline-none">
           {children}
         </main>
-        <Footer />
+        <Footer homeCountry={homeCountry} />
         <ConsentBanner />
       </body>
     </html>

@@ -46,3 +46,23 @@ test("the ATS check updates as you type and the PDF button is ready", async ({ p
   await page.getByLabel("Full name", { exact: true }).fill("Asha Rao");
   await expect(page.getByRole("button", { name: "Download PDF" })).toBeEnabled();
 });
+
+test("sign-up asks for a country and passes it to Google sign-in", async ({ page }) => {
+  await page.goto("/sign-up");
+  const picker = page.getByRole("combobox", { name: "Your country" });
+  await expect(picker).toBeVisible();
+  await picker.click();
+  await page.getByRole("option", { name: "Kenya" }).click();
+  await expect(page.getByRole("link", { name: "Continue with Google" })).toHaveAttribute(
+    "href",
+    /[?&]country=ke(&|$)/,
+  );
+});
+
+test("every market has a real flag in the footer", async ({ page }) => {
+  await page.goto("/");
+  const flags = page.locator("footer img[src^='/flags/']");
+  await expect(flags).toHaveCount(23);
+  const res = await page.request.get("/flags/sa.svg");
+  expect(res.ok()).toBe(true);
+});

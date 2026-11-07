@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { saveHomeCountryIfMissing } from "@/lib/auth/homeCountry";
 import { createSupabaseServer } from "@/lib/supabase/server";
 import { safeNext } from "@/lib/auth/safe-next";
 
@@ -25,5 +26,6 @@ export async function GET(request: Request): Promise<Response> {
     return NextResponse.redirect(new URL("/sign-in?error=exchange_failed", url.origin));
   }
 
+  await saveHomeCountryIfMissing(supabase, url.searchParams.get("country"), request.headers);
   return NextResponse.redirect(new URL(next, url.origin));
 }

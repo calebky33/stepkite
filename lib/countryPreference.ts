@@ -2,7 +2,6 @@
 
 import { useSyncExternalStore } from "react";
 import { isCountry, type CountryCode } from "@/lib/countries";
-import { countryRoutes } from "@/lib/routes";
 
 /** Country code only. No personal data is stored. */
 export const COUNTRY_STORAGE_KEY = "sk_country";
@@ -29,7 +28,35 @@ export function saveCountry(code: CountryCode): void {
   window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 
+/**
+ * The visitor's market guessed from their location, held in memory for this page only. It is a
+ * suggestion: it never overrides a saved choice and is never written to storage by itself.
+ */
+let detected: CountryCode | null = null;
+let detectRequested = false;
+
+function detectCountryOnce(): void {
+  if (detectRequested || readSavedCountry() !== null) return;
+  detectRequested = true;
+  fetch("/api/geo", { cache: "no-store" })
+    .then((res) => (res.ok ? res.json() : null))
+    .then((body: unknown) => {
+      const value =
+        typeof body === "object" && body !== null
+          ? (body as Record<string, unknown>).country
+          : null;
+      if (typeof value === "string" && isCountry(value)) {
+        detected = value;
+        window.dispatchEvent(new Event(CHANGE_EVENT));
+      }
+    })
+    .catch(() => {
+      // No guess: the default stays. Location is only a convenience.
+    });
+}
+
 function subscribe(onChange: () => void): () => void {
+  detectCountryOnce();
   window.addEventListener(CHANGE_EVENT, onChange);
   window.addEventListener("storage", onChange);
   return () => {
@@ -38,21 +65,14 @@ function subscribe(onChange: () => void): () => void {
   };
 }
 
-/** The remembered country, or the UK. Matches the server render until the page hydrates. */
+/** The remembered country, else the one guessed from location, else the UK. Matches the server
+ *  render until the page hydrates. */
 export function useSavedCountry(): CountryCode {
   return useSyncExternalStore(
     subscribe,
-    () => readSavedCountry() ?? DEFAULT_COUNTRY,
+    () => readSavedCountry() ?? detected ?? DEFAULT_COUNTRY,
     (): CountryCode => DEFAULT_COUNTRY,
   );
 }
 
-/** The same page in another country when that route exists, else the country hub. */
-export function pathForCountry(pathname: string, target: CountryCode): string {
-  const [, first = "", ...rest] = pathname.split("/");
-  if (!isCountry(first) || rest.length === 0 || rest.every((part) => part === "")) {
-    return `/${target}`;
-  }
-  const candidate = `/${target}/${rest.join("/")}`;
-  return countryRoutes(target).includes(candidate) ? candidate : `/${target}`;
-}
+export { pathForCountry } from "@/lib/routes";

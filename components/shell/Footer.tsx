@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
-import { COUNTRIES, COUNTRY_INFO } from "@/lib/countries";
+import { COUNTRIES, COUNTRY_INFO, type CountryCode } from "@/lib/countries";
 import { Flag } from "./Flag";
 import { FooterGroup } from "./FooterGroup";
 import { FooterNav } from "./FooterNav";
@@ -11,7 +11,9 @@ import { ThemeToggle } from "./ThemeToggle";
 const LINK_CLASS =
   "inline-flex min-h-11 items-center text-sm text-ink-muted underline-offset-4 hover:text-ink-fg hover:underline";
 
-export function Footer() {
+/** `homeCountry` is the signed-in user's market. They see only that one here, with a link to
+ *  change it in account settings. */
+export function Footer({ homeCountry = null }: { homeCountry?: CountryCode | null }) {
   return (
     <footer className="on-ink mt-8 mb-[var(--consent-h,0px)] bg-ink pb-[max(0.5rem,env(safe-area-inset-bottom))] text-ink-fg lg:mt-12 lg:pb-[max(1rem,env(safe-area-inset-bottom))]">
       <div className="mx-auto max-w-[1120px] px-4 pt-4 md:px-6 lg:pt-6">
@@ -29,18 +31,36 @@ export function Footer() {
         </div>
 
         <FooterNav>
-          <FooterGroup title="Supported countries" label="Countries">
-            <ul className="lg:columns-2 lg:gap-4">
-              {COUNTRIES.map((code) => (
-                <li key={code} className="break-inside-avoid">
-                  <Link href={`/${code}`} className={`${LINK_CLASS} gap-2`}>
-                    <Flag code={code} />
-                    {COUNTRY_INFO[code].shortName}
+          {homeCountry ? (
+            <FooterGroup title="Your country" label="Your country">
+              <ul>
+                <li>
+                  <Link href={`/${homeCountry}`} className={`${LINK_CLASS} gap-2`}>
+                    <Flag code={homeCountry} />
+                    {COUNTRY_INFO[homeCountry].name}
                   </Link>
                 </li>
-              ))}
-            </ul>
-          </FooterGroup>
+                <li>
+                  <Link href="/account#country" className={LINK_CLASS}>
+                    Change country
+                  </Link>
+                </li>
+              </ul>
+            </FooterGroup>
+          ) : (
+            <FooterGroup title="Supported countries" label="Countries">
+              <ul className="lg:columns-2 lg:gap-4">
+                {COUNTRIES.map((code) => (
+                  <li key={code} className="break-inside-avoid">
+                    <Link href={`/${code}`} className={`${LINK_CLASS} gap-2`}>
+                      <Flag code={code} />
+                      {COUNTRY_INFO[code].shortName}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </FooterGroup>
+          )}
         </FooterNav>
 
         <section

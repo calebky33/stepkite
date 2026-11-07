@@ -27,6 +27,7 @@ export default function Privacy() {
           heading: "What we store when you sign up",
           paragraphs: [
             "We store your email address, a hashed password or an OAuth identifier (Google or LinkedIn), the plan you are on, and the CVs and jobs you choose to save.",
+            "We also store the country you job hunt in, so the site shows tools for that country. You pick it when you sign up and can change it in your account. If you sign in with Google without picking one, we use the country your connection comes from. We only ever see the country, never your town or IP address.",
             "During the seven-day free trial we also store an anonymised browser fingerprint and a hashed IP address. We use these only to stop the same person starting more than one free trial.",
             "If you pay, Paystack handles your card details. We keep a record that a charge happened, the amount and the date, not your card number.",
           ],

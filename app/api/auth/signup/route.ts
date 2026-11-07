@@ -1,12 +1,18 @@
 // Supabase sign-up lands in a later session. Until the owner connects a Supabase project
 // and sets SUPABASE_URL and the keys, this route answers 503 so the UI shows "not open yet".
 import { z } from "zod";
+import { isCountry } from "@/lib/countries";
 
 const bodySchema = z
   .object({
     email: z.email().max(254),
     password: z.string().min(8).max(200),
     next: z.string().max(1024).optional(),
+    // The market picked on the sign-up form. Saved to the account once sign-up opens.
+    country: z
+      .string()
+      .refine((c) => isCountry(c))
+      .optional(),
   })
   .strict();
 

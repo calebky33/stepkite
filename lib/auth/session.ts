@@ -1,3 +1,4 @@
+import { isCountry, type CountryCode } from "@/lib/countries";
 import { createSupabaseServer } from "@/lib/supabase/server";
 
 export type SessionUser = {
@@ -6,7 +7,19 @@ export type SessionUser = {
   createdAt: string;
   /** Display name from the sign in provider (Google), or null when there is none. */
   name: string | null;
+  /** The market chosen at sign-up or in account settings. Null until one is set. */
+  country: CountryCode | null;
 };
+
+/** Key in Supabase user_metadata that holds the home market. */
+export const HOME_COUNTRY_KEY = "home_country";
+
+/** user_metadata can be edited by the user, so only a registry code is trusted. */
+export function homeCountry(metadata: unknown): CountryCode | null {
+  if (typeof metadata !== "object" || metadata === null) return null;
+  const value = (metadata as Record<string, unknown>)[HOME_COUNTRY_KEY];
+  return typeof value === "string" && isCountry(value) ? value : null;
+}
 
 /** The provider puts the name in user_metadata. It is untrusted text, so only keep a plain,
  *  trimmed, bounded string. */
@@ -35,6 +48,7 @@ export async function getSession(_request?: Request): Promise<SessionUser | null
     email: data.user.email ?? "",
     createdAt: data.user.created_at,
     name: displayName(data.user.user_metadata),
+    country: homeCountry(data.user.user_metadata),
   };
 }
 

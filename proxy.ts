@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getSession } from "@/lib/auth/session";
 import { COUNTRIES } from "@/lib/countries";
+import { homeCountryRedirect } from "@/lib/routes";
 import { USER_COOKIE } from "@/lib/cv/userCookie";
 import { buildCsp, cspHeaderName } from "@/lib/security/csp";
 
@@ -64,6 +65,20 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   // The display name for the header. Percent encoded so any character is safe in a header.
   requestHeaders.delete("x-stepkite-user-name");
   if (user?.name) requestHeaders.set("x-stepkite-user-name", encodeURIComponent(user.name));
+  // The home market, so the layout can hide the country switcher. Never trusted from the client.
+  requestHeaders.delete("x-stepkite-user-country");
+  if (user?.country) requestHeaders.set("x-stepkite-user-country", user.country);
+  // A signed-in user with a home market only sees that market: another market's page opens
+  // the same page in theirs, or their hub when it has no such page.
+  const homeTarget = user?.country ? homeCountryRedirect(url.pathname, user.country) : null;
+  if (homeTarget) {
+    const redirect = NextResponse.redirect(new URL(`${homeTarget}${url.search}`, url.origin));
+    redirect.headers.set(name, csp);
+    // Depends on who is signed in, so no shared cache may keep it.
+    redirect.headers.set("Cache-Control", "private, no-store");
+    syncUserCookie(request, redirect, true);
+    return redirect;
+  }
   if (shouldRedirect(url.pathname, user !== null)) {
     const next = `${url.pathname}${url.search}`;
     const target = new URL(`/sign-up?next=${encodeURIComponent(next)}`, url.origin);
@@ -119,7 +134,8 @@ function syncUserCookie(request: NextRequest, response: NextResponse, signedIn: 
 export const config = {
   matcher: [
     {
-      source: "/((?!api/|_next/static/|_next/image/|favicon.ico|icon.svg).*)",
+      // flags/ holds static SVGs: no session check or CSP needed, and a page shows up to 23.
+      source: "/((?!api/|_next/static/|_next/image/|flags/|favicon.ico|icon.svg).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" },

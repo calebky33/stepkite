@@ -1,14 +1,8 @@
-import { z } from "zod";
-
 /** Preferences only. No personal data is stored (CLAUDE.md rule 3, RULES.md 33). */
 export const CONSENT_COOKIE = "sk_consent";
 const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 
-export const consentSchema = z.object({
-  analytics: z.boolean(),
-  ads: z.boolean(),
-});
-export type Consent = z.infer<typeof consentSchema>;
+export type Consent = { analytics: boolean; ads: boolean };
 
 export const DECLINED: Consent = { analytics: false, ads: false };
 
@@ -56,8 +50,11 @@ export function needsConsentBanner(countryCode: string | null | undefined): bool
 export function parseConsent(raw: string | null | undefined): Consent | null {
   if (!raw) return null;
   try {
-    const parsed = consentSchema.safeParse(JSON.parse(decodeURIComponent(raw)));
-    return parsed.success ? parsed.data : null;
+    const value: unknown = JSON.parse(decodeURIComponent(raw));
+    if (typeof value !== "object" || value === null) return null;
+    const { analytics, ads } = value as Partial<Record<keyof Consent, unknown>>;
+    if (typeof analytics !== "boolean" || typeof ads !== "boolean") return null;
+    return { analytics, ads };
   } catch {
     return null;
   }

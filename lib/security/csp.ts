@@ -1,6 +1,8 @@
 /**
  * Content-Security-Policy for pages. Hosts come from the code:
  * - connect-src https://*.supabase.co: the browser Supabase client (lib/supabase/browser.ts).
+ * - frame-src and connect-src https://challenges.cloudflare.com: the Turnstile bot check on the
+ *   newsletter form (components/shell/NewsletterSignup.tsx). Its script is loaded with our nonce.
  * - Fonts are self-hosted by next/font, images are local, and checkout is a redirect to Paystack
  *   (navigation is not limited by CSP), so no other host is allowed.
  * - style-src 'unsafe-inline': React style attributes need it. Scripts never get it.
@@ -12,7 +14,8 @@ export function buildCsp(nonce: string, isDev: boolean): string {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' blob: data:",
     "font-src 'self'",
-    "connect-src 'self' https://*.supabase.co",
+    "connect-src 'self' https://*.supabase.co https://challenges.cloudflare.com",
+    "frame-src https://challenges.cloudflare.com",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",

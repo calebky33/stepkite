@@ -18,6 +18,36 @@ async function runProxy(options: {
   return response;
 }
 
+describe("proxy www redirect", () => {
+  async function runAt(url: string) {
+    vi.resetModules();
+    vi.doMock("@/lib/auth/session", () => ({ getSession: async () => null }));
+    const { proxy } = await import("./proxy");
+    const { NextRequest } = await import("next/server");
+    const response = await proxy(new NextRequest(url));
+    vi.doUnmock("@/lib/auth/session");
+    return response;
+  }
+
+  it("sends www to the bare domain with a permanent redirect, keeping path and query", async () => {
+    const response = await runAt("https://www.stepkite.app/uk/salary-calculator?x=1");
+    expect(response.status).toBe(308);
+    expect(response.headers.get("location")).toBe("https://stepkite.app/uk/salary-calculator?x=1");
+  });
+
+  it("leaves the bare domain and other hosts alone", async () => {
+    for (const url of [
+      "https://stepkite.app/uk",
+      "https://stepkite.calebky33.workers.dev/uk",
+      "https://www.example.com/uk",
+      "https://www.stepkite.com/uk",
+    ]) {
+      const response = await runAt(url);
+      expect(response.status).toBe(200);
+    }
+  });
+});
+
 describe("proxy sk_user hint cookie", () => {
   it("sets it for a signed in visitor who does not have it yet", async () => {
     const response = await runProxy({ user: { name: "Caleb" } });

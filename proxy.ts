@@ -14,6 +14,9 @@ import { buildCsp, cspHeaderName } from "@/lib/security/csp";
  * docs/MONETIZATION.md (Gated pages).
  */
 
+const WWW_HOST = "www.stepkite.app";
+const BARE_HOST = "stepkite.app";
+
 const GATED_PATH_PATTERNS: readonly RegExp[] = [
   /^\/(uk|us|in)\/tracker(?:\/|$)/,
   /^\/account(?:\/|$)/,
@@ -45,6 +48,13 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   requestHeaders.set(name, csp);
 
   const url = new URL(request.url);
+  // One address for the site: www.stepkite.app goes to stepkite.app, keeping the path and query.
+  // An exact match, so no other host can be bounced anywhere.
+  if (url.hostname === WWW_HOST) {
+    const target = new URL(request.url);
+    target.hostname = BARE_HOST;
+    return NextResponse.redirect(target, 308);
+  }
   const user = await getSession(request);
   // Carry the signed-in boolean to page renders so the root layout reads it
   // from headers() instead of calling getSession a second time.

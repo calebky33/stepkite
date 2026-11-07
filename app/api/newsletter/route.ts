@@ -68,6 +68,12 @@ export async function POST(request: Request): Promise<Response> {
       .map((h) => h.trim())
       .filter(Boolean),
   });
-  if (!verify.ok) return reply({ error: "challenge_failed" }, 403);
+  if (!verify.ok) {
+    // The reason only, never the token or the email, so a failing bot check can be diagnosed.
+    console.error(
+      JSON.stringify({ route: "newsletter", event: "challenge_failed", reason: verify.reason }),
+    );
+    return reply({ error: "challenge_failed" }, 403);
+  }
   return reply({ error: "not_available_yet" }, 503);
 }

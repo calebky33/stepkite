@@ -34,7 +34,11 @@ describe("security headers", () => {
     const csp = res.headers.get("Content-Security-Policy") ?? "";
     expect(csp).toContain("manifest-src 'self'");
     expect(csp).toContain("upgrade-insecure-requests");
-    expect(csp).not.toContain("frame-src");
+    // Only the Turnstile bot check may be framed or contacted from the page.
+    expect(csp).toContain("frame-src https://challenges.cloudflare.com;");
+    expect(csp).toContain(
+      "connect-src 'self' https://*.supabase.co https://challenges.cloudflare.com",
+    );
     expect(csp).not.toContain("worker-src");
   });
 

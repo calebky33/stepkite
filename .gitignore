@@ -52,8 +52,16 @@ next-env.d.ts
 # playwright
 /test-results/
 /playwright-report/
+/.playwright-mcp/
 
 # Local release markers (scripts/preflight.mjs, scripts/smoke.mjs)
 .claude/.preflight-ok
 .claude/.smoke-ok
 litellm-*
+
+# pi agent harness
+.pi/agents
+.agents/skills
+
+# e2e signed-in session (never commit)
+/e2e/.auth/

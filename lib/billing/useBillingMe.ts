@@ -1,12 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { hasProAccess, type Entitlement } from "./entitlement";
+import * as z from "zod/mini";
+import { hasProAccess } from "./entitlement";
 
-type BillingMeResponse = {
-  signedIn: boolean;
-  entitlement: Entitlement | null;
-};
+// zod/mini keeps this small: the hook runs on calculator pages through AdSlot.
+const responseSchema = z.object({
+  signedIn: z.boolean(),
+  entitlement: z.nullable(
+    z.object({
+      planCode: z.enum(["free", "trial", "monthly", "yearly", "lifetime"]),
+      status: z.enum(["none", "trialing", "active", "canceled", "past_due", "revoked"]),
+      trialEndsAt: z.nullable(z.string()),
+      currentPeriodEnd: z.nullable(z.string()),
+      cancelAt: z.nullable(z.string()),
+      trialExportsToday: z.number(),
+    }),
+  ),
+});
 
 export type BillingMeState =
   | { status: "loading"; isPro: false; signedIn: false }
@@ -30,7 +41,8 @@ export function useBillingMe(): BillingMeState {
     fetch("/api/billing/me", { signal: controller.signal, cache: "no-store" })
       .then(async (res) => {
         if (!res.ok) throw new Error(`billing/me ${res.status}`);
-        const body = (await res.json()) as BillingMeResponse;
+        // A body that does not match is treated like a failed request: free plan, no Pro UI.
+        const body = responseSchema.parse(await res.json());
         const isPro = body.entitlement ? hasProAccess(body.entitlement) : false;
         setState({ status: "ready", isPro, signedIn: body.signedIn });
       })

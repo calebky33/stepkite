@@ -76,12 +76,8 @@ export default async function SalaryCalculatorPage({ params, searchParams }: Pro
   const content = SALARY_CONTENT[country];
 
   if (!isTaxCountry(country)) {
-    return (
-      <>
-        <TaxUnavailable country={country} />
-        <ToolLinks country={country} />
-      </>
-    );
+    // TaxUnavailable already links to the CV builder and the tracker, so no ToolLinks here.
+    return <TaxUnavailable country={country} />;
   }
 
   if (!content) {

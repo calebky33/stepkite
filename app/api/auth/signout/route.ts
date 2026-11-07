@@ -1,4 +1,5 @@
 import { USER_COOKIE } from "@/lib/cv/userCookie";
+import { rateLimit } from "@/lib/rateLimit";
 import { createSupabaseServer } from "@/lib/supabase/server";
 
 /**
@@ -9,6 +10,12 @@ export async function POST(request: Request): Promise<Response> {
   const origin = request.headers.get("origin");
   if (!origin || origin !== new URL(request.url).origin) {
     return Response.json({ error: "forbidden" }, { status: 403 });
+  }
+  if (!(await rateLimit(request, "RL_AUTH"))) {
+    return Response.json(
+      { error: "rate_limited" },
+      { status: 429, headers: { "Cache-Control": "no-store" } },
+    );
   }
 
   const supabase = await createSupabaseServer();

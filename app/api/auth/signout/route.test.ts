@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
 vi.mock("@/lib/supabase/server", () => ({ createSupabaseServer: vi.fn() }));
+vi.mock("@/lib/rateLimit", () => ({ rateLimit: vi.fn().mockResolvedValue(true) }));
 
+import { rateLimit } from "@/lib/rateLimit";
 import { createSupabaseServer } from "@/lib/supabase/server";
 import { POST } from "./route";
 
@@ -26,6 +28,14 @@ describe("POST /api/auth/signout", () => {
     );
     expect(res.status).toBe(403);
     expect(await res.json()).toEqual({ error: "forbidden" });
+    expect(createSupabaseServer).not.toHaveBeenCalled();
+  });
+
+  it("returns 429 when the auth rate limit is hit, before touching Supabase", async () => {
+    (rateLimit as Mock).mockResolvedValueOnce(false);
+    const res = await POST(new Request(url, { method: "POST", headers: { origin: sameOrigin } }));
+    expect(res.status).toBe(429);
+    expect(await res.json()).toEqual({ error: "rate_limited" });
     expect(createSupabaseServer).not.toHaveBeenCalled();
   });
 

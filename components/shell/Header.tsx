@@ -9,7 +9,7 @@ import { IconButton } from "@/components/ui/IconButton";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/components/ui/cn";
 import { COUNTRY_INFO, cvLabelTitle, isCountry, type CountryCode } from "@/lib/countries";
-import { useSavedCountry } from "@/lib/countryPreference";
+import { saveCountry, useSavedCountry } from "@/lib/countryPreference";
 import { CountrySwitcher } from "./CountrySwitcher";
 import { ToolsMenu } from "./ToolsMenu";
 
@@ -85,9 +85,24 @@ function navName(name: string | null | undefined): string | null {
   return characters.length > 18 ? `${characters.slice(0, 17).join("")}…` : first;
 }
 
-export function Header({ signedIn, userName }: { signedIn: boolean; userName?: string | null }) {
+export function Header({
+  signedIn,
+  userName,
+  homeCountry = null,
+}: {
+  signedIn: boolean;
+  userName?: string | null;
+  /** The signed-in user's market. When set, the header stays on it and the switcher is hidden. */
+  homeCountry?: CountryCode | null;
+}) {
   const pathname = usePathname() ?? "/";
-  const country = countryFrom(pathname, useSavedCountry());
+  const saved = useSavedCountry();
+  const country = homeCountry ?? countryFrom(pathname, saved);
+  // Keep the remembered country in step with the account, so pages outside a market (home,
+  // guides) and the next visit after sign-out start from it.
+  useEffect(() => {
+    if (homeCountry && saved !== homeCountry) saveCountry(homeCountry);
+  }, [homeCountry, saved]);
   const info = COUNTRY_INFO[country];
   const accountLabel = navName(userName);
   // The menu belongs to the path it was opened on, so a route change closes it.
@@ -188,7 +203,7 @@ export function Header({ signedIn, userName }: { signedIn: boolean; userName?: s
 
         <div className="flex items-center gap-2">
           <div className="hidden items-center gap-2 lg:flex">
-            <CountrySwitcher />
+            {homeCountry ? null : <CountrySwitcher />}
             {signedIn ? (
               <Link
                 href="/account"
@@ -278,9 +293,11 @@ export function Header({ signedIn, userName }: { signedIn: boolean; userName?: s
               </Link>
             );
           })}
-          <div className="mt-2 border-t border-border pt-3">
-            <CountrySwitcher layout="inline" onNavigate={() => setOpenedPath(null)} />
-          </div>
+          {homeCountry ? null : (
+            <div className="mt-2 border-t border-border pt-3">
+              <CountrySwitcher layout="inline" onNavigate={() => setOpenedPath(null)} />
+            </div>
+          )}
           <Link
             href={`/${country}/cv`}
             onClick={() => setOpenedPath(null)}

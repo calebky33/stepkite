@@ -35,3 +35,23 @@ export function countryRoutes(country: CountryCode): string[] {
   }
   return routes;
 }
+
+/** The same page in another country when that route exists, else the country hub. */
+export function pathForCountry(pathname: string, target: CountryCode): string {
+  const [, first = "", ...rest] = pathname.split("/");
+  if (!isCountry(first) || rest.length === 0 || rest.every((part) => part === "")) {
+    return `/${target}`;
+  }
+  const candidate = `/${target}/${rest.join("/")}`;
+  return countryRoutes(target).includes(candidate) ? candidate : `/${target}`;
+}
+
+/**
+ * Where a signed-in user with a home market goes when they open another market's page. Null
+ * when the path is not a market page or is already in their market.
+ */
+export function homeCountryRedirect(pathname: string, home: CountryCode): string | null {
+  const first = pathname.split("/")[1] ?? "";
+  if (!isCountry(first) || first === home) return null;
+  return pathForCountry(pathname, home);
+}

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isCountry } from "@/lib/countries";
 import { createSupabaseServer } from "@/lib/supabase/server";
 import { safeNext } from "@/lib/auth/safe-next";
 
@@ -13,6 +14,9 @@ export async function GET(request: Request): Promise<Response> {
 
   const callback = new URL("/api/auth/callback", url.origin);
   callback.searchParams.set("next", next);
+  // The market picked on the sign-up page. Only a registry code is passed on.
+  const country = url.searchParams.get("country");
+  if (country && isCountry(country)) callback.searchParams.set("country", country);
 
   try {
     const { data, error } = await supabase.auth.signInWithOAuth({

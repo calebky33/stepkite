@@ -1,53 +1,22 @@
 import type { CountryCode } from "@/lib/countries";
 
-/** Small flat flags, drawn inline. Decorative: the country name always sits beside them.
- *  Markets without a drawn flag get a two-letter badge instead. */
+/**
+ * Small flat flag for every market, served as a static SVG from public/flags (copied from the
+ * MIT licensed country-flag-icons 1.6.20, see public/flags/LICENSE.txt). An image instead of
+ * inline SVG keeps the flags out of the JavaScript bundle. Decorative: the country name always
+ * sits beside it, so the alt text is empty.
+ */
 export function Flag({ code }: { code: CountryCode }) {
   return (
-    <svg
-      aria-hidden="true"
-      focusable="false"
-      viewBox="0 0 24 16"
-      className="h-4 w-6 shrink-0 rounded-[2px]"
-    >
-      {code === "uk" ? (
-        <>
-          <rect width="24" height="16" fill="#012169" />
-          <path d="M0 0l24 16M24 0L0 16" stroke="#fff" strokeWidth="3.2" />
-          <path d="M0 0l24 16M24 0L0 16" stroke="#c8102e" strokeWidth="1.2" />
-          <path d="M12 0v16M0 8h24" stroke="#fff" strokeWidth="5.2" />
-          <path d="M12 0v16M0 8h24" stroke="#c8102e" strokeWidth="3.2" />
-        </>
-      ) : code === "us" ? (
-        <>
-          <rect width="24" height="16" fill="#fff" />
-          {[0, 2, 4, 6, 8, 10, 12].map((i) => (
-            <rect key={i} y={i * (16 / 13)} width="24" height={16 / 13} fill="#b22234" />
-          ))}
-          <rect width="10" height={(16 / 13) * 7} fill="#3c3b6e" />
-        </>
-      ) : code === "in" ? (
-        <>
-          <rect width="24" height="5.34" fill="#ff9933" />
-          <rect y="5.33" width="24" height="5.34" fill="#fff" />
-          <rect y="10.66" width="24" height="5.34" fill="#138808" />
-          <circle cx="12" cy="8" r="1.9" fill="none" stroke="#000080" strokeWidth="0.6" />
-        </>
-      ) : (
-        <>
-          <rect width="24" height="16" style={{ fill: "var(--surface-2)" }} />
-          <text
-            x="12"
-            y="12"
-            textAnchor="middle"
-            fontSize="7"
-            fontWeight="700"
-            style={{ fill: "var(--text-muted)" }}
-          >
-            {code.toUpperCase()}
-          </text>
-        </>
-      )}
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element -- a 1 to 3 KB static SVG needs no next/image optimiser or its client code.
+    <img
+      src={`/flags/${code}.svg`}
+      alt=""
+      width={24}
+      height={16}
+      loading="lazy"
+      decoding="async"
+      className="h-4 w-6 shrink-0 rounded-[2px] object-cover shadow-[0_0_0_1px_var(--border)]"
+    />
   );
 }

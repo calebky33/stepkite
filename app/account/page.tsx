@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/Card";
 import { PageShell } from "@/components/shell/PageShell";
 import { stubMetadata } from "@/lib/seo";
 import { AccountPanel } from "./AccountPanel";
+import { CountryCard } from "./CountryCard";
 
 export const metadata: Metadata = stubMetadata({
   title: "Your account",
@@ -39,6 +40,11 @@ export default async function Account() {
             ) : null}
           </dl>
         </Card>
+      ) : null}
+      {user ? (
+        <div className="mb-6">
+          <CountryCard current={user.country} />
+        </div>
       ) : null}
       <AccountPanel />
     </PageShell>

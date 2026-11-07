@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/Button";
 import type { PlanCode } from "@/lib/billing/plans";
@@ -22,9 +22,9 @@ const responseSchema = z.object({
 const MESSAGES: Record<string, string> = {
   already_subscribed: "You already have a plan. Manage it on your account page.",
   rate_limited: "Too many tries. Wait a minute and try again.",
-  not_available_yet: "Payments are not open yet. Try again soon.",
+  not_available_yet: "Payments aren't open yet. Try again soon.",
 };
-const FALLBACK = "Checkout did not start. Try again in a minute.";
+const FALLBACK = "Checkout didn't start. Try again in a minute.";
 
 export function CheckoutButton({
   plan,
@@ -36,6 +36,16 @@ export function CheckoutButton({
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+
+  // Coming back from Paystack with the Back button restores this page from the browser cache with
+  // the button still busy. Clear it.
+  useEffect(() => {
+    const onShow = (event: PageTransitionEvent) => {
+      if (event.persisted) setBusy(false);
+    };
+    window.addEventListener("pageshow", onShow);
+    return () => window.removeEventListener("pageshow", onShow);
+  }, []);
 
   async function start() {
     setBusy(true);
@@ -52,8 +62,9 @@ export function CheckoutButton({
       }
       const parsed = responseSchema.safeParse(await res.json().catch(() => null));
       const url = parsed.success ? parsed.data.authorization_url : undefined;
-      if (res.ok && url && new URL(url).hostname === CHECKOUT_HOST) {
-        window.location.assign(url);
+      const target = url ? new URL(url) : null;
+      if (res.ok && target?.protocol === "https:" && target.hostname === CHECKOUT_HOST) {
+        window.location.assign(target.href);
         return;
       }
       const code = parsed.success ? parsed.data.error : undefined;
@@ -66,7 +77,7 @@ export function CheckoutButton({
 
   return (
     <div className="flex flex-col gap-2">
-      <Button variant="secondary" loading={busy} onClick={start}>
+      <Button variant="secondary" loading={busy} onClick={start} aria-label={label}>
         {busy ? "Opening checkout" : label}
       </Button>
       <p role="status" className="min-h-5 text-sm text-muted">

@@ -83,11 +83,16 @@ describe("PricingCards", () => {
     render(<PricingCards />);
     const button = screen.getByRole("button", { name: "Choose Monthly" });
     fireEvent.click(button);
-    expect((await screen.findAllByText(/did not start/))[0]).toBeTruthy();
-    fetchSpy.mockResolvedValue(Response.json({ authorization_url: "https://evil.example/pay" }));
-    fireEvent.click(button);
-    await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(2));
-    expect((await screen.findAllByText(/did not start/))[0]).toBeTruthy();
+    expect((await screen.findAllByText(/didn't start/))[0]).toBeTruthy();
+    for (const [index, link] of [
+      "https://evil.example/pay",
+      "http://checkout.paystack.com/x",
+    ].entries()) {
+      fetchSpy.mockResolvedValue(Response.json({ authorization_url: link }));
+      fireEvent.click(button);
+      await waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(index + 2));
+      expect((await screen.findAllByText(/didn't start/))[0]).toBeTruthy();
+    }
   });
 
   it("gives the Free card a sign-up note rather than a link", () => {

@@ -47,6 +47,7 @@ jobs:
             versions deploy
             ${{ inputs.new_version_id }}@${{ inputs.new_percent }}%
             ${{ inputs.current_version_id }}@${{ steps.split.outputs.rest }}%
+            --name stepkite
             --yes
             --message "promote ${{ inputs.new_version_id }} to ${{ inputs.new_percent }}%"
       - name: Note

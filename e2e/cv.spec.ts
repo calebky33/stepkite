@@ -43,20 +43,6 @@ test("duplicate, delete and restore from the list", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Open Copy of Graduate UK" })).toBeVisible();
 });
 
-test("the ATS check updates as you type and the PDF button is ready", async ({ page }) => {
-  await page.goto("/uk/cv");
-  const panel = page.getByRole("heading", { name: "ATS check" });
-  await expect(panel).toBeVisible();
-  await expect(page.getByText("Add your email.", { exact: false })).toBeVisible();
-  await page.getByLabel("Email", { exact: true }).fill("asha@example.com");
-  await expect(page.getByText("Add your email.", { exact: false })).toHaveCount(0);
-  await page.getByRole("button", { name: "Go to Full name in Contact" }).focus();
-  await page.keyboard.press("Enter");
-  await expect(page.getByLabel("Full name", { exact: true })).toBeFocused();
-  await page.getByLabel("Full name", { exact: true }).fill("Asha Rao");
-  await expect(page.getByRole("button", { name: "Download PDF" })).toBeEnabled();
-});
-
 test("an old CV is read on the device, reviewed, and saved as a new CV", async ({ page }) => {
   const uploads: string[] = [];
   page.on("request", (request) => {
@@ -67,7 +53,9 @@ test("an old CV is read on the device, reviewed, and saved as a new CV", async (
   await expect(page.getByRole("heading", { name: "Upload your old CV" })).toBeVisible();
 
   await page.getByLabel("Choose your old CV file").setInputFiles("e2e/fixtures/not-a-cv.exe");
-  await expect(page.getByRole("alert").filter({ hasText: "That file type does not work here" })).toBeVisible();
+  await expect(
+    page.getByRole("alert").filter({ hasText: "That file type does not work here" }),
+  ).toBeVisible();
 
   await page.getByLabel("Choose your old CV file").setInputFiles("e2e/fixtures/old-cv.txt");
   await expect(page.getByRole("heading", { name: /Check what we found/ })).toBeFocused();

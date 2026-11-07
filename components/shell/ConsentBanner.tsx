@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/Button";
-import { DECLINED, needsConsentBanner } from "@/lib/consent";
+import { CONSENT_REQUIRED_REGIONS, DECLINED, needsConsentBanner } from "@/lib/consent";
+import { isCountry } from "@/lib/countries";
 import { saveConsent, subscribeToConsent, useConsent } from "./consentStore";
 
 /**
@@ -14,6 +15,9 @@ import { saveConsent, subscribeToConsent, useConsent } from "./consentStore";
 function guessRegion(pathname: string | null): string | null {
   const first = pathname?.split("/")[1];
   if (first === "uk") return "GB";
+  if (first && isCountry(first) && CONSENT_REQUIRED_REGIONS.has(first.toUpperCase())) {
+    return first.toUpperCase();
+  }
   let zone = "";
   try {
     zone = Intl.DateTimeFormat().resolvedOptions().timeZone ?? "";

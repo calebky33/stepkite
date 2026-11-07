@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ComponentType } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { CurrencyInput } from "@/components/ui/CurrencyInput";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { Slider } from "@/components/ui/Slider";
-import { COUNTRY_INFO, formatMoney, type CountryCode } from "@/lib/countries";
-import { getRates } from "@/lib/tax";
+import { COUNTRY_INFO, formatMoney, type TaxCountry } from "@/lib/countries";
+import { requireRates } from "@/lib/tax";
 import { MAX_GROSS, MIN_GROSS, type PayEngine } from "@/lib/tax/types";
 import { InFields } from "./InFields";
+import type { FieldsProps } from "./fieldTypes";
 import { buildOptions, DEFAULT_VALUES, type FieldValues } from "./options";
 import { convertGross, PERIODS_PER_YEAR, type Period } from "./period";
 import { NetBar, ResultCard, type ResultState } from "./ResultCard";
@@ -20,19 +21,23 @@ import { UsFields } from "./UsFields";
 const PERIOD_WORD: Record<Period, string> = { year: "a year", month: "a month", week: "a week" };
 
 /** Slider reach per country, in yearly terms. Input limits for the slider only, not tax figures. */
-const SLIDER_YEARLY: Record<CountryCode, { max: number; step: number }> = {
+const SLIDER_YEARLY: Record<TaxCountry, { max: number; step: number }> = {
   uk: { max: 150_000, step: 500 },
   us: { max: 300_000, step: 1_000 },
   in: { max: 5_000_000, step: 10_000 },
 };
 
-const COPY: Record<CountryCode, { label: string; hint: string }> = {
+const COPY: Record<TaxCountry, { label: string; hint: string }> = {
   uk: { label: "Salary before tax", hint: "Your gross pay, before tax and National Insurance." },
   us: { label: "Salary before taxes", hint: "Your gross pay, before taxes and deductions." },
   in: { label: "Salary before tax", hint: "Your gross pay or CTC, before tax and deductions." },
 };
 
-const FIELDS = { uk: UkFields, us: UsFields, in: InFields } as const;
+const FIELDS: Record<TaxCountry, ComponentType<FieldsProps>> = {
+  uk: UkFields,
+  us: UsFields,
+  in: InFields,
+};
 
 function isValid(gross: number | null): gross is number {
   return gross !== null && gross >= MIN_GROSS && gross <= MAX_GROSS;
@@ -42,14 +47,14 @@ type Settled = { gross: number | null; values: FieldValues };
 
 function compute(
   engine: PayEngine,
-  country: CountryCode,
+  country: TaxCountry,
   gross: number,
   period: Period,
   values: FieldValues,
 ): ResultState {
   try {
     const built = buildOptions(country, values);
-    const taxYear = getRates(country).taxYear;
+    const taxYear = requireRates(country).taxYear;
     const outcome = engine({
       country,
       taxYear,
@@ -65,7 +70,7 @@ function compute(
   }
 }
 
-type PayCalculatorProps = { country: CountryCode; initialGross?: number };
+type PayCalculatorProps = { country: TaxCountry; initialGross?: number };
 
 /** Reads ?gross=&period= from the URL once, server-side safe (returns null when there is no
  * window). A link from the job tracker uses this to prefill the calculator. */

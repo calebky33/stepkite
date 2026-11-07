@@ -16,7 +16,7 @@ import { buildOptions, DEFAULT_VALUES } from "@/components/tools/PayCalculator/o
 import { slicesFor } from "@/components/tools/PayCalculator/ResultCard";
 import { useEngine } from "@/components/tools/PayCalculator/useEngine";
 import { formatMoney } from "@/lib/countries";
-import { getRates } from "@/lib/tax";
+import { requireRates } from "@/lib/tax";
 import { MAX_GROSS, MIN_GROSS, type PayResult } from "@/lib/tax/types";
 
 type DashboardTab = "pay" | "cv";
@@ -76,7 +76,7 @@ export function StepkiteDashboard() {
     try {
       const outcome = engine({
         country: "uk",
-        taxYear: getRates("uk").taxYear,
+        taxYear: requireRates("uk").taxYear,
         gross,
         period: "year",
         region: built.region,

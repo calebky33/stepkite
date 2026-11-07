@@ -1,6 +1,6 @@
 import { permanentRedirect } from "next/navigation";
 import { COUNTRIES, COUNTRY_INFO, isCountry } from "@/lib/countries";
-import { SEO_SALARY_LEVELS } from "@/lib/salaryLevels";
+import { salaryLevelsFor } from "@/lib/salaryLevels";
 
 type Params = { country: string; amount: string };
 type Props = { params: Promise<Params> };
@@ -23,7 +23,7 @@ export default async function LegacySalaryPage({ params }: Props) {
   if (!isCountry(country) || !/^\d+$/.test(amount)) permanentRedirect("/");
   const gross = Number(amount);
   const base = `/${country}/salary-calculator`;
-  const target = (SEO_SALARY_LEVELS[country] as readonly number[]).includes(gross)
+  const target = salaryLevelsFor(country).includes(gross)
     ? `${base}/${gross}`
     : `${base}?gross=${gross}`;
   permanentRedirect(target);

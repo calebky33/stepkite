@@ -3,34 +3,34 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { CurrencyInput } from "@/components/ui/CurrencyInput";
-import { COUNTRY_INFO, formatMoney, type CountryCode } from "@/lib/countries";
+import { COUNTRY_INFO, formatMoney, type TaxCountry } from "@/lib/countries";
 import { useEngine } from "@/components/tools/PayCalculator/useEngine";
-import { getRates } from "@/lib/tax";
+import { requireRates } from "@/lib/tax";
 import { MAX_GROSS, MIN_GROSS, type EngineOutcome, type PayEngine } from "@/lib/tax/types";
 
 type Offer = { name: "Offer A" | "Offer B"; gross: number | null };
 
 function outcomeFor(
   engine: PayEngine | null,
-  country: CountryCode,
+  country: TaxCountry,
   gross: number | null,
 ): EngineOutcome | null {
   if (!engine || gross === null || gross < MIN_GROSS || gross > MAX_GROSS) return null;
   return engine({
     country,
-    taxYear: getRates(country).taxYear,
+    taxYear: requireRates(country).taxYear,
     gross,
     period: "year",
     options: {},
   });
 }
 
-function rangeError(gross: number | null, country: CountryCode): string | undefined {
+function rangeError(gross: number | null, country: TaxCountry): string | undefined {
   if (gross === null || (gross >= MIN_GROSS && gross <= MAX_GROSS)) return undefined;
   return `Enter a salary between ${formatMoney(MIN_GROSS, country)} and ${formatMoney(MAX_GROSS, country)}.`;
 }
 
-export function OfferCompare({ country }: { country: CountryCode }) {
+export function OfferCompare({ country }: { country: TaxCountry }) {
   const info = COUNTRY_INFO[country];
   const [offers, setOffers] = useState<[Offer, Offer]>([
     { name: "Offer A", gross: null },

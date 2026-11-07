@@ -1,6 +1,7 @@
 import type { CountryCode } from "@/lib/countries";
 
-/** Small flat flags, drawn inline. Decorative: the country name always sits beside them. */
+/** Small flat flags, drawn inline. Decorative: the country name always sits beside them.
+ *  Markets without a drawn flag get a two-letter badge instead. */
 export function Flag({ code }: { code: CountryCode }) {
   return (
     <svg
@@ -17,8 +18,7 @@ export function Flag({ code }: { code: CountryCode }) {
           <path d="M12 0v16M0 8h24" stroke="#fff" strokeWidth="5.2" />
           <path d="M12 0v16M0 8h24" stroke="#c8102e" strokeWidth="3.2" />
         </>
-      ) : null}
-      {code === "us" ? (
+      ) : code === "us" ? (
         <>
           <rect width="24" height="16" fill="#fff" />
           {[0, 2, 4, 6, 8, 10, 12].map((i) => (
@@ -26,15 +26,28 @@ export function Flag({ code }: { code: CountryCode }) {
           ))}
           <rect width="10" height={(16 / 13) * 7} fill="#3c3b6e" />
         </>
-      ) : null}
-      {code === "in" ? (
+      ) : code === "in" ? (
         <>
           <rect width="24" height="5.34" fill="#ff9933" />
           <rect y="5.33" width="24" height="5.34" fill="#fff" />
           <rect y="10.66" width="24" height="5.34" fill="#138808" />
           <circle cx="12" cy="8" r="1.9" fill="none" stroke="#000080" strokeWidth="0.6" />
         </>
-      ) : null}
+      ) : (
+        <>
+          <rect width="24" height="16" style={{ fill: "var(--surface-2)" }} />
+          <text
+            x="12"
+            y="12"
+            textAnchor="middle"
+            fontSize="7"
+            fontWeight="700"
+            style={{ fill: "var(--text-muted)" }}
+          >
+            {code.toUpperCase()}
+          </text>
+        </>
+      )}
     </svg>
   );
 }

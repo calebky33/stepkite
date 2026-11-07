@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { COUNTRY_INFO, formatMoney, type CountryCode } from "@/lib/countries";
+import { COUNTRY_INFO, formatMoney, isTaxCountry, type CountryCode } from "@/lib/countries";
 import { countryParams, requireCountry, type CountryParams } from "@/lib/routes";
 import { SITE_URL, stubMetadata } from "@/lib/seo";
 
@@ -27,33 +27,35 @@ type HubGroup = { heading: string; links: HubLink[] };
 function groupsFor(country: CountryCode): HubGroup[] {
   const info = COUNTRY_INFO[country];
   const base = `/${country}`;
-  const pay: HubLink[] = [{ href: `${base}/compare/offers`, label: "Compare two job offers" }];
-  if (country === "in") {
-    pay.push({ href: `${base}/compare/regime`, label: "Old or new tax regime" });
-  }
-  return [
-    { heading: "Pay", links: pay },
-    {
+  const groups: HubGroup[] = [];
+  if (info.tier === 1) {
+    const pay: HubLink[] = [{ href: `${base}/compare/offers`, label: "Compare two job offers" }];
+    if (country === "in") {
+      pay.push({ href: `${base}/compare/regime`, label: "Old or new tax regime" });
+    }
+    groups.push({ heading: "Pay", links: pay });
+    groups.push({
       heading: "Common salaries",
       links: info.salaryLevels.map((amount) => ({
         href: `${base}/salary-calculator/${amount}`,
         label: `${info.takeHomeTerm.charAt(0).toUpperCase()}${info.takeHomeTerm.slice(1)} on ${formatMoney(amount, country)}`,
       })),
-    },
-    {
-      heading: "Job search",
-      links: [
-        { href: `${base}/cv`, label: `Build your ${info.cvName}` },
-        { href: `${base}/tracker`, label: "Track your applications" },
-        {
-          href: `${base}/match`,
-          label: `Match your ${info.cvName} to a job ad`,
-          note: "Not available yet",
-        },
-        { href: `/guides`, label: "Guides" },
-      ],
-    },
-  ];
+    });
+  }
+  groups.push({
+    heading: "Job search",
+    links: [
+      { href: `${base}/cv`, label: `Build your ${info.cvName}` },
+      { href: `${base}/tracker`, label: "Track your applications" },
+      {
+        href: `${base}/match`,
+        label: `Match your ${info.cvName} to a job ad`,
+        note: "Not available yet",
+      },
+      { href: `/guides`, label: "Guides" },
+    ],
+  });
+  return groups;
 }
 
 export default async function CountryHubPage({ params }: Props) {
@@ -65,16 +67,32 @@ export default async function CountryHubPage({ params }: Props) {
         Tools for {info.name}
       </h1>
       <p className="max-w-prose text-lg text-muted">
-        Work out your {info.takeHomeTerm}, build a {info.cvName} that fits {info.name}, and keep
-        track of the jobs you apply for. Your {info.cvName} and your jobs stay on this device.
+        {info.tier === 1
+          ? `Work out your ${info.takeHomeTerm}, build a ${info.cvName} that fits ${info.name}, and keep track of the jobs you apply for. Your ${info.cvName} and your jobs stay on this device.`
+          : `Build a ${info.cvName} that fits ${info.name} and keep track of the jobs you apply for. Your ${info.cvName} and your jobs stay on this device.`}
       </p>
-      <Link
-        href={`/${country}/salary-calculator`}
-        className="inline-flex min-h-11 items-center self-start rounded-input bg-primary px-4 py-2 text-base font-semibold text-primary-fg transition-[transform,scale,translate,opacity] duration-150 ease-[var(--ease-out)] hover:opacity-90 active:scale-[0.97]"
+      {isTaxCountry(country) ? (
+        <Link
+          href={`/${country}/salary-calculator`}
+          className="inline-flex min-h-11 items-center self-start rounded-input bg-primary px-4 py-2 text-base font-semibold text-primary-fg transition-[transform,scale,translate,opacity] duration-150 ease-[var(--ease-out)] hover:opacity-90 active:scale-[0.97]"
+        >
+          Open the salary calculator
+        </Link>
+      ) : (
+        <Link
+          href={`/${country}/cv`}
+          className="inline-flex min-h-11 items-center self-start rounded-input bg-primary px-4 py-2 text-base font-semibold text-primary-fg transition-[transform,scale,translate,opacity] duration-150 ease-[var(--ease-out)] hover:opacity-90 active:scale-[0.97]"
+        >
+          Build your {info.cvName}
+        </Link>
+      )}
+      <div
+        className={
+          isTaxCountry(country)
+            ? "grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-8"
+            : "grid max-w-xl gap-6"
+        }
       >
-        Open the salary calculator
-      </Link>
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-8">
         {groupsFor(country).map((group) => {
           const lead = group.heading === "Common salaries";
           return (
@@ -84,7 +102,9 @@ export default async function CountryHubPage({ params }: Props) {
               className={
                 lead
                   ? "rounded-card border border-border bg-surface p-6 shadow-card md:p-8 lg:col-start-1 lg:row-span-2 lg:row-start-1"
-                  : "rounded-card border border-border bg-surface-2 p-6 lg:col-start-2"
+                  : isTaxCountry(country)
+                    ? "rounded-card border border-border bg-surface-2 p-6 lg:col-start-2"
+                    : "rounded-card border border-border bg-surface-2 p-6"
               }
             >
               <h2

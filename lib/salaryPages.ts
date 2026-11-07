@@ -2,10 +2,10 @@ import { COUNTRIES, type CountryCode } from "@/lib/countries";
 import { loadEngine } from "@/lib/tax";
 import type { PayResult } from "@/lib/tax/types";
 
-import { SEO_SALARY_LEVELS } from "@/lib/salaryLevels";
+import { salaryLevelsFor } from "@/lib/salaryLevels";
 
 export function salaryPagePaths(country: CountryCode): string[] {
-  return SEO_SALARY_LEVELS[country].map((g) => `/${country}/salary-calculator/${g}`);
+  return salaryLevelsFor(country).map((g) => `/${country}/salary-calculator/${g}`);
 }
 
 export const ALL_SALARY_PAGE_PATHS: readonly string[] = COUNTRIES.flatMap(salaryPagePaths);
@@ -16,6 +16,7 @@ export async function computeSalary(
   gross: number,
 ): Promise<PayResult | null> {
   const engine = await loadEngine(country);
+  if (!engine) return null;
   const outcome = engine({
     country,
     taxYear: "2026",

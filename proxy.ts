@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getSession } from "@/lib/auth/session";
+import { COUNTRIES } from "@/lib/countries";
 import { USER_COOKIE } from "@/lib/cv/userCookie";
 import { buildCsp, cspHeaderName } from "@/lib/security/csp";
 
@@ -18,7 +19,8 @@ const WWW_HOST = "www.stepkite.app";
 const BARE_HOST = "stepkite.app";
 
 const GATED_PATH_PATTERNS: readonly RegExp[] = [
-  /^\/(uk|us|in)\/tracker(?:\/|$)/,
+  // Every market in the registry, not only the three tax markets.
+  new RegExp(`^/(${COUNTRIES.join("|")})/tracker(?:/|$)`),
   /^\/account(?:\/|$)/,
   /^\/billing(?:\/|$)/,
 ];

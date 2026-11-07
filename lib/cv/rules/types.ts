@@ -17,6 +17,6 @@ export interface CvRules {
   allowMaritalStatus: boolean;
   documentName: string;
   paper: "A4" | "Letter";
-  spelling: "en-GB" | "en-US" | "en-IN";
+  spelling: string;
   sources: readonly string[];
 }

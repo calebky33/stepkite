@@ -8,6 +8,11 @@ vi.mock("@/lib/tax", () => ({
     loaded: false,
     officialSources: ["https://www.gov.uk/income-tax-rates"],
   }),
+  requireRates: () => ({
+    taxYear: "2026",
+    loaded: false,
+    officialSources: ["https://www.gov.uk/income-tax-rates"],
+  }),
 }));
 
 const ready: ResultState = {

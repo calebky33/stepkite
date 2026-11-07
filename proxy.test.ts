@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { COUNTRIES } from "@/lib/countries";
 import { shouldRedirect, shouldRedirectWhenSignedIn } from "./proxy";
 
 async function runProxy(options: {
@@ -104,6 +105,15 @@ describe("shouldRedirect", () => {
     expect(shouldRedirect("/uk/tracker", false)).toBe(true);
     expect(shouldRedirect("/us/tracker/applications", false)).toBe(true);
     expect(shouldRedirect("/in/tracker", false)).toBe(true);
+  });
+
+  it("gates the tracker in tier 2 markets too", () => {
+    for (const code of COUNTRIES) {
+      expect(shouldRedirect(`/${code}/tracker`, false)).toBe(true);
+    }
+    expect(shouldRedirect("/de/tracker/applications", false)).toBe(true);
+    // A two-letter prefix that is not a market is left to the 404 page.
+    expect(shouldRedirect("/xx/tracker", false)).toBe(false);
   });
 
   it("lets open pages through for anonymous visitors", () => {

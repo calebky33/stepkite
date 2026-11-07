@@ -80,6 +80,26 @@ The owner asked Claude to take over Pi's uncommitted fixes and close the review.
 Still open: the 375px and 1280px visual check in light and dark mode, the migration has not been
 applied to Supabase, and nothing has been pushed. Before merge, run the `reviewer` agent and then `/ship-check`.
 
+## Ship-check and merge (2026-11-07, later)
+
+At the owner's request, Claude ran /ship-check, fixed the findings and merged.
+- 93ab375: ship-check fixes. Registry drift test (lib/countries.test.ts), tier 2 metadata,
+  hub button gated on isTaxCountry, flag tokens, a scrolling country menu, and TaxUnavailable copy.
+- ab0a375: SECURITY FIX. The tracker sign-up gate in proxy.ts was hard-coded to uk, us and in, so
+  the 20 tier 2 trackers were open to anonymous visitors. The gate is now built from COUNTRIES.
+  E2E is split into an anonymous project and a signed-in project (CV list, import and tracker
+  need E2E_EMAIL and E2E_PASSWORD for a test account). There are also visual fixes: the tier 2 hub
+  uses one column, and the footer lists countries in two columns with new copy.
+- 61a8dc2: e2e/.gitignore for the stored session.
+- Merged to master as 81d1a39 and pushed, so it deploys live.
+Checks: 1200 of 1200 unit tests, 7 of 7 anonymous e2e tests, build passed with 228 pages. Visual check done at 375px and 1280px in light and dark.
+
+Still open (owner):
+- Apply migration 20261108000000 in Supabase.
+- Create a test account and set E2E_EMAIL and E2E_PASSWORD, then run the signed-in e2e tests.
+  Their assertions are unverified against the signed-in UI.
+- Decide on the JS budget (about 245 KB compared with the 90 KB rule).
+
 ## Handback
 
 Pi: reference item numbers in your fix commits, or add a reply section here.

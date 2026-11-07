@@ -86,7 +86,13 @@ export default async function CountryHubPage({ params }: Props) {
           Build your {info.cvName}
         </Link>
       )}
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-8">
+      <div
+        className={
+          isTaxCountry(country)
+            ? "grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-8"
+            : "grid max-w-xl gap-6"
+        }
+      >
         {groupsFor(country).map((group) => {
           const lead = group.heading === "Common salaries";
           return (
@@ -96,7 +102,9 @@ export default async function CountryHubPage({ params }: Props) {
               className={
                 lead
                   ? "rounded-card border border-border bg-surface p-6 shadow-card md:p-8 lg:col-start-1 lg:row-span-2 lg:row-start-1"
-                  : "rounded-card border border-border bg-surface-2 p-6 lg:col-start-2"
+                  : isTaxCountry(country)
+                    ? "rounded-card border border-border bg-surface-2 p-6 lg:col-start-2"
+                    : "rounded-card border border-border bg-surface-2 p-6"
               }
             >
               <h2

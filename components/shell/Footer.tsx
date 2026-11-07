@@ -21,8 +21,8 @@ export function Footer() {
               <Logo className="h-6 w-auto" />
             </Link>
             <p className="max-w-md text-sm text-ink-muted">
-              Pay and career tools for the UK, US and India. Free to use. Your CV and job list stay
-              on your device.
+              Take-home pay for the UK, US and India, and CV and job tools for {COUNTRIES.length}{" "}
+              countries. Free to use. Your CV and job list stay on your device.
             </p>
           </div>
           <SocialIcons />
@@ -30,12 +30,12 @@ export function Footer() {
 
         <FooterNav>
           <FooterGroup title="Supported countries" label="Countries">
-            <ul>
+            <ul className="lg:columns-2 lg:gap-4">
               {COUNTRIES.map((code) => (
-                <li key={code}>
+                <li key={code} className="break-inside-avoid">
                   <Link href={`/${code}`} className={`${LINK_CLASS} gap-2`}>
                     <Flag code={code} />
-                    {COUNTRY_INFO[code].name}
+                    {COUNTRY_INFO[code].shortName}
                   </Link>
                 </li>
               ))}

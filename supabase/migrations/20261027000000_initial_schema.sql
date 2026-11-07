@@ -130,15 +130,13 @@ create trigger jobs_sync_lww
   before insert or update on public.jobs
   for each row execute function public.sync_lww();
 
--- plans: one row per Paystack product/plan; readable by everyone. USD only at launch (Paystack
--- does not support GBP or INR), so the currency check is a hard single value, not a set.
+-- plans: one row per Stripe product+price; readable by everyone.
 create table public.plans (
   code text primary key check (code in ('free', 'trial', 'monthly', 'yearly', 'lifetime')),
-  -- Paystack recurring plans only. One-time plans (lifetime) leave paystack_plan_code null and
-  -- are initialized by amount alone.
-  paystack_plan_code text,
+  stripe_product_id text,
+  stripe_price_id text,
   amount_cents int not null default 0,
-  currency text not null default 'USD' check (currency = 'USD'),
+  currency text not null default 'USD' check (currency in ('USD', 'GBP', 'INR')),
   interval text check (interval in ('day', 'month', 'year')),
   interval_count int,
   active boolean not null default true,
@@ -146,16 +144,16 @@ create table public.plans (
   created_at timestamptz not null default now()
 );
 
--- Webhook maps Paystack plan code back to plan code. Unique keeps that mapping 1:1.
-create unique index plans_paystack_plan_uniq on public.plans (paystack_plan_code)
-  where paystack_plan_code is not null;
+-- Webhook maps Stripe price id back to plan code. Unique keeps that mapping 1:1.
+create unique index plans_stripe_price_uniq on public.plans (stripe_price_id)
+  where stripe_price_id is not null;
 
--- Seed the free row. Paid plans are inserted once the owner has Paystack plan codes.
+-- Seed the free row. Paid plans are inserted once the owner has Stripe price ids.
 insert into public.plans (code, amount_cents, currency, active, notes)
 values ('free', 0, 'USD', true, 'Default plan for every signed-in user')
 on conflict do nothing;
 
--- entitlements: one row per user. Only the Paystack webhook and /api/trial/start write.
+-- entitlements: one row per user. Only the Stripe webhook and /api/trial/start write.
 create table public.entitlements (
   user_id uuid primary key references auth.users (id) on delete cascade,
   plan_code text not null default 'free' references public.plans (code) on delete restrict,
@@ -167,15 +165,15 @@ create table public.entitlements (
   trial_exports_date date,
   current_period_end timestamptz,
   cancel_at timestamptz,
-  paystack_customer_code text,
-  paystack_subscription_code text unique,
+  stripe_customer_id text,
+  stripe_subscription_id text unique,
   updated_at timestamptz not null default now()
 );
 
--- One Paystack customer maps to one user. Partial unique prevents webhook "update by customer"
--- from silently hitting several rows if a bug lets two users share a customer code.
-create unique index entitlements_customer_uniq on public.entitlements (paystack_customer_code)
-  where paystack_customer_code is not null;
+-- One Stripe customer maps to one user. Partial unique prevents webhook "update by customer"
+-- from silently hitting several rows if a bug lets two users share a customer id.
+create unique index entitlements_customer_uniq on public.entitlements (stripe_customer_id)
+  where stripe_customer_id is not null;
 
 create trigger entitlements_set_updated_at
   before update on public.entitlements
@@ -214,7 +212,7 @@ create table public.trial_fingerprints (
 
 create index trial_fingerprints_ip_idx on public.trial_fingerprints (ip_hash);
 
--- payments: Paystack event audit log; event_id gives webhook idempotency.
+-- payments: Stripe event audit log; event_id gives webhook idempotency.
 create table public.payments (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users (id) on delete set null,

@@ -1,3 +1,4 @@
+import { USER_COOKIE } from "@/lib/cv/userCookie";
 import { createSupabaseServer } from "@/lib/supabase/server";
 
 /**
@@ -33,8 +34,8 @@ export async function POST(request: Request): Promise<Response> {
       { status: 500, headers: { "Cache-Control": "no-store" } },
     );
   }
-  return Response.json(
-    { signedOut: true },
-    { status: 200, headers: { "Cache-Control": "no-store" } },
-  );
+  const headers = new Headers({ "Cache-Control": "no-store" });
+  // Drop the CV page's signed in hint right away rather than waiting for the next page request.
+  headers.append("Set-Cookie", `${USER_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax`);
+  return Response.json({ signedOut: true }, { status: 200, headers });
 }

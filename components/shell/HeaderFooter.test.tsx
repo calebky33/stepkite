@@ -14,6 +14,36 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+describe("Header account link", () => {
+  it("shows the first name instead of Your account when signed in", () => {
+    render(<Header signedIn userName="Caleb Yegon" />);
+    const link = screen.getAllByRole("link", { name: "Your account, Caleb" })[0];
+    expect(link?.textContent).toBe("Caleb");
+    expect(link?.getAttribute("href")).toBe("/account");
+    expect(screen.queryByRole("link", { name: "Your account" })).toBeNull();
+  });
+
+  it("falls back to Your account when there is no name", () => {
+    for (const userName of [undefined, null, "", "   "]) {
+      const { unmount } = render(<Header signedIn userName={userName} />);
+      expect(screen.getAllByRole("link", { name: "Your account" }).length).toBeGreaterThan(0);
+      unmount();
+    }
+  });
+
+  it("keeps a very long name short", () => {
+    render(<Header signedIn userName={"A".repeat(60)} />);
+    const link = screen.getAllByRole("link", { name: /^Your account, / })[0];
+    expect((link?.textContent ?? "").length).toBeLessThanOrEqual(18);
+  });
+
+  it("shows Sign in, never a name, when signed out", () => {
+    render(<Header signedIn={false} userName="Caleb" />);
+    expect(screen.getAllByRole("link", { name: "Sign in" }).length).toBeGreaterThan(0);
+    expect(screen.queryByText("Caleb")).toBeNull();
+  });
+});
+
 describe("Header", () => {
   it("shows the logo, the main links and the country links", () => {
     render(<Header signedIn={false} />);

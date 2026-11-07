@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getSession } from "@/lib/auth/session";
+import { USER_COOKIE } from "@/lib/cv/userCookie";
 import { buildCsp, cspHeaderName } from "@/lib/security/csp";
 
 /**
@@ -48,6 +49,9 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   // Carry the signed-in boolean to page renders so the root layout reads it
   // from headers() instead of calling getSession a second time.
   requestHeaders.set("x-stepkite-signed-in", user !== null ? "1" : "0");
+  // The display name for the header. Percent encoded so any character is safe in a header.
+  requestHeaders.delete("x-stepkite-user-name");
+  if (user?.name) requestHeaders.set("x-stepkite-user-name", encodeURIComponent(user.name));
   if (shouldRedirect(url.pathname, user !== null)) {
     const next = `${url.pathname}${url.search}`;
     const target = new URL(`/sign-up?next=${encodeURIComponent(next)}`, url.origin);
@@ -74,7 +78,28 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
   response.headers.set(name, csp);
+  syncUserCookie(request, response, user !== null);
   return response;
+}
+
+/**
+ * Keeps the `sk_user` hint cookie in step with the real session. The CV page is client side and
+ * cannot see the Supabase cookies, so it reads this to choose between the sandbox draft and the
+ * signed in builder. It is a UI hint only: every protected read and write checks the session on
+ * the server, so a forged cookie unlocks nothing.
+ */
+function syncUserCookie(request: NextRequest, response: NextResponse, signedIn: boolean): void {
+  const has = request.cookies.has(USER_COOKIE);
+  if (signedIn && !has) {
+    response.cookies.set(USER_COOKIE, "1", {
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+  } else if (!signedIn && has) {
+    response.cookies.delete(USER_COOKIE);
+  }
 }
 
 export const config = {

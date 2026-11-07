@@ -1,5 +1,58 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { shouldRedirect, shouldRedirectWhenSignedIn } from "./proxy";
+
+async function runProxy(options: {
+  user: { name: string | null } | null;
+  cookie?: string;
+  path?: string;
+}) {
+  vi.resetModules();
+  vi.doMock("@/lib/auth/session", () => ({ getSession: async () => options.user }));
+  const { proxy } = await import("./proxy");
+  const { NextRequest } = await import("next/server");
+  const request = new NextRequest(`https://stepkite.test${options.path ?? "/uk/cv"}`, {
+    headers: options.cookie ? { cookie: options.cookie } : {},
+  });
+  const response = await proxy(request);
+  vi.doUnmock("@/lib/auth/session");
+  return response;
+}
+
+describe("proxy sk_user hint cookie", () => {
+  it("sets it for a signed in visitor who does not have it yet", async () => {
+    const response = await runProxy({ user: { name: "Caleb" } });
+    const cookie = response.cookies.get("sk_user");
+    expect(cookie?.value).toBe("1");
+    expect(cookie?.path).toBe("/");
+    expect(cookie?.sameSite).toBe("lax");
+    expect(cookie?.httpOnly).not.toBe(true);
+  });
+
+  it("leaves it alone when it is already there", async () => {
+    const response = await runProxy({ user: { name: "Caleb" }, cookie: "sk_user=1" });
+    expect(response.cookies.get("sk_user")).toBeUndefined();
+  });
+
+  it("clears it when the visitor is signed out", async () => {
+    const response = await runProxy({ user: null, cookie: "sk_user=1" });
+    expect(response.headers.get("set-cookie") ?? "").toMatch(/sk_user=;/);
+  });
+
+  it("sets nothing for an anonymous visitor with no cookie", async () => {
+    const response = await runProxy({ user: null });
+    expect(response.headers.get("set-cookie")).toBeNull();
+  });
+});
+
+describe("proxy user name header", () => {
+  it("forwards the name percent encoded and drops a spoofed one", async () => {
+    const response = await runProxy({ user: { name: "Zoë O'Neil" } });
+    const forwarded = response.headers.get("x-middleware-request-x-stepkite-user-name");
+    expect(forwarded).toBe(encodeURIComponent("Zoë O'Neil"));
+    const anonymous = await runProxy({ user: null });
+    expect(anonymous.headers.get("x-middleware-request-x-stepkite-user-name")).toBeNull();
+  });
+});
 
 describe("shouldRedirect", () => {
   it("sends anonymous visitors to sign up for gated routes", () => {

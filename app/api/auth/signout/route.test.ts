@@ -44,6 +44,7 @@ describe("POST /api/auth/signout", () => {
     expect(res.headers.get("Cache-Control")).toBe("no-store");
     expect(signOut).toHaveBeenCalledTimes(1);
     expect(await res.json()).toEqual({ signedOut: true });
+    expect(res.headers.get("Set-Cookie")).toMatch(/^sk_user=; Path=\/; Max-Age=0/);
   });
 
   it("returns 500 when supabase.auth.signOut returns an error", async () => {

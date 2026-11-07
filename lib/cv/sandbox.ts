@@ -1,5 +1,6 @@
 import { storedCvSchema, type Cv } from "@/lib/cv/schema";
 import { saveCv } from "@/lib/storage/cvStore";
+import { USER_COOKIE } from "@/lib/cv/userCookie";
 
 /**
  * Anonymous CV sandbox. Visitors who have not signed up edit a single draft that lives in this
@@ -9,7 +10,7 @@ import { saveCv } from "@/lib/storage/cvStore";
  * See docs/MONETIZATION.md (Soft-start sandbox) and docs/RULES.md rule 16.
  */
 export const SANDBOX_KEY = "stepkite-cv-sandbox";
-export const USER_COOKIE = "sk_user";
+export { USER_COOKIE };
 export const USER_ID_STORAGE_KEY = "sk_user_id";
 
 /**

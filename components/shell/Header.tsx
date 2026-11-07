@@ -76,10 +76,20 @@ function currentFor(pathname: string, href: string, active: boolean): "page" | "
   return pathname === href ? "page" : "true";
 }
 
-export function Header({ signedIn }: { signedIn: boolean }) {
+/** First name for the nav link, kept short so a long name never crowds the bar. */
+function navName(name: string | null | undefined): string | null {
+  const first = name?.trim().split(/\s+/)[0] ?? "";
+  if (!first) return null;
+  // Count whole characters so a long emoji or accented name is never cut in half.
+  const characters = Array.from(first);
+  return characters.length > 18 ? `${characters.slice(0, 17).join("")}…` : first;
+}
+
+export function Header({ signedIn, userName }: { signedIn: boolean; userName?: string | null }) {
   const pathname = usePathname() ?? "/";
   const country = countryFrom(pathname, useSavedCountry());
   const info = COUNTRY_INFO[country];
+  const accountLabel = navName(userName);
   // The menu belongs to the path it was opened on, so a route change closes it.
   const [openedPath, setOpenedPath] = useState<string | null>(null);
   const open = openedPath === pathname;
@@ -182,6 +192,7 @@ export function Header({ signedIn }: { signedIn: boolean }) {
             {signedIn ? (
               <Link
                 href="/account"
+                aria-label={accountLabel ? `Your account, ${accountLabel}` : undefined}
                 aria-current={
                   pathname === "/account" || pathname.startsWith("/account/") ? "page" : undefined
                 }
@@ -192,7 +203,9 @@ export function Header({ signedIn }: { signedIn: boolean }) {
                     : "text-muted hover:bg-surface-2 hover:text-text",
                 )}
               >
-                Your account
+                <span className="block max-w-[12rem] truncate">
+                  {accountLabel ?? "Your account"}
+                </span>
               </Link>
             ) : (
               <Link
@@ -278,6 +291,7 @@ export function Header({ signedIn }: { signedIn: boolean }) {
           {signedIn ? (
             <Link
               href="/account"
+              aria-label={accountLabel ? `Your account, ${accountLabel}` : undefined}
               onClick={() => setOpenedPath(null)}
               aria-current={
                 pathname === "/account" || pathname.startsWith("/account/") ? "page" : undefined
@@ -290,7 +304,7 @@ export function Header({ signedIn }: { signedIn: boolean }) {
                   : "text-muted hover:bg-surface-2 hover:text-text",
               )}
             >
-              Your account
+              {accountLabel ?? "Your account"}
             </Link>
           ) : (
             <>

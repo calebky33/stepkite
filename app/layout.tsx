@@ -44,16 +44,28 @@ export const viewport: Viewport = {
   ],
 };
 
+/** The proxy sends the name percent encoded. Anything that does not decode cleanly is dropped. */
+function readUserName(value: string | null): string | null {
+  if (!value) return null;
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return null;
+  }
+}
+
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   // Every page renders per request so the proxy can attach a CSP nonce to Next's own scripts.
   await connection();
   // The proxy already called getSession and tagged the request. Reuse that result
   // instead of a second Supabase round trip per page render.
-  const signedIn = (await headers()).get("x-stepkite-signed-in") === "1";
+  const requestHeaders = await headers();
+  const signedIn = requestHeaders.get("x-stepkite-signed-in") === "1";
+  const userName = readUserName(requestHeaders.get("x-stepkite-user-name"));
   return (
     <html lang="en" className={`${inter.variable} ${calistoga.variable} ${jakarta.variable}`}>
       <body className="flex min-h-dvh flex-col">
-        <Header signedIn={signedIn} />
+        <Header signedIn={signedIn} userName={userName} />
         <main id="main" tabIndex={-1} className="flex-1 outline-none">
           {children}
         </main>

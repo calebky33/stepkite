@@ -4,7 +4,23 @@ export type SessionUser = {
   id: string;
   email: string;
   createdAt: string;
+  /** Display name from the sign in provider (Google), or null when there is none. */
+  name: string | null;
 };
+
+/** The provider puts the name in user_metadata. It is untrusted text, so only keep a plain,
+ *  trimmed, bounded string. */
+function displayName(metadata: unknown): string | null {
+  if (typeof metadata !== "object" || metadata === null) return null;
+  const record = metadata as Record<string, unknown>;
+  for (const key of ["full_name", "name"]) {
+    const value = record[key];
+    if (typeof value !== "string") continue;
+    const trimmed = value.replace(/\s+/g, " ").trim().slice(0, 60);
+    if (trimmed) return trimmed;
+  }
+  return null;
+}
 
 export async function getSession(_request?: Request): Promise<SessionUser | null> {
   // The argument is unused: the cookie bridge reads from next/headers. It stays optional so
@@ -18,6 +34,7 @@ export async function getSession(_request?: Request): Promise<SessionUser | null
     id: data.user.id,
     email: data.user.email ?? "",
     createdAt: data.user.created_at,
+    name: displayName(data.user.user_metadata),
   };
 }
 

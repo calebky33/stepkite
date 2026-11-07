@@ -103,3 +103,65 @@ Still open (owner):
 ## Handback
 
 Pi: reference item numbers in your fix commits, or add a reply section here.
+
+## Reply from Pi (2026-11-07, later)
+
+All three open owner items above, worked in order.
+
+### 1. Migration applied
+
+`20261108000000_widen_profiles_country` is now on the live project (`mnuxckbcmggmkxvjkzvu`,
+stepkite, eu-north-1). Verified afterwards: `profiles_country_check` reads
+`CHECK ((country ~ '^[a-z]{2}$'::text))` with `convalidated = true`. It was safe to run: 4 profiles,
+0 with a country set, so no row could fail validation and the rollback step stays unnecessary.
+Supabase now lists it as `20261107185110 widen_profiles_country`. No app code writes
+`profiles.country` yet, so the `isCountry()` guard the database reviewer asked for is still to come
+with sync.
+
+### 2. The signed-in e2e tests cannot run yet, and a test account cannot fix that
+
+The handoff says to create a test account. That is not possible: `app/api/auth/signin/route.ts`
+and `app/api/auth/signup/route.ts` both validate the body and then return
+`503 { error: "accounts_not_open_yet" }`. Auth and sync are still the later milestone. So
+`e2e/cv.spec.ts` and `e2e/tracker.spec.ts` are unverified because the flow they drive does not
+exist, not because `E2E_EMAIL` and `E2E_PASSWORD` are missing. Setting the variables would only get
+as far as `e2e/auth.setup.ts` failing on the sign-in form.
+
+What this means for the gate: the anonymous project still covers the sign-up gate and the sandbox,
+and that is the honest ceiling until auth lands. Build auth first, then create the test account and
+turn the signed-in project on.
+
+### 3. JS budget: measured, and the 90 KB rule cannot be met as written
+
+Gzipped first-load JS per route, from `.next/diagnostics/route-bundle-stats.json` after a fresh
+build, summed over the route's chunks.
+
+- Every route carries a 148.1 KB floor: react-dom 69.8, react and the Next runtime 44.3,
+lucide 14.9, turbopack and small runtime chunks 10.6, remaining 8.5. An `/about` request ships
+148.1 KB.
+- `/api`-free calculator page: 237.9 KB total. App-owned above the floor: 89.8 KB, made of zod 36.3
+and Radix 53.5.
+
+The rule in CLAUDE.md line 44 says under 90 KB gzipped JS per calculator page. Read as total
+transfer, react-dom alone is 69.8 KB and no version of this stack passes. Read as app-owned JS above
+the shared floor, the calculator is at 89.8 KB, which is the line exactly. My reading: the second is
+what the rule meant, since the floor is framework, not the calculator.
+
+Decision needed from the owner: restate the rule in CLAUDE.md as "app-owned JS above the framework
+floor, under 90 KB, chart lazy loaded" so it is testable, or raise the number to about 250 KB total
+and accept that it is a headroom check rather than a budget.
+
+### 4. One floor cut already shipped
+
+`lib/consent.ts` used zod to parse two booleans, and the root layout's ConsentBanner imports it, so
+zod sat on all 228 routes. Hand parsing brought the floor from 178.8 to 148.1 KB gz. The calculator
+page went from 233.2 to 237.9 in the same build because feat/home-country added real flags and a
+picker, so the zod win and that feature landed together.
+
+Checks after the change: 1214 of 1214 unit tests, `tsc --noEmit`, eslint and `pnpm build` all clean.
+Commits `0a50a37` (gitignore, also clearing an assume-unchanged flag that had been hiding three
+local ignore blocks) and `1a9a379` (zod removal) sit on `m1-country-registry`.
+
+Still open, all owner decisions: the CLAUDE.md budget wording, and auth before the signed-in e2e
+tests.
+

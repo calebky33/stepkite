@@ -13,7 +13,7 @@
   ],
   "version_metadata": { "binding": "CF_VERSION_METADATA" },
   "vars": {
-    "TURNSTILE_HOSTNAMES": "stepkite.calebky33.workers.dev,stepkite.com,localhost,127.0.0.1",
+    "TURNSTILE_HOSTNAMES": "stepkite.app,stepkite.calebky33.workers.dev,localhost,127.0.0.1",
     "NEXT_PUBLIC_SUPABASE_URL": "https://mnuxckbcmggmkxvjkzvu.supabase.co",
     "NEXT_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_1ph1wjmCAnl56_tWQYxYiQ_GsiEUhM6",
   },

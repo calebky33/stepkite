@@ -21,8 +21,8 @@ export default function Contact() {
             github.com/calebky33/stepkite/issues
           </a>{" "}
           or email{" "}
-          <a href="mailto:contact@stepkite.com" className={link}>
-            contact@stepkite.com
+          <a href="mailto:contact@stepkite.app" className={link}>
+            contact@stepkite.app
           </a>
           . The email address will go live soon.
         </p>

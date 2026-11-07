@@ -4,7 +4,7 @@
 
 1. Open `C:\Users\USER\stepkite` in Claude Code. CLAUDE.md, agents, skills, hooks and settings load automatically.
 2. Check: `/agents` lists the 6 project agents (plus the global reviewers). `/` shows 9 project skills: new-calculator, cv-template, ui-component, ship-check, humanizer, emil-design-eng, review-animations, break-ui, mobile-native. `/hooks` shows the after-edit hook.
-3. Before building: register stepkite.com, run a trademark search, and create Paystack, Supabase and Cloudflare accounts yourself. Keep keys in `.env` (Claude is blocked from reading it).
+3. Before building: keep stepkite.app registered (done), run a trademark search, and create Paystack, Supabase and Cloudflare accounts yourself. Keep keys in `.env` (Claude is blocked from reading it).
 
 ## How "human, no errors" is enforced
 

@@ -58,7 +58,7 @@ The two `PLN_...` codes above are the live plans created on 2026-11-07. Confirm 
   pnpm exec wrangler secret put PAYSTACK_SECRET_KEY --name stepkite
   ```
 
-2.5 Settings → API Keys & Webhooks → Webhook URL: `https://stepkite.com/api/paystack/webhook` (or the current workers.dev host while the custom domain is pending). Events sent are all events Paystack supports; the route acts on `charge.success`, `subscription.create`, `subscription.not_renew`, `subscription.disable` and `invoice.payment_failed`, and acknowledges the rest. Refunds are done by hand in the Paystack dashboard.
+2.5 Settings → API Keys & Webhooks → Webhook URL: `https://stepkite.app/api/paystack/webhook`. Events sent are all events Paystack supports; the route acts on `charge.success`, `subscription.create`, `subscription.not_renew`, `subscription.disable` and `invoice.payment_failed`, and acknowledges the rest. Refunds are done by hand in the Paystack dashboard.
 
 Copy the signing secret (`whsec_...`) from the same page and set it as a Worker secret:
 
@@ -86,7 +86,7 @@ pnpm exec wrangler secret put PAYSTACK_WEBHOOK_SECRET --name stepkite
 pnpm exec wrangler turnstile widget delete 0x4AAAAAAFuKX0ye0q3FPyLZ
 pnpm exec wrangler turnstile widget create "stepkite" \
   --domain stepkite.calebky33.workers.dev \
-  --domain stepkite.com \
+  --domain stepkite.app \
   --domain localhost \
   --mode managed
 ```
@@ -97,9 +97,9 @@ The command prints a new sitekey and secret. Copy the sitekey into the GitHub Ac
 pnpm exec wrangler secret put TURNSTILE_SECRET --name stepkite
 ```
 
-3.4 (Optional, needs the custom domain) Workers Custom Domain — Workers & Pages → stepkite → Custom Domain → add `stepkite.com`. Change DNS in your registrar to Cloudflare nameservers.
+3.4 Custom domain: `stepkite.app` is registered at Cloudflare and connected to the Worker (Workers & Pages → stepkite → Domains). `stepkite.com` belongs to someone else, so never use it.
 
-3.5 Uptime monitor — Notifications → Create. Monitor `https://stepkite.com/api/health` every 1 minute, alert email on 3 failures.
+3.5 Uptime monitor — Notifications → Create. Monitor `https://stepkite.app/api/health` every 1 minute, alert email on 3 failures.
 
 ## 4. GitHub Actions secrets (5 min)
 

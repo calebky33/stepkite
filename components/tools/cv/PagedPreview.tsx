@@ -204,7 +204,7 @@ export function PagedPreview({
                       color: "#6b7280",
                     }}
                   >
-                    Made with Stepkite. stepkite.com
+                    Made with Stepkite. stepkite.app
                   </p>
                 ) : null}
               </div>

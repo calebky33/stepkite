@@ -31,4 +31,4 @@ Meaning colours stay fixed: green for net pay, orange for tax, red for errors.
 - Keep clear space around the logo equal to the height of the steps.
 - Never stretch, rotate, recolour outside this palette, add shadows, gradients or outlines.
 - Minimum size: mark 16px (use `favicon.svg` below 32px), full logo 96px wide.
-- Before launch: trademark search (USPTO, UKIPO, India, WIPO) and register stepkite.com.
+- Before launch: trademark search (USPTO, UKIPO, India, WIPO) and keep stepkite.app registered (stepkite.com is taken by someone else).

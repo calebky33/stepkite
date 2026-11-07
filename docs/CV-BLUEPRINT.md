@@ -101,7 +101,7 @@ client -> api/ai/{task} -> auth + rate limit -> context (CV JSON, locale, job ad
 
 - Creating a share link uploads that CV, so the UI says so and asks for confirmation first (CLAUDE.md rule 3).
 - Share link: random 128 bit token, `noindex` by default, optional expiry, revocable, option to hide phone and address. Never sequential ids. Requires sign in because it needs a server record.
-- Personal site: a second set of responsive templates over the same JSON and tokens. One click publishes a snapshot to `name.stepkite.com`. Default is publish on click, not live linked, so unfinished edits never leak.
+- Personal site: a second set of responsive templates over the same JSON and tokens. One click publishes a snapshot to `name.stepkite.app`. Default is publish on click, not live linked, so unfinished edits never leak.
 - Both are Pro features and come after the validation gate.
 
 ## 11. Promotions

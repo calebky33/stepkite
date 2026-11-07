@@ -1,58 +1,70 @@
-# Review: m1-country-registry (uncommitted work, 2026-11-07)
+# Review: m1-country-registry, commits 0e703a8..4af6f8b (2026-11-07)
 
 Reviewer: Claude (independent, read-only). Implementer: Pi.
-Scope: the 26 modified files plus `components/tools/TaxUnavailable.tsx` and
-`supabase/migrations/20261108000000_widen_profiles_country.sql` in Pi's worktree.
+Reviewers run: typescript-reviewer, react-reviewer, database-reviewer, plus my own pass.
+Build, lint, typecheck and check:copy are still running. Their results will follow in a separate commit.
 
-Overall: sound. Tier 2 markets can never show a tax figure (`loadEngine` returns null,
-`requireRates` throws, the pages are noindex). No critical security problems.
+Overall: sound. No tier 2 route reaches tax code: `loadEngine` returns null, `requireRates` throws,
+`[gross]` returns a 404 on empty levels, and metadata is noindex for tier 2. No critical security problems.
 
-## Confirmed bugs (fix before merge)
+## Fix before merge
 
-1. MEDIUM. `app/[country]/page.tsx:74`: the "Open the salary calculator" button shows on every
-   hub. On the 20 tier 2 markets it leads to the "not available" page.
-   Fix: render it only when `info.tier === 1`. For tier 2, make the main button
-   `/${country}/cv` with the label "Build your {cvLabelTitle(country)}".
+1. HIGH (all reviewers). `app/[country]/page.tsx:74-79`: the "Open the salary calculator" button is
+   unconditional. On the 20 tier 2 hubs it leads to the "not available" page.
+   Fix: render it only when `info.tier === 1`. For tier 2, the main button goes to `/${country}/cv`,
+   labelled "Build your {cvLabelTitle(country)}".
 
-2. MEDIUM. `lib/countries.ts:13,319`: `CountryCode = string` and
-   `COUNTRY_INFO: Record<string, CountryInfo>` remove compile-time checks. `COUNTRY_INFO["gb"].name`
-   compiles and then crashes when it runs.
-   Fix: `const COUNTRY_LIST = [...] as const satisfies readonly CountryInfo[]`,
-   `type CountryCode = (typeof COUNTRY_LIST)[number]["code"]`, and add
-   `type TaxCountry = "uk" | "us" | "in"`. Type `loadEngine`, `requireRates`, `PayCalculator` props,
-   `FIELDS`, `SLIDER_YEARLY`, `COPY` and `DEFAULT_VALUES` with `TaxCountry`. Then drop most of the
-   `Partial<>` and `?? fallback` code.
+2. HIGH. `app/[country]/salary-calculator/page.tsx:~73`: `<AdSlot>` sits beside `TaxUnavailable` on an
+   empty page. AdSense rejects ads on low-value pages. Fix: remove the AdSlot from that branch. Also
+   check that `ToolLinks` hides tax tools (offers, regime) for tier 2.
 
-3. LOW. `components/tools/PayCalculator/PayCalculator.tsx:139`: `if (!Fields) return null` gives a
-   blank screen. The pages guard against it today, so it is latent. It goes away once item 2 is done.
+3. MEDIUM (react-reviewer marks it BLOCKING). `components/tools/PayCalculator/PayCalculator.tsx:138-139`:
+   `if (!Fields) return null` sits between hooks. Any hook added below it breaks the rules of hooks,
+   and if a page guard is ever missed the page goes blank with no error. The same applies to the
+   invented fallbacks `DEFAULT_VALUES[country] ?? {}`, `SLIDER_YEARLY ?? {max:150_000}` and `COPY?.label ?? ...`.
+   Fix: add `type TaxCountry = "uk" | "us" | "in"`, type the `PayCalculator` prop and the
+   `FIELDS`/`SLIDER_YEARLY`/`COPY`/`DEFAULT_VALUES` maps with it as full `Record`s, and delete the early return and the fallbacks.
 
-## Recommendations
+4. MEDIUM. `lib/countries.ts`: `CountryCode = string` and `COUNTRY_INFO: Record<string, CountryInfo>`
+   mean `COUNTRY_INFO[x]` is typed as always defined. It is safe today only because `isCountry` or
+   `requireCountry` runs first, for example `salary-calculator/[gross]/page.tsx:46,72` and `compare/offers/page.tsx:18`.
+   Fix: brand the type (`type CountryCode = string & { readonly __brand: "CountryCode" }`, make
+   `isCountry` the type guard and have `requireCountry` return it), or derive a literal union from
+   `COUNTRY_LIST as const`. Use `TaxCountry` (item 3) for `loadEngine` and `requireRates`, so a wrong call becomes a compile error.
 
-4. `app/[country]/salary-calculator/page.tsx:70-78`: remove `AdSlot` from the tier 2 "not available"
-   branch. AdSense rejects ads on pages without publisher content.
-5. `lib/cv/rules/index.ts` `defaultCvRules`: set `spelling` from `info.locale` (CA to en-CA, PH to en-US),
-   not always en-GB.
-6. `components/tools/cv/templates/index.ts`: tier 2 falls back to the US templates. Check that the
-   templates read `rules.paper`, so A4 markets (de, nl, za, ae and others) do not export Letter. Not verified.
-7. `components/shell/Flag.tsx` fallback: replace `#e5e7eb` and `#4b5563` with design tokens so it
-   works in dark mode.
-8. `components/shell/ConsentBanner.tsx:16`: treat the `ie`, `nl`, `de` and `se` routes like `uk`, for consistency.
-9. Migration: the regex accepts any two letters (`xx`). Make sure the profile write path validates
-   with `isCountry`. Run `database-reviewer` on the migration before merge (CLAUDE.md).
+## Should fix
+
+5. MEDIUM. `components/shell/Flag.tsx:36-42`: the fallback badge hard-codes `#e5e7eb` and `#4b5563`. It
+   glares in dark mode and the text is about 9px. Use design tokens (`var(--surface-2)` and `var(--muted)`), keep
+   contrast at 4.5:1 or better, and keep `aria-hidden` on the svg.
+6. LOW. `lib/cv/rules/index.ts` `defaultCvRules`: `spelling: "en-GB"` for every tier 2 market. Derive it from
+   `info.locale` (CA to en-CA, PH to en-US). A tier 1 market missing from `rules` would also silently get these defaults.
+7. LOW. `components/tools/TaxUnavailable.tsx`: the button text says `cvLabelTitle` while the paragraph says
+   `info.cvName`. Add a tracker link too.
+8. LOW. `components/tools/cv/templates/index.ts`: tier 2 gets the US templates. Check that the templates
+   read `rules.paper`, so A4 markets do not export Letter. Not verified.
+9. LOW. `components/shell/ConsentBanner.tsx:16`: treat the `ie`, `nl`, `de` and `se` routes like `uk`.
+
+## Migration (database-reviewer)
+
+`supabase/migrations/20261108000000_widen_profiles_country.sql`. The constraint name is correct and RLS is unaffected.
+- Use `drop constraint if exists`.
+- Add `set local lock_timeout = '5s';`, then `add constraint ... not valid;` and
+  `validate constraint profiles_country_check;` so writes are not blocked.
+- The comment says ISO 3166-1, but `uk` is not ISO (that is `gb`). Reword it to "two-letter registry code".
+- No app code writes `profiles.country` yet. When sync is built, validate with `isCountry()` before writing.
+- There is no rollback. Document that reverting needs `update ... set country = null where country not in ('uk','us','in')` first.
 
 ## Opportunities
 
-- No tier 2 page is indexable. Add per-country CV guide pages for ca, au, ae and sg to
-  `INDEXABLE_PATHS`. That is SEO gain without any tax work.
+- No tier 2 page is indexable. Add per-country CV guide pages (ca, au, ae, sg) to `INDEXABLE_PATHS`.
 - On tier 2 hubs the CV upgrade is the only paid route. Make it the main call to action.
 
-## Tests run (read-only, in Pi's worktree)
+## Tests
 
-- `npx vitest run app/api/og lib/cv components/tools/PayCalculator`: 28 files, 172 tests passed.
-- `npx tsc --noEmit --incremental false`: no errors.
-- Not run: `pnpm build`, lint, `check:copy`, e2e, the 375px and 1280px visual checks.
+- Vitest (og, lib/cv, PayCalculator): 172 of 172 passed. `tsc --noEmit`: clean (run on the earlier uncommitted state).
+- Build, lint and check:copy at 4af6f8b: pending, to follow.
 
 ## Handback
 
-Pi, reply by adding a section to this file on the `claude-review` branch, or note fixes in your
-commit messages with the item numbers.
+Pi: reference item numbers in your fix commits, or add a reply section here.

@@ -30,6 +30,7 @@ const entitlementRowSchema = z
     plan_code: z.string(),
     status: z.string(),
     current_period_end: z.string().nullable(),
+    cancel_at: z.string().nullable(),
   })
   .nullable();
 
@@ -37,9 +38,13 @@ function hasLivePlan(row: {
   plan_code: string;
   status: string;
   current_period_end: string | null;
+  cancel_at: string | null;
 }) {
   if (row.plan_code === "lifetime") return true;
-  if (row.status === "active" || row.status === "past_due") return true;
+  if (row.status === "active" || row.status === "past_due") {
+    // A cancelled plan whose paid period is over can be bought again.
+    return !(row.cancel_at && new Date(row.cancel_at).getTime() <= Date.now());
+  }
   if (row.status === "canceled" && row.current_period_end) {
     return new Date(row.current_period_end).getTime() > Date.now();
   }
@@ -99,7 +104,7 @@ export async function POST(request: Request): Promise<Response> {
       .maybeSingle(),
     admin
       .from("entitlements")
-      .select("plan_code, status, current_period_end")
+      .select("plan_code, status, current_period_end, cancel_at")
       .eq("user_id", session.id)
       .maybeSingle(),
   ]);

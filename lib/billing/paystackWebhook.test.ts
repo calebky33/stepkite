@@ -152,6 +152,7 @@ function paystackReturning(overrides: Record<string, unknown> = {}): PaystackCli
       ...overrides,
     })),
     initializeTransaction: vi.fn(),
+    fetchSubscriptionToken: vi.fn(),
     disableSubscription: vi.fn(),
   };
 }
@@ -228,6 +229,20 @@ describe("charge.success", () => {
     ];
     expect(await run(charge, paystackReturning({ metadata: null }))).toBe("applied");
     expect(db.tables.entitlements?.[0]).toMatchObject({ current_period_end: MONTH_END });
+  });
+
+  it("keeps a recorded cancellation when a late renewal arrives", async () => {
+    db.tables.entitlements = [
+      {
+        user_id: UID,
+        plan_code: "monthly",
+        status: "active",
+        paystack_customer_code: "CUS_1",
+        cancel_at: MONTH_END,
+      },
+    ];
+    expect(await run(charge, paystackReturning({ metadata: null }))).toBe("applied");
+    expect(db.tables.entitlements?.[0]).toMatchObject({ cancel_at: MONTH_END });
   });
 
   it("asks for a retry, and grants nothing, when a real payment does not match the plans table", async () => {
@@ -372,7 +387,26 @@ describe("subscription events", () => {
       data: { id: 11, subscription: { subscription_code: "SUB_1" } },
     };
     expect(await run(disable)).toBe("applied");
-    expect(db.tables.entitlements?.[0]).toMatchObject({ status: "canceled" });
+    // Paid up until MONTH_END, so the plan stays active and just records when it ends.
+    expect(db.tables.entitlements?.[0]).toMatchObject({ status: "active", cancel_at: MONTH_END });
+  });
+
+  it("ends the plan on disable once the paid period has passed", async () => {
+    db.tables.entitlements = [
+      {
+        user_id: UID,
+        plan_code: "monthly",
+        status: "active",
+        paystack_subscription_code: "SUB_1",
+        current_period_end: "2026-11-01T12:00:00.000Z",
+      },
+    ];
+    const disable = { event: "subscription.disable", data: { id: 21, subscription_code: "SUB_1" } };
+    expect(await run(disable)).toBe("applied");
+    expect(db.tables.entitlements?.[0]).toMatchObject({
+      status: "canceled",
+      cancel_at: NOW.toISOString(),
+    });
   });
 
   it("asks for a retry when the subscription is unknown, and never cancels a lifetime plan", async () => {

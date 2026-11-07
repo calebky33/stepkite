@@ -61,6 +61,18 @@ describe("entitlement helpers", () => {
     ).toBe(true);
   });
 
+  it("hasProAccess keeps a cancelled plan until its end date, then stops", () => {
+    const now = new Date("2026-11-10T12:00:00.000Z");
+    const cancelled = {
+      ...FREE,
+      planCode: "monthly" as const,
+      status: "active" as const,
+      currentPeriodEnd: "2026-11-30T12:00:00.000Z",
+    };
+    expect(hasProAccess({ ...cancelled, cancelAt: "2026-11-30T12:00:00.000Z" }, now)).toBe(true);
+    expect(hasProAccess({ ...cancelled, cancelAt: "2026-11-09T12:00:00.000Z" }, now)).toBe(false);
+  });
+
   it("hasProAccess is false for past_due", () => {
     expect(hasProAccess({ ...FREE, planCode: "monthly", status: "past_due" })).toBe(false);
   });

@@ -168,10 +168,10 @@ describe("paywall checkout route, wired", () => {
   it("returns 409 when the user already has an active plan or lifetime", async () => {
     const future = new Date(Date.now() + 86_400_000).toISOString();
     for (const entitlement of [
-      { plan_code: "monthly", status: "active", current_period_end: null },
-      { plan_code: "monthly", status: "past_due", current_period_end: null },
-      { plan_code: "monthly", status: "canceled", current_period_end: future },
-      { plan_code: "lifetime", status: "none", current_period_end: null },
+      { plan_code: "monthly", status: "active", current_period_end: null, cancel_at: null },
+      { plan_code: "monthly", status: "past_due", current_period_end: null, cancel_at: null },
+      { plan_code: "monthly", status: "canceled", current_period_end: future, cancel_at: null },
+      { plan_code: "lifetime", status: "none", current_period_end: null, cancel_at: null },
     ]) {
       const { POST, initializeTransaction } = await loadWired({ plan: MONTHLY, entitlement });
       const res = await POST(post(JSON.stringify({ plan: "monthly" })));
@@ -183,13 +183,39 @@ describe("paywall checkout route, wired", () => {
   it("lets trialing, expired-cancelled and revoked users buy", async () => {
     const past = new Date(Date.now() - 86_400_000).toISOString();
     for (const entitlement of [
-      { plan_code: "free", status: "trialing", current_period_end: null },
-      { plan_code: "monthly", status: "canceled", current_period_end: past },
-      { plan_code: "free", status: "revoked", current_period_end: null },
+      { plan_code: "free", status: "trialing", current_period_end: null, cancel_at: null },
+      { plan_code: "monthly", status: "canceled", current_period_end: past, cancel_at: null },
+      { plan_code: "free", status: "revoked", current_period_end: null, cancel_at: null },
     ]) {
       const { POST } = await loadWired({ plan: MONTHLY, entitlement });
       expect((await POST(post(JSON.stringify({ plan: "monthly" })))).status).toBe(200);
     }
+  });
+
+  it("lets a user whose cancelled plan has run out buy again, but not before", async () => {
+    const past = new Date(Date.now() - 86_400_000).toISOString();
+    const future = new Date(Date.now() + 86_400_000).toISOString();
+    const ended = {
+      plan_code: "monthly",
+      status: "active",
+      current_period_end: past,
+      cancel_at: past,
+    };
+    const running = { ...ended, current_period_end: future, cancel_at: future };
+    expect(
+      (
+        await (
+          await loadWired({ plan: MONTHLY, entitlement: ended })
+        ).POST(post(JSON.stringify({ plan: "monthly" })))
+      ).status,
+    ).toBe(200);
+    expect(
+      (
+        await (
+          await loadWired({ plan: MONTHLY, entitlement: running })
+        ).POST(post(JSON.stringify({ plan: "monthly" })))
+      ).status,
+    ).toBe(409);
   });
 
   it("returns 502 when a row has an unexpected shape", async () => {

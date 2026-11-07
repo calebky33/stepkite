@@ -39,8 +39,8 @@ content/<country>/*.mdx
 
 - Provider: Paystack. USD only at launch (Paystack does not support GBP or INR).
 - Lifetime: POST `/transaction/initialize` (one-time, no plan). On `charge.success`, grant lifetime entitlement. Idempotent on the Paystack event id.
-- Monthly and yearly: POST `/transaction/initialize` with a `plan` code (PLN_...). Paystack bills the cadence automatically. The `subscription.create` event records the subscription code; `charge.success` extends `current_period_end`; `subscription.disable` revokes.
-- Cancel: POST `/subscription/disable` from our own `/api/paywall/cancel` (Paystack has no hosted customer portal).
+- Monthly and yearly: POST `/transaction/initialize` with a `plan` code (PLN_...). Paystack bills the cadence automatically. The `subscription.create` event records the subscription code; `charge.success` extends `current_period_end`; `subscription.disable` ends access at the paid period end.
+- Cancel: the Cancel plan button on `/account` calls `/api/paywall/cancel`, which fetches the subscription token and POSTs `/subscription/disable` (Paystack has no hosted customer portal). It sets `cancel_at` to the end of the paid period.
 - Tax is our responsibility (Paystack does not collect), so prices are tax-inclusive outside the US. No card data touches our servers.
 
 ## AI matching

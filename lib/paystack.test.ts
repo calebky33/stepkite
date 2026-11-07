@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { verifyPaystackSignature } from "./paystack";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { PaystackError, createPaystack, verifyPaystackSignature } from "./paystack";
 
 async function hmacSha512Hex(secret: string, message: string): Promise<string> {
   const key = await crypto.subtle.importKey(
@@ -93,5 +93,39 @@ describe("verifyPaystackSignature", () => {
         secretKey: null,
       }),
     ).toBe(false);
+  });
+});
+
+describe("createPaystack subscription calls", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  function client(response: Response) {
+    vi.stubEnv("PAYSTACK_SECRET_KEY", "sk_test_x");
+    const fetchImpl = vi.fn(async () => response);
+    const paystack = createPaystack({ fetchImpl: fetchImpl as unknown as typeof fetch });
+    if (!paystack) throw new Error("client not created");
+    return { paystack, fetchImpl };
+  }
+
+  it("reads the email token for a subscription code", async () => {
+    const { paystack, fetchImpl } = client(
+      Response.json({ status: true, data: { email_token: "tok_1", subscription_code: "SUB_1" } }),
+    );
+    expect(await paystack.fetchSubscriptionToken("SUB_1")).toBe("tok_1");
+    const call = fetchImpl.mock.calls[0] as unknown as [string, RequestInit];
+    expect(call[0]).toBe("https://api.paystack.co/subscription/SUB_1");
+    expect(call[1].method).toBe("GET");
+  });
+
+  it("encodes the subscription code and rejects a response with no token", async () => {
+    const { paystack, fetchImpl } = client(Response.json({ status: true, data: {} }));
+    await expect(paystack.fetchSubscriptionToken("SUB/../x")).rejects.toBeInstanceOf(PaystackError);
+    const call = fetchImpl.mock.calls[0] as unknown as [string];
+    expect(call[0]).toBe("https://api.paystack.co/subscription/SUB%2F..%2Fx");
+  });
+
+  it("raises a PaystackError with the status when Paystack rejects the call", async () => {
+    const { paystack } = client(Response.json({ status: false }, { status: 404 }));
+    await expect(paystack.fetchSubscriptionToken("SUB_9")).rejects.toMatchObject({ status: 404 });
   });
 });

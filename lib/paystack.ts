@@ -21,6 +21,8 @@ const DEFAULT_TIMEOUT_MS = 8_000;
 export interface PaystackClient {
   initializeTransaction: (input: InitializeInput) => Promise<InitializeResult>;
   verifyTransaction: (reference: string) => Promise<VerifyResult>;
+  /** The token Paystack requires to disable a subscription. */
+  fetchSubscriptionToken: (code: string) => Promise<string>;
   disableSubscription: (code: string, emailToken: string) => Promise<DisableResult>;
 }
 
@@ -84,6 +86,8 @@ const verifySchema = z.object({
   plan: z.unknown().optional(),
   metadata: z.unknown().optional(),
 });
+
+const subscriptionSchema = z.object({ email_token: z.string().min(1) });
 
 const initializeSchema = z.object({
   authorization_url: z.url(),
@@ -184,6 +188,14 @@ export function createPaystack(options?: {
         planCode,
         metadata: data.metadata ?? null,
       };
+    },
+    async fetchSubscriptionToken(code) {
+      const data = await call(
+        `/subscription/${encodeURIComponent(code)}`,
+        { method: "GET" },
+        subscriptionSchema,
+      );
+      return data.email_token;
     },
     async disableSubscription(code, emailToken) {
       // Paystack's disable endpoint returns {status: true, message: "Subscription disabled..."}

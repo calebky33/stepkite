@@ -58,7 +58,7 @@ The two `PLN_...` codes above are the live plans created on 2026-11-07. Confirm 
   pnpm exec wrangler secret put PAYSTACK_SECRET_KEY --name stepkite
   ```
 
-2.5 Settings → API Keys & Webhooks → Webhook URL: `https://stepkite.com/api/paystack/webhook` (or the current workers.dev host while the custom domain is pending). Events sent are all events Paystack supports; the route only acts on `charge.success`, `customeridentification.success`, `subscription.create`, `subscription.not_renew`, `subscription.disable`, `invoice.update`, `invoice.payment_failed` and `charge.refunded`.
+2.5 Settings → API Keys & Webhooks → Webhook URL: `https://stepkite.com/api/paystack/webhook` (or the current workers.dev host while the custom domain is pending). Events sent are all events Paystack supports; the route acts on `charge.success`, `subscription.create`, `subscription.not_renew`, `subscription.disable` and `invoice.payment_failed`, and acknowledges the rest. Refunds are done by hand in the Paystack dashboard.
 
 Copy the signing secret (`whsec_...`) from the same page and set it as a Worker secret:
 

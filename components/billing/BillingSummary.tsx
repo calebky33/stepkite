@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { z } from "zod";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import type { Entitlement } from "@/lib/billing/entitlement";
@@ -14,8 +15,26 @@ type DisplayPlan = {
   name: string;
   nextChargeAmount: string | null;
   nextChargeDate: string | null;
+  /** Set once the user has cancelled: the last day of the paid period. */
+  endsOn: string | null;
   cancelable: boolean;
 };
+
+const CANCEL_MESSAGES: Record<string, string> = {
+  no_subscription: "There is no recurring plan to cancel. Reload the page to see your plan.",
+  rate_limited: "Too many tries. Wait a minute and try again.",
+};
+const CANCEL_FALLBACK = "We couldn't cancel your plan. Try again in a minute.";
+
+const cancelResponseSchema = z.object({
+  status: z.string().optional(),
+  access_until: z.string().optional(),
+  error: z.string().optional(),
+});
+
+function formatDate(iso: string): string {
+  return new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(new Date(iso));
+}
 
 const PLAN_NAMES: Record<Entitlement["planCode"], string> = {
   free: "Free",
@@ -31,19 +50,24 @@ function toDisplay(entitlement: Entitlement): DisplayPlan {
   const name = PLAN_NAMES[entitlement.planCode];
   // Only paid subscriptions have a next charge amount and date, and only they can be canceled.
   if (!SUBSCRIPTION_PLANS.has(entitlement.planCode as PlanCode)) {
-    return { name, nextChargeAmount: null, nextChargeDate: null, cancelable: false };
+    return { name, nextChargeAmount: null, nextChargeDate: null, endsOn: null, cancelable: false };
   }
   const plan = getPlan(entitlement.planCode as PlanCode);
   const nextChargeDate = entitlement.currentPeriodEnd
-    ? new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(
-        new Date(entitlement.currentPeriodEnd),
-      )
+    ? formatDate(entitlement.currentPeriodEnd)
     : null;
+  const cancelled = entitlement.cancelAt !== null;
   return {
     name,
     nextChargeAmount: formatPrice(plan),
     nextChargeDate,
-    cancelable: entitlement.status === "active" || entitlement.status === "trialing",
+    endsOn: cancelled
+      ? formatDate(entitlement.cancelAt ?? entitlement.currentPeriodEnd ?? "")
+      : null,
+    // A trial takes no card, so there is nothing to cancel. Only a live subscription that is not
+    // already cancelled can be.
+    cancelable:
+      !cancelled && (entitlement.status === "active" || entitlement.status === "past_due"),
   };
 }
 
@@ -56,6 +80,29 @@ function toDisplay(entitlement: Entitlement): DisplayPlan {
 export function BillingSummary(): React.ReactElement {
   const [state, setState] = useState<Status>("loading");
   const [data, setData] = useState<BillingMe | null>(null);
+  const [confirming, setConfirming] = useState(false);
+  const [canceling, setCanceling] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+  const [successNote, setSuccessNote] = useState<string | null>(null);
+
+  // Each step swaps or disables the focused control, so say where focus goes next and move it
+  // after the render that follows. A ref, not state, so no extra render is needed.
+  const pendingFocus = useRef<"confirm" | "trigger" | "done" | null>(null);
+  const confirmRef = useRef<HTMLParagraphElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const doneRef = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    const target = pendingFocus.current;
+    if (!target) return;
+    pendingFocus.current = null;
+    const element =
+      target === "confirm"
+        ? confirmRef.current
+        : target === "trigger"
+          ? triggerRef.current
+          : doneRef.current;
+    element?.focus();
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -82,6 +129,34 @@ export function BillingSummary(): React.ReactElement {
     };
   }, []);
 
+  async function cancelPlan() {
+    setCanceling(true);
+    setCancelError(null);
+    try {
+      const res = await fetch("/api/paywall/cancel", { method: "POST" });
+      const parsed = cancelResponseSchema.safeParse(await res.json().catch(() => null));
+      if (res.ok && parsed.success && parsed.data.access_until) {
+        const accessUntil = parsed.data.access_until;
+        setData((current) =>
+          current && current.entitlement
+            ? { ...current, entitlement: { ...current.entitlement, cancelAt: accessUntil } }
+            : current,
+        );
+        setConfirming(false);
+        setSuccessNote(`Plan cancelled. You keep Pro until ${formatDate(accessUntil)}.`);
+        pendingFocus.current = "done";
+      } else {
+        const code = parsed.success ? parsed.data.error : undefined;
+        setCancelError((code && CANCEL_MESSAGES[code]) || CANCEL_FALLBACK);
+        pendingFocus.current = "confirm";
+      }
+    } catch {
+      setCancelError(CANCEL_FALLBACK);
+      pendingFocus.current = "confirm";
+    }
+    setCanceling(false);
+  }
+
   if (state === "loading") {
     return (
       <Card aria-busy="true" className="flex flex-col gap-2">
@@ -93,7 +168,7 @@ export function BillingSummary(): React.ReactElement {
 
   if (state === "failed" || !data) {
     return (
-      <Card className="flex flex-col gap-2" role="status">
+      <Card className="flex flex-col gap-2" role="alert">
         <h2 className="text-sm font-semibold text-muted">Your plan</h2>
         <p className="text-base text-muted">
           We couldn&apos;t load your plan. Reload the page to try again.
@@ -119,18 +194,58 @@ export function BillingSummary(): React.ReactElement {
       <div className="flex flex-col gap-2">
         <h2 className="text-sm font-semibold text-muted">Your plan</h2>
         <p className="text-xl font-semibold text-text">{display.name}</p>
-        {display.nextChargeAmount && display.nextChargeDate ? (
+        {display.endsOn ? (
+          <p ref={doneRef} tabIndex={-1} className="text-base text-muted outline-offset-4">
+            Cancelled. You keep Pro until {display.endsOn}, and you won&apos;t be charged again.
+          </p>
+        ) : display.nextChargeAmount && display.nextChargeDate ? (
           <p className="text-base text-muted">
             Next charge {display.nextChargeAmount} on {display.nextChargeDate}.
           </p>
         ) : (
           <p className="text-base text-muted">No charges are scheduled.</p>
         )}
+        <p role="status" aria-live="polite" className="min-h-5 text-sm text-muted">
+          {cancelError ?? successNote}
+        </p>
       </div>
       {display.cancelable ? (
-        <Button variant="secondary" className="self-start md:self-auto">
-          Cancel plan
-        </Button>
+        confirming ? (
+          <div className="flex flex-col gap-2 self-start md:self-auto">
+            <p ref={confirmRef} tabIndex={-1} className="text-base text-text outline-offset-4">
+              Stop renewals? You keep Pro until the period you&apos;ve paid for ends.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="secondary" loading={canceling} onClick={cancelPlan}>
+                Yes, cancel plan
+              </Button>
+              <Button
+                variant="ghost"
+                disabled={canceling}
+                onClick={() => {
+                  setConfirming(false);
+                  setCancelError(null);
+                  pendingFocus.current = "trigger";
+                }}
+              >
+                Keep plan
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <Button
+            ref={triggerRef}
+            variant="secondary"
+            className="self-start md:self-auto"
+            onClick={() => {
+              setConfirming(true);
+              setCancelError(null);
+              pendingFocus.current = "confirm";
+            }}
+          >
+            Cancel plan
+          </Button>
+        )
       ) : null}
     </Card>
   );

@@ -138,19 +138,26 @@ Gated pages (sign-up required):
 
 ## Webhook contract
 
-Idempotent. The route stores Paystack's event id in `payments`; a second delivery of the same id is accepted and dropped. Signature verification uses `Paystack-Signature` (current scheme: HMAC-SHA512 of `<t>.<kid>.<body>` with the `whsec_...` signing secret, 300 second tolerance on `t`) with a fallback to the legacy `x-paystack-signature` header (HMAC-SHA512 of the raw body with the secret key) so a slow signing-secret rollout cannot drop live events.
+Implemented in `lib/billing/paystackWebhook.ts`, called by `app/api/paystack/webhook/route.ts` after the signature check. Signature verification uses `Paystack-Signature` (current scheme: HMAC-SHA512 of `<t>.<kid>.<body>` with the `whsec_...` signing secret, 300 second tolerance on `t`) with a fallback to the legacy `x-paystack-signature` header (HMAC-SHA512 of the raw body with the secret key). Only `PAYSTACK_SECRET_KEY` is required.
 
-| Paystack event                 | Entitlement change                                                                              |
-| ------------------------------ | ----------------------------------------------------------------------------------------------- |
-| customeridentification.success | insert `users` row if missing, store `paystack_customer_code` in `entitlements`                 |
-| charge.success                 | first paid charge for the plan: mark entitlement active, extend `current_period_end`            |
-| subscription.create            | store `paystack_subscription_code` and `current_period_end` from Paystack's `next_payment_date` |
-| subscription.not_renew         | set `cancel_at = current_period_end` (user cancelled; access runs out the period)               |
-| subscription.disable           | status = `"canceled"`, cancel_at = now                                                          |
-| invoice.create                 | nothing until the paid variant lands                                                            |
-| invoice.update                 | if paid, append to `payments` and extend `current_period_end`                                   |
-| invoice.payment_failed         | status = `"past_due"`                                                                           |
-| charge.refunded                | status = `"revoked"` when the refund is full                                                    |
+Rules the code follows:
+
+- **Grant first, record second.** Every write is idempotent. The event is written to `payments(event_id unique)` last and only means "done", so a crash or a retry in between applies the same write again. Nothing is deleted to undo a failed write.
+- **Money is never trusted from the body.** `charge.success` re-fetches the transaction from Paystack and checks status, USD, the plan code and the exact amount against the `plans` row.
+- **Retry versus ignore.** The route answers 200 for applied, duplicate and ignored events and 500 (Paystack retries) when the row an event points at is not there yet or the `plans` table disagrees with a real payment. Ignored means not ours, not paid, or the account is gone.
+- **Lifetime is protected.** An older subscription event cannot cancel or downgrade a lifetime plan, and a time-limited payment on a lifetime account is recorded and flagged for a manual refund.
+- **No revival.** A renewal that arrives after a plan was cancelled or revoked does not bring it back. A new checkout (it carries our metadata) does.
+- **Refunds are manual.** Refund events are acknowledged and ignored. Refund in the Paystack dashboard and change the entitlement by hand if access should end.
+
+| Paystack event         | Entitlement change                                                                                                                                  |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| charge.success         | verified paid charge: plan active, customer code stored, `current_period_end` = now plus the plan interval (none for lifetime), `cancel_at` cleared |
+| subscription.create    | store `paystack_subscription_code` and `current_period_end` from `next_payment_date`; retried until the first charge has landed                     |
+| subscription.not_renew | set `cancel_at = current_period_end`; access continues                                                                                              |
+| subscription.disable   | paid up: set `cancel_at = current_period_end`, stay active. Period already over: status `canceled`, `cancel_at` now                                 |
+| invoice.payment_failed | status `past_due` (never for lifetime)                                                                                                              |
+
+`hasProAccess` ends access at `cancel_at` and allows three extra days after `current_period_end` for a delayed renewal.
 
 Reminders ride on top:
 

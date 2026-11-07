@@ -230,9 +230,12 @@ async function applyCancellation(input: {
   // An old subscription must never cancel a lifetime plan bought later.
   if (row.data.plan_code === "lifetime") return "ignored";
 
-  // not_renew: the user cancelled but paid until the period ends. disable: the plan is over.
+  // The user cancelled. A plan that is paid up keeps access until its period ends (`cancel_at`,
+  // which hasProAccess honours). Only a plan with no paid time left becomes "canceled" now.
+  const periodEnd = row.data.current_period_end ? Date.parse(row.data.current_period_end) : NaN;
+  const paidUp = Number.isFinite(periodEnd) && periodEnd > now.getTime();
   const patch =
-    event === "subscription.not_renew"
+    event === "subscription.not_renew" || paidUp
       ? { cancel_at: row.data.current_period_end ?? now.toISOString() }
       : { status: "canceled", cancel_at: now.toISOString() };
   const { error } = await admin.from("entitlements").update(patch).eq("user_id", row.data.user_id);
@@ -354,7 +357,9 @@ async function handleCharge(input: {
       status: "active",
       paystack_customer_code: tx.customerCode,
       current_period_end: addInterval(now, plan.data.interval),
-      cancel_at: null,
+      // A new checkout clears an old cancellation. A renewal that lands just before a cancel must
+      // not erase it.
+      ...(meta.success ? { cancel_at: null } : {}),
       // Buying lifetime ends any old subscription link so its later events cannot touch it.
       ...(plan.data.code === "lifetime" ? { paystack_subscription_code: null } : {}),
     },

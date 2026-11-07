@@ -36,6 +36,8 @@ export function hasProAccess(e: Entitlement, now: Date = new Date()): boolean {
   if (e.planCode === "lifetime") return true;
   if (e.status === "trialing") return true;
   if (e.status !== "active") return false;
+  // A cancelled plan keeps access to the end of the period the user paid for.
+  if (e.cancelAt && new Date(e.cancelAt).getTime() <= now.getTime()) return false;
   if (!e.currentPeriodEnd) return true;
   return new Date(e.currentPeriodEnd).getTime() + RENEWAL_GRACE_MS > now.getTime();
 }

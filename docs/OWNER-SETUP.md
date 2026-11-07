@@ -43,10 +43,12 @@ Lifetime does not need a plan: the checkout route initialises a one-time transac
 ```sql
 insert into plans (code, paystack_plan_code, amount_cents, currency, interval, interval_count, active)
 values
-  ('monthly',  'PLN_...',  999, 'USD', 'month', 1, true),
-  ('yearly',   'PLN_...', 3900, 'USD', 'year',  1, true),
-  ('lifetime', null,     14900, 'USD', null,    null, true);
+  ('monthly',  'PLN_i39qwcg76iesqck',  999, 'USD', 'month', 1, true),
+  ('yearly',   'PLN_thy98vgrfkw4s2c', 3900, 'USD', 'year',  1, true),
+  ('lifetime', null,                 14900, 'USD', null,    null, true);
 ```
+
+The two `PLN_...` codes above are the live plans created on 2026-11-07. Confirm they still exist and match in the Paystack dashboard before running this insert.
 
 2.4 Settings → API Keys & Webhooks:
 

@@ -46,7 +46,10 @@ test("duplicate, delete and restore from the list", async ({ page }) => {
 test("an old CV is read on the device, reviewed, and saved as a new CV", async ({ page }) => {
   const uploads: string[] = [];
   page.on("request", (request) => {
-    if (request.method() !== "GET") uploads.push(request.url());
+    if (request.method() === "GET") return;
+    // Cloudflare's bot check posts a challenge token of its own. It never carries the CV text.
+    if (request.url().startsWith("https://challenges.cloudflare.com/")) return;
+    uploads.push(request.url());
   });
   await page.goto("/uk/cv");
   await page.getByRole("button", { name: "Upload it" }).click();

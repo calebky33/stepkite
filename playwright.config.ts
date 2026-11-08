@@ -36,6 +36,9 @@ if (hasTestAccount) {
 
 export default defineConfig({
   testDir: "e2e",
+  // A cold dev server compiles a route on first hit and Supabase sign-in can take 5s, so the
+  // 5s default assertion timeout reported real latency as a failure.
+  expect: { timeout: 15_000 },
   webServer: { command: "pnpm dev", url: "http://localhost:3000", reuseExistingServer: true },
   use: { baseURL: "http://localhost:3000" },
   projects,

@@ -11,6 +11,13 @@ setup("sign in with the test account", async ({ page }) => {
   await page.getByLabel("Email", { exact: true }).fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page).toHaveURL(/\/account/);
+  // Match the path only. `/sign-in?next=/account` also contains "/account", so a loose pattern
+  // passed while the form was still on screen and saved an empty session.
+  await expect(page).toHaveURL((url) => url.pathname === "/account");
+  // Fail loudly here rather than shipping an empty state to every signed-in test.
+  const cookies = await page.context().cookies();
+  if (!cookies.some((cookie) => cookie.name.startsWith("sb-"))) {
+    throw new Error("sign-in left no Supabase session cookie");
+  }
   await page.context().storageState({ path: AUTH_FILE });
 });

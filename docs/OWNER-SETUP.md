@@ -148,3 +148,23 @@ pnpm exec wrangler rollback <previous-version-id>
 ## Changing a price later
 
 Create a new Paystack plan (never mutate an existing one). Update the `paystack_plan_code` in the `plans` row for that code. Existing subscriptions keep the old price until they renew.
+
+## The signed-in e2e test account
+
+`e2e/cv.spec.ts` and `e2e/tracker.spec.ts` need a real account. Playwright reads
+`E2E_EMAIL` and `E2E_PASSWORD` from the shell and skips those specs when either is missing.
+
+`e2e.test@stepkite.app` exists on the project and is confirmed. The password is not in this repo;
+it lives in your password manager. Set both variables in the shell before a run:
+
+```
+E2E_EMAIL=e2e.test@stepkite.app E2E_PASSWORD=... pnpm e2e
+```
+
+`e2e/auth.setup.ts` signs in once, checks that a Supabase session cookie was stored, and writes
+`e2e/.auth/user.json` (gitignored). A missing cookie now fails the setup instead of silently
+saving an empty session, which is what made the signed-in specs fail with a redirect to `/sign-up`.
+
+Two other things the e2e run needs: email confirmation is on for this project, so a new account
+cannot sign in until the link is clicked. For the test account, confirm it once in Supabase
+(Authentication → Users → the user → Confirm email).
